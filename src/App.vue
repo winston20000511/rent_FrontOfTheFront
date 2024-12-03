@@ -9,7 +9,7 @@ import 'bootstrap-icons/font/bootstrap-icons.min.css'
 <template>
   <header>
     </header>
-
+    
   <RouterView />
 </template>
 

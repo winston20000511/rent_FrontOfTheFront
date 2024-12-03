@@ -1,5 +1,6 @@
+import MemberCenter from '@/components/memberCenter.vue';
 import { createRouter, createWebHistory } from 'vue-router';
-import MemberCenter from '../views/MemberCenter.vue';
+
 
 const routes = [
   {
