@@ -1,4 +1,4 @@
-import MemberCenter from '@/components/memberCenter.vue';
+import MemberCenter from '@/components/User/memberCenter.vue';
 import { createRouter, createWebHistory } from 'vue-router';
 
 
