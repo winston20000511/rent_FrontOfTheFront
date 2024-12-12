@@ -46,7 +46,7 @@ export default {
     async handleLogin() {
       try {
         // 發送登入請求到後端
-        const response = await api.post("/login", {
+        const response = await api.post("http://localhost:8080/login", {
           email: this.email,
           password: this.password,
         });
