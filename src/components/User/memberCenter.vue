@@ -27,7 +27,7 @@
     <!-- 頁籤內容 -->
     <div class="tab-content" id="memberCenterTabsContent">
       <div class="tab-pane fade show active" id="edit-profile" role="tabpanel" aria-labelledby="edit-profile-tab">
-        <Profile />
+        <Profile/>
       </div>
       <div class="tab-pane fade" id="favorite-houses" role="tabpanel" aria-labelledby="favorite-houses-tab">
         <FavoriteHouses />
@@ -36,17 +36,19 @@
         <AppointmentsOverview />
       </div>
       <div class="tab-pane fade" id="my-ads" role="tabpanel" aria-labelledby="my-ads-tab">
-        <MyAds />
+        <MyAds></MyAds>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import Profile from '../components/Profile.vue';
-import FavoriteHouses from '../components/FavoriteHouses.vue';
-import AppointmentsOverview from '../components/AppointmentsOverview.vue';
-import MyAds from '../components/MyAds.vue';
+import MyAds from '../Ads/MyAds.vue';
+import AppointmentsOverview from '../Booking/AppointmentsOverview.vue';
+import Profile from './Profile.vue';
+import FavoriteHouses from '../houses/FavoriteHouses.vue';
+
+
 
 export default {
   name: 'MemberCenter',
