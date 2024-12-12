@@ -46,7 +46,7 @@ import HomeNavbar from '@/components/HomeNavbar.vue';
   }
   .main-left{
     width: 45%;
-    z-index: 1;
+    position: relative;
   }
   .main-right{
     width: 55%;
