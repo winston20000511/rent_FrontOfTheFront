@@ -1,4 +1,4 @@
-@import './base.css';
+/* @import './base.css';
 
 /* Reset 基本樣式 */
 * {
@@ -54,4 +54,11 @@ a,
     grid-template-columns: 1fr 1fr;
     padding: 0 2rem;
   }
+} */
+body{
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0px 15px;
+  width:auto;
+  height: 100vh;
 }
