@@ -1,13 +1,13 @@
   <script setup>
   import { ref } from 'vue';
-  // import 'bootstrap/dist/css/bootstrap.min.css';
-  // import 'bootstrap/dist/js/bootstrap.min.js';
-  // import 'bootstrap-icons/font/bootstrap-icons.min.css';
   import BookingView from './BookingView.vue';
 
   const showBookingView = ref(false);
   const loadBookingView = () => {
     showBookingView.value = true;
+  };
+  const closeBookingView = () => {
+    showBookingView.value = false;
   };
 
   </script>
@@ -30,7 +30,8 @@
           <div class="modal-body">
             <button type="button" class="btn btn-primary" @click="loadBookingView">預約看房
             </button>
-            <BookingView v-if="showBookingView" />
+            <BookingView v-if="showBookingView" :isVisible="showBookingView"  @closeView="closeBookingView" />
+            
           </div>
 
 

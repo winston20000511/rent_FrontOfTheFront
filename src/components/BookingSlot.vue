@@ -1,26 +1,33 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import 'bootstrap/dist/css/bootstrap.min.css'
-import 'bootstrap/dist/js/bootstrap.min.js'
 import Datepicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
 
-
 const BASE_URL = import.meta.env.VITE_APIURL
 
-const houseId = 1;  //此由父層傳遞近來
+const someAction = async () => {
+    console.log('提交預約');
+};
 
-// 初始設置：最小和最大日期範圍
+
+const houseId = 1;  //此由父層傳遞近來
+const weekDays = ref('');
 const minDate = ref(null);
 const maxDate = ref(null);
-
-// 用來存儲選擇的日期和時間
 const selectedDate = ref(null);
 const selectedTime = ref('');
-
-// 模擬可用的時間段（可以根據需求來動態更新）
 const timeSlots = ref([]);
+const currentSection = ref(1);
 
+let startTime; 
+let endTime; 
+let duration; 
+
+const excludedTimes = ref([
+    '2024-12-12T12:00:00', // 需要排除的时间点
+    '2024-12-13T13:00:00', // 示例：另一个排除的时间点
+]); 
 
 const load = async () => {
     const response = await fetch(`${BASE_URL}/booking/list?houseId=1`);
@@ -30,15 +37,27 @@ const load = async () => {
     minDate.value = new Date(data.fromDate);
     maxDate.value = new Date(data.toDate);
 
-    const weekDays = data.weekDay;
+    weekDays.value = data.weekDay;
 
+    startTime = data.fromTime;
+    endTime = data.toTime;
+    duration = data.duration;
 
-    const startTime = data.fromTime;
-    const endTime = data.toTime;
-    const duration = data.duration;
-
-    generateTimeSlots(startTime, endTime, duration);
 }
+
+// 當選擇日期後觸發的邏輯
+const onDateChange = (date) => {
+    
+    if (date) {
+        // 格式化日期为 YYYY-MM-DD
+        selectedDate.value = date.toISOString().split('T')[0]; // 获取 ISO 字符串并提取日期部分
+        selectedTime.value = ''; // 清空时间
+        generateTimeSlots(startTime, endTime, duration);
+    } else {
+        selectedDate.value = null;
+        selectedTime.value = '';
+    }
+};
 
 // 產生時間段
 const generateTimeSlots = (startTime, endTime, duration) => {
@@ -47,29 +66,45 @@ const generateTimeSlots = (startTime, endTime, duration) => {
     const times = [];
 
     while (start <= end) {
-        times.push(start.toTimeString().substring(0, 5));
+        const timeString = start.toTimeString().substring(0, 5);
+        const fullDateTimeString = `${selectedDate.value}T${timeString}:00`;
+        // 检查当前生成的时间是否在排除列表中
+        if (!excludedTimes.value.includes(fullDateTimeString)) {
+            times.push(timeString);
+        }
         start.setMinutes(start.getMinutes() + duration);
     }
 
     timeSlots.value = times;
 };
 
-const isDateAllowed = {
-  customPredictor: (date) => {
-    const dayOfWeek = date.getDay(); // 取得星期幾 (0 = 週日, 1 = 週一, ...)
-    
-    // 根據 `weekDay` 字符串判斷對應星期是否開放
-    const isOpen = weekDays.value[dayOfWeek] === '1'; // 檢查對應位置的字符，是否為 '1' 表示開放
-    return isOpen;
-  }
+const isDateAllowed = (date) => {
+    const day = date.getDay();
+    const convertedDay = (day === 0) ? 6 : (day - 1);
+    const isDisabled = weekDays.value.charAt(convertedDay) === '0';
+    return !isDisabled;
 };
+const disabledWeekDays = computed(() => {
+    const disabledDays = [];
+    for (let i = 0; i < 7; i++) {
+        const date = new Date();
+        date.setDate(date.getDate() + i);
+        if (!isDateAllowed(date)) {
+            disabledDays.push(i);
+        }
+    }
+    return disabledDays;
+});
 
-// 當選擇日期後觸發的邏輯
-const onDateChange = (date) => {
-    selectedDate.value = date;
-    selectedTime.value = '';
-};
 
+
+
+
+const goNextSection = () => {
+    if (selectedDate.value && selectedTime.value) {
+        currentSection.value += 1;
+    }
+}
 
 onMounted(() => {
     load();
@@ -80,30 +115,40 @@ onMounted(() => {
 
 <template>
 
-    <div class="booking-slot">
-        <!-- 日期選擇 -->
-        <label for="select-date">選擇日期:</label>
-        <Datepicker
-            id="select-date"
-            v-model="selectedDate"
-            :min-date="minDate"
-            :max-date="maxDate"
-            :filters="isDateAllowed"
-            :inline="true"
-            :enable-time-picker="false"
-            @change="onDateChange"
-            />
+    <div class="booking-slot container">
+        <!-- section 1 -->
+        <section v-if="currentSection === 1">
+            <Datepicker id="select-date" 
+                locale="zh" 
+                format="yyyy-MM-dd"
+                v-model="selectedDate" 
+                :min-date="minDate" 
+                :max-date="maxDate"
+                :disabled-week-days="disabledWeekDays" 
+                inline 
+                auto-apply
+                :enable-time-picker="false" 
+                @update:modelValue="onDateChange" />
 
-        <!-- 如果選擇了日期，顯示時間選擇 -->
-        <div v-if="selectedDate">
-            <label for="select-time">選擇時間:</label>
-            <select v-model="selectedTime">
-                <option value="" disabled>請選擇時間</option>
-                <option v-for="time in timeSlots" :key="time" :value="time">
-                    {{ time }}
-                </option>
-            </select>
-        </div>
+            <div v-if="!selectedDate">請先選擇日期</div>
+            <div v-if="selectedDate">
+                <label for="select-time">選擇時間:</label>
+                <select v-model="selectedTime">
+                    <option value="" disabled>請選擇時間</option>
+                    <option v-for="time in timeSlots" :key="time" :value="time">
+                        {{ time }}
+                    </option>
+                </select>
+            </div>
+            <button :disabled="!selectedDate || !selectedTime"  class="btn btn-primary" @click="goNextSection">下一步</button>
+        </section>
+        <!-- section 2 -->
+        <section v-if="currentSection === 2">
+            <div >{{ selectedDate }}　{{ selectedTime }}</div>
+            
+            <button class="btn btn-info" type="button" @click="someAction" >完成預約</button>
+            <button @click="currentSection--">上一步</button>
+        </section>
     </div>
 
 </template>
@@ -112,14 +157,12 @@ onMounted(() => {
 .booking-slot {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+     gap: 10px;
 }
 
-select {
-    padding: 5px;
-}
+
 
 input[type="date"] {
-    padding: 5px;
+    padding: 10px;
 }
 </style>
