@@ -15,8 +15,8 @@
         <input type="number" id="size" class="form-control" v-model.number="form.size" required min="1" />
       </div>
       <div class="form-group">
-        <label for="addressDetail">詳細地址</label>
-        <input type="text" id="addressDetail" class="form-control" v-model="form.addressDetail" required />
+        <label for="address">詳細地址</label>
+        <input type="text" id="address" class="form-control" v-model="form.addressDetail" required />
       </div>
       <div class="form-group">
         <label for="room">房間數</label>
@@ -236,65 +236,92 @@ export default {
       images.value.splice(index, 1);
     };
 
-    const submitForm = async () => {
-  const formData = new FormData();
-  formData.append('title', form.title);
-  formData.append('price', form.price);
-  formData.append('size', form.size);
-  formData.append('addressDetail', form.addressDetail);
-  formData.append('room', form.room);
-  formData.append('bathroom', form.bathroom);
-  formData.append('livingroom', form.livingroom);
-  formData.append('kitchen', form.kitchen);
-  formData.append('floor', form.floor);
-  formData.append('description', form.description);
-  formData.append('genderOption', genderOption.value || '');
+    const submitForm = () => {
+      const formData = new FormData();
 
-  // 修正這裡，使用 key 作為欄位名稱
-  Object.entries(furnitureServices).forEach(([key, value]) => {
-    formData.append(key, value);  // 使用 key 而不是 furnitureServices[${key}]
-  });
+      // Basic house details
+      formData.append('title', form.title || '');
+      formData.append('price', form.price || '0');
+      formData.append('size', form.size || '0');
+      formData.append('address', form.address || '');
+      formData.append('room', form.room || '0');
+      formData.append('bathroom', form.bathroom || '0');
+      formData.append('livingroom', form.livingroom || '0');
+      formData.append('kitchen', form.kitchen || '0');
+      formData.append('floor', form.floor || '0');
+      formData.append('atticAddition', furnitureServices.atticAddition ? '1' : '0');
 
-  // 修正這裡，使用 key 作為欄位名稱
-  Object.entries(houseRestrictions).forEach(([key, value]) => {
-    formData.append(key, value);  // 使用 key 而不是 houseRestrictions[${key}]
-  });
+      // Furniture Services (BOOLEAN to BYTE: true = 1, false = 0)
+      formData.append('washingMachine', furnitureServices.washingMachine ? '1' : '0');
+      formData.append('airConditioner', furnitureServices.airConditioner ? '1' : '0');
+      formData.append('network', furnitureServices.network ? '1' : '0');
+      formData.append('bedstead', furnitureServices.bedstead ? '1' : '0');
+      formData.append('mattress', furnitureServices.mattress ? '1' : '0');
+      formData.append('refrigerator', furnitureServices.refrigerator ? '1' : '0');
+      formData.append('ewaterHeater', furnitureServices.ewaterHeater ? '1' : '0');
+      formData.append('gwaterHeater', furnitureServices.gwaterHeater ? '1' : '0');
+      formData.append('television', furnitureServices.television ? '1' : '0');
+      formData.append('channel4', furnitureServices.channel4 ? '1' : '0');
+      formData.append('sofa', furnitureServices.sofa ? '1' : '0');
+      formData.append('tables', furnitureServices.tables ? '1' : '0');
 
-  // 上傳圖片
-  images.value.forEach((image) => {
+      // House Restrictions (BOOLEAN to BYTE: true = 1, false = 0)
+      formData.append('pet', houseRestrictions.pet ? '1' : '0');
+      formData.append('parkingSpace', houseRestrictions.parkingSpace ? '1' : '0');
+      formData.append('elevator', houseRestrictions.elevator ? '1' : '0');
+      formData.append('balcony', houseRestrictions.balcony ? '1' : '0');
+      formData.append('shortTerm', houseRestrictions.shortTerm ? '1' : '0');
+      formData.append('cooking', houseRestrictions.cooking ? '1' : '0');
+      formData.append('waterDispenser', houseRestrictions.waterDispenser ? '1' : '0');
+      formData.append('managementFee', houseRestrictions.fee ? '1' : '0');
+
+      // Gender Restrictions (Specific BYTE values)
+      const genderRestrictionsByte = houseRestrictions.genderRestrictions
+        ? (genderOption.value === '1' ? '1' : '2')
+        : '0';
+      formData.append('genderRestrictions', genderRestrictionsByte);
+      console.log('Images to upload:', images.value);
+      // Image Handling
+      images.value.forEach((image, index) => {
+    console.log(`上傳圖片 ${index + 1}:`, image.file);
     formData.append('images', image.file);
   });
 
-  try {
-    const response = await fetch('http://localhost:8080/api/houses/add', {
-      method: 'POST',
-      body: formData,
-    });
+      // Debug: Log FormData contents
+      for (let [key, value] of formData.entries()) {
+        console.log(key, value);
+      }
 
-    if (!response.ok) {
-      throw new Error('提交失敗！');
-    }
+      fetch('http://localhost:8080/api/houses/add', {
+        method: 'POST',
+        body: formData
+      })
+        .then((response) => {
+          if (!response.ok) {
+            return response.text().then(text => {
+              throw new Error(text);
+            });
+          }
+          return response.json();
+        })
+        .then((data) => {
+          alert('房屋新增成功！');
+          resetForm();
+        })
+        .catch((error) => {
+          console.error('提交失敗:', error);
+          alert('提交失敗：' + error.message);
+        });
+    };
 
-    const data = await response.json();
-    alert('房屋資料已成功提交！');
-    resetForm();
-  } catch (error) {
-    alert('提交錯誤：' + error.message);
-  }
-};
 
     const resetForm = () => {
-      Object.keys(form).forEach((key) => {
-        form[key] = '';
-      });
-      Object.keys(furnitureServices).forEach((key) => {
-        furnitureServices[key] = false;
-      });
-      Object.keys(houseRestrictions).forEach((key) => {
-        houseRestrictions[key] = false;
-      });
+      Object.keys(form).forEach((key) => { form[key] = ''; });
+      Object.keys(furnitureServices).forEach((key) => { furnitureServices[key] = false; });
+      Object.keys(houseRestrictions).forEach((key) => { houseRestrictions[key] = false; });
       images.value = [];
     };
+
 
     return {
       form,

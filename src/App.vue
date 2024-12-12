@@ -5,8 +5,7 @@
     </header>
 
     <main>
-
-      <HouseCreate></HouseCreate>
+<CollectHouseList></CollectHouseList>
     </main>
 
     <footer>
