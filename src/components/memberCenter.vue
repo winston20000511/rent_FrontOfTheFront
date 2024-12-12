@@ -20,7 +20,12 @@
         </li>
         <li class="nav-item" role="presentation">
           <button class="nav-link" data-bs-toggle="tab" data-bs-target="#my-ads" type="button" role="tab" aria-controls="my-ads" aria-selected="false">
-            我的廣告
+            我申請的VIP服務
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#my-orders" type="button" role="tab" aria-controls="my-ads" aria-selected="false">
+            我的VIP訂單
           </button>
         </li>
       </ul>
@@ -40,6 +45,9 @@
       <div class="tab-pane fade" id="my-ads" role="tabpanel" aria-labelledby="my-ads-tab">
         <MyAds />
       </div>
+      <div class="tab-pane fade" id="my-orders" role="tabpanel" aria-labelledby="my-orders-tab">
+        <MyOrders />
+      </div>
     </div>
   </div>
 </template>
@@ -49,6 +57,7 @@ import Profile from '../components/Profile.vue';
 import FavoriteHouses from '../components/FavoriteHouses.vue';
 import AppointmentsOverview from '../components/AppointmentsOverview.vue';
 import MyAds from '../components/MyAds.vue';
+import MyOrders from '../components/MyOrders.vue';
 
 export default {
   name: 'MemberCenter',
@@ -56,7 +65,8 @@ export default {
     Profile,
     FavoriteHouses,
     AppointmentsOverview,
-    MyAds
+    MyAds,
+    MyOrders
   }
 };
 </script>
