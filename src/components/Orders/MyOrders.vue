@@ -5,7 +5,7 @@
     import OrderUserInputFilter from './MyOrders/OrderUserInputFilter.vue';
     import CreateOrderButton from './MyOrders/CreateOrderButton.vue';
     import OrderList from './MyOrders/OrderList.vue';
-    import Overlay from './MyAds/Overlay.vue';
+    import Overlay from './Ads/Overlay.vue';
     import OrderDetailModal from './MyOrders/OrderDetailModal.vue';
     import OrderPopUpMessage from './MyOrders/OrderPopUpMessage.vue';
 </script>
