@@ -1,6 +1,4 @@
 <script setup>
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.min.js'
 import BookingSlot from '@/components/Booking/BookingSlot.vue';
 import { ref, defineEmits } from 'vue';
 
@@ -48,14 +46,15 @@ h2 {
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 1000;
 }
 
 .modal-content {
   background-color: white;
   border-radius: 8px;
   padding: 20px;
-  width: 500px;
-  /* Adjust width as needed */
+  width: 400px;
+
 }
 
 .modal-header {

@@ -5,6 +5,8 @@ import HomeMap from '@/components/Home/HomeMap.vue';
 import HomeNavbar from '@/components/Home/HomeNavbar.vue';
 
 
+
+
 </script>
 <template>
     <header>

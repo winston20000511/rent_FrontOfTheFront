@@ -103,9 +103,6 @@ const disabledWeekDays = computed(() => {
 });
 
 
-
-
-
 const goNextSection = () => {
     if (selectedDate.value && selectedTime.value) {
         currentSection.value += 1;
@@ -125,7 +122,7 @@ onMounted(() => {
         <!-- section 1 -->
         <section v-if="currentSection === 1">
             <header>
-            <h2>選擇您想要的看房時間</h2>
+            <h2>選擇您想要看房的時間</h2>
             </header>
             <hr/>
             <Datepicker id="select-date" 
