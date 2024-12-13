@@ -22,10 +22,10 @@
           <!-- Tab contents -->
           <div class="tab-content" id="formTabContent">
             <div class="tab-pane fade show active" id="login" role="tabpanel" aria-labelledby="login-tab">
-              <LoginForm />
+             <LoginForm></LoginForm>
             </div>
             <div class="tab-pane fade" id="register" role="tabpanel" aria-labelledby="register-tab">
-              <RegisterForm />
+            <RegisterForm></RegisterForm>
             </div>
           </div>
         </div>
@@ -34,14 +34,10 @@
   </template>
   
   <script>
-  import LoginForm from './LoginForm.vue';
-  import RegisterForm from './RegisterForm.vue';
+import LoginForm from './LoginForm.vue';
+import RegisterForm from './RegisterForm.vue';
+
+
   
-  export default {
-    components: {
-      LoginForm,
-      RegisterForm
-    }
-  };
   </script>
   

@@ -8,7 +8,8 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 // 引入 Bootstrap Icons
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import { createPinia } from 'pinia'
-import LoginPage from './components/LoginPage.vue'
+import LoginPage from './components/User/LoginPage.vue';
+
 
 const app = createApp(App)
 app.use(LoginPage)

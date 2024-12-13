@@ -1,15 +1,14 @@
-import IndexView from '@/views/HomeView.vue';
-import MemberCenter from '@/components/memberCenter.vue';
 import { createRouter, createWebHistory } from 'vue-router';
-import MemberCenter from '@/components/memberCenter.vue';
-import LoginPage from '@/components/LoginPage.vue'; // 引入 LoginPage 組件
-import ForgotPassword from '@/components/ForgotPassword.vue'; // 引入 ForgotPassword 組件
-import EditUserPage from "@/components/EditUserPage.vue";
+import HomeView from '@/View/HomeView.vue';
+import MemberCenter from '@/components/User/memberCenter.vue';
+import EditUserPage from '@/components/User/EditUserPage.vue';
+import ForgotPassword from '@/components/User/ForgotPassword.vue';
+import LoginPage from '@/components/User/LoginPage.vue';
 const routes = [
   {
     path: '/',
     name: 'home',
-    component: IndexView
+    component: HomeView
   },
   {
     path: '/login', // 登入頁面的路徑設定
@@ -24,8 +23,13 @@ const routes = [
   {
     path: "/edit-user",
     name: "EditUser",
-    component: EditUserPage,
+    component: EditUserPage
   },
+  {
+    path:"/MemberCenter",
+    name:"MemberCenter",
+    component: MemberCenter
+  }
   // 其他路由可以在這裡添加
 ];
 

@@ -56,7 +56,7 @@ const linkMouseLeave=()=>{
 </ul>
 
 <div class="nav-middle">
-    <img src="../assets/Logo3.jpg" alt="">
+    <img src="../../assets/Logo3.jpg" alt="LOGO">
     
     <div class="nav-title">
         <h1>house</h1>
@@ -69,8 +69,10 @@ const linkMouseLeave=()=>{
     <li><RouterLink to="#">Manage Rentals</RouterLink></li>
     <li><RouterLink to="#">Advertise</RouterLink></li>
     <li><RouterLink to="#">Help</RouterLink></li>
-    <li><RouterLink to="#">Sign In</RouterLink></li>
+    <RouterLink to="/login" class="nav-link">登入</RouterLink>
+    <RouterLink to="/member-center" class="nav-link">會員中心</RouterLink>
 </div>
+
 </template>
 
 <style scoped>

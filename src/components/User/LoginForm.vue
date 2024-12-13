@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import api from "../api/api"; // api.js 位置在 src/api.js 記得確保你的 `api.js` 已正確設定 Axios
+import api from "../../api/api";
 
 export default {
   data() {

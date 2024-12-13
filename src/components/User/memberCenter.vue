@@ -29,7 +29,7 @@
     <!-- 頁籤內容 -->
     <div class="tab-content" id="memberCenterTabsContent">
       <div class="tab-pane fade show active" id="edit-profile" role="tabpanel" aria-labelledby="edit-profile-tab">
-        <Profile/>
+        <ProfileForm></ProfileForm>
       </div>
       <div class="tab-pane fade" id="favorite-houses" role="tabpanel" aria-labelledby="favorite-houses-tab">
         <FavoriteHouses />
@@ -47,15 +47,16 @@
 <script>
 import MyAds from '../Ads/MyAds.vue';
 import AppointmentsOverview from '../Booking/AppointmentsOverview.vue';
-import Profile from './Profile.vue';
 import FavoriteHouses from '../houses/FavoriteHouses.vue';
+import ProfileForm from './ProfileForm.vue';
+
 
 
 
 export default {
   name: 'MemberCenter',
   components: {
-    Profile,
+    ProfileForm,
     FavoriteHouses,
     AppointmentsOverview,
     MyAds
