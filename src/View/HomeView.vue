@@ -1,8 +1,8 @@
 <script setup>
-import HomeCardList from '@/components/search/HomeCardList.vue';
-import HomeFilter from '@/components/search/HomeFilter.vue';
-import HomeMap from '@/components/search/HomeMap.vue';
-import HomeNavbar from '@/components/search/HomeNavbar.vue';
+import HomeCardList from '@/components/Home/HomeCardList.vue';
+import HomeFilter from '@/components/Home/HomeFilter.vue';
+import HomeMap from '@/components/Home/HomeMap.vue';
+import HomeNavbar from '@/components/Home/HomeNavbar.vue';
 
 
 </script>
