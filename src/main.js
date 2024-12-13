@@ -9,11 +9,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import { createPinia } from 'pinia'
 import LoginPage from './components/User/LoginPage.vue';
-
-
 const app = createApp(App)
-app.use(LoginPage)
 app.use(createPinia())
 app.use(router)
-
 app.mount('#app')
