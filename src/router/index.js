@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import HomeView from '@/View/HomeView.vue';
+import HomeView from '@/views/HomeView.vue';
 import MemberCenter from '@/components/User/memberCenter.vue';
 import EditUserPage from '@/components/User/EditUserPage.vue';
 import ForgotPassword from '@/components/User/ForgotPassword.vue';
@@ -14,8 +14,8 @@ const routes = [
   {
     path: '/login', // 登入頁面的路徑設定
     name: 'LoginForm',
-    component: LoginForm // 使用 LoginPage 組件
-  },
+    component: LoginForm}
+    ,
   {
     path: '/forgot-password', // 忘記密碼頁面的路徑設定
     name: 'ForgotPassword',
