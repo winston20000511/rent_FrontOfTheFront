@@ -1,7 +1,7 @@
 <script setup>
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.min.js'
-import BookingSlot from '@/components/BookingSlot.vue';
+import BookingSlot from '@/components/Booking/BookingSlot.vue';
 import { ref, defineEmits } from 'vue';
 
 const houseId = 1; //由上一層提供,目前寫死

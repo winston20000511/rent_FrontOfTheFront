@@ -1,20 +1,18 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
-import 'bootstrap/dist/css/bootstrap.min.css'
-import 'bootstrap/dist/js/bootstrap.min.js'
-import 'bootstrap-icons/font/bootstrap-icons.min.css'
-import IndexTestView from './View/IndexTestView.vue';
+import { RouterLink, RouterView } from 'vue-router';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap/dist/js/bootstrap.bundle.min.js';
+import 'bootstrap-icons/font/bootstrap-icons.min.css';
+
 
 
 </script>
 
 <template>
-  <header><IndexTestView></IndexTestView></header>
-
-  
-
+  <RouterView></RouterView>
 </template>
 
-<style>
+<style scoped>
+/* 這裡可以添加你自定義的樣式 */
 
 </style>
