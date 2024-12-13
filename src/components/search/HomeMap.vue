@@ -4,6 +4,8 @@ import { Loader } from '@googlemaps/js-api-loader';
 
 const map = ref(null); // 地圖容器
 const canvas = ref(null);
+const refbtnDraw = ref(null)
+const isDrawingMode = ref(false);
 let isDrawing = false;
 let context = null;
 let points = []; // 存储 Canvas 路径点
@@ -21,7 +23,13 @@ onMounted(() => {
       center: { lat: 23.023535, lng: 120.222776 }, // 設置地圖中心
       zoom: 13, // 設置縮放級別
     });
-        // 初始化 Canvas
+
+    map.value.addListener('idle',()=>{
+      refbtnDraw.value.style.display='block';
+      // google.maps.event.removeListener(idleListener);
+    })
+    console.log(map);
+    // 初始化 Canvas
     const canvasElement = canvas.value;
     context = canvasElement.getContext('2d');
 
@@ -40,12 +48,6 @@ onMounted(() => {
   // 开始绘图
   function startDrawing(event) {
     isDrawing = true;
-
-    // 禁用地图的拖拽和缩放
-    map.value.setOptions({
-      draggable: false,
-      gestureHandling: 'none',
-    });
     points = [];
     addPoint(event);
     const { offsetX, offsetY } = event;
@@ -69,15 +71,40 @@ onMounted(() => {
   function stopDrawing() {
     if (!isDrawing) return;
     isDrawing = false;
-
-      map.value.setOptions({
-      draggable: true,
-      gestureHandling: 'auto',
-    });
-    
     context.closePath();
     convertToPolygon();
   }
+
+  //清除畫筆
+  function clearCanvas(canvasElement) {
+    const context = canvasElement.getContext('2d');
+    context.clearRect(0, 0, canvasElement.width, canvasElement.height);
+  } 
+
+  //Draw模式切換
+  function toggleDrawingMode(){
+    console.log(map);
+    isDrawingMode.value = !isDrawingMode.value;
+    const canvasElement = canvas.value;
+    if (isDrawingMode.value) {
+      // 啟動繪圖模式
+      canvasElement.style.pointerEvents = 'auto';
+      map.value.setOptions({
+        draggable: false,
+        gestureHandling: 'none',
+      });
+      console.log(map);
+    } else {
+      // 關閉繪圖模式
+      canvasElement.style.pointerEvents = 'none';
+      map.value.setOptions({
+        draggable: true,
+        gestureHandling: 'auto',
+      });
+    }
+
+  }
+
   function addPoint(event) {
     points.push({ x: event.offsetX, y: event.offsetY });
   }
@@ -85,14 +112,20 @@ onMounted(() => {
   function pixelToLatLng(mapInstance, x, y) {
     return new Promise((resolve, reject) => {
       const overlay = new google.maps.OverlayView();
-      // console.log(x + ' , ' + y)
       overlay.onAdd = function () {};
       overlay.draw = function () {
         const projection = overlay.getProjection();
         if (projection) {
           const point = new google.maps.Point(x, y);
-          console.log(point);
-          resolve(projection.fromContainerPixelToLatLng(point));
+          
+          // console.log(point);
+          // console.log('LatLng:', projection.fromContainerPixelToLatLng(point));
+          const latLng = projection.fromContainerPixelToLatLng(point);
+          const latitude = latLng.lat();
+          const lngitude = latLng.lng();
+          // console.log('Converted LatLng:', {lat: latitude , lng: lngitude})
+
+          resolve({lat: latitude , lng:lngitude});
           overlay.setMap(null); // 释放 OverlayView
         } else {
           reject(new Error('Projection is not available'));
@@ -103,8 +136,11 @@ onMounted(() => {
     });
   }
 
-  function convertPointsToLatLng(map, points) {
-    return points.map((point) => pixelToLatLng(map, point.x, point.y));
+  async function convertPointsToLatLng(map, points) {
+    const latLngArray = await Promise.all(
+      points.map((point) => pixelToLatLng(map, point.x, point.y))
+    );
+    return latLngArray;
   }
 
   function drawPolygonOnMap(map, latLngPoints) {
@@ -119,10 +155,14 @@ onMounted(() => {
     });
   }
 
-  function convertToPolygon() {
+  //將繪製的圖案轉成多邊形
+  async function convertToPolygon() {
     if (!points.length) return;
-    const latLngPoints = convertPointsToLatLng(map.value, points);
+    const latLngPoints = await convertPointsToLatLng(map.value, points);
+    console.log(latLngPoints);
     drawPolygonOnMap(map.value, latLngPoints);
+    const canvasElement = canvas.value;
+    clearCanvas(canvasElement);
   }
 </script>
 <template>
@@ -130,9 +170,11 @@ onMounted(() => {
     <!-- <button @click="toggleDrawingMode">
       {{ isDrawingMode ? '退出绘图模式' : '启用绘图模式' }}
     </button> -->
+    <button class="btn btn-outline-secondary btnDraw" ref="refbtnDraw" @click="toggleDrawingMode">
+      {{ isDrawingMode ? '關閉繪圖模式' : '啟動繪圖模式' }}
+    </button>
     <div ref="map" class="map-container"></div>
     <canvas ref="canvas" class="drawing-canvas"></canvas>
-    <button @click="convertToPolygon">多邊形</button>
   </div>
 </template>
 
@@ -143,7 +185,6 @@ onMounted(() => {
   position: relative;
 }
 .drawing-canvas {
-  border: 10px solid black;
   width: 100%;
   height: 76vh;
   position: absolute;
@@ -151,5 +192,12 @@ onMounted(() => {
   left: 0;
   background: transparent;
   pointer-events: auto; /* 确保鼠标事件只针对 Canvas */
+}
+.btnDraw{
+  display: block;
+  position: absolute;
+  top: 10px;
+  left: 60%;
+  z-index: 2;
 }
 </style>

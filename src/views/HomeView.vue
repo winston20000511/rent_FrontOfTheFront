@@ -1,8 +1,8 @@
 <script setup>
-import HomeCardList from '@/components/HomeCardList.vue';
-import HomeFilter from '@/components/HomeFilter.vue';
-import HomeMap from '@/components/HomeMap.vue';
-import HomeNavbar from '@/components/HomeNavbar.vue';
+import HomeCardList from '@/components/search/HomeCardList.vue';
+import HomeFilter from '@/components/search/HomeFilter.vue';
+import HomeMap from '@/components/search/HomeMap.vue';
+import HomeNavbar from '@/components/search/HomeNavbar.vue';
 
 
 </script>
@@ -50,7 +50,8 @@ import HomeNavbar from '@/components/HomeNavbar.vue';
   }
   .main-right{
     width: 55%;
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: hidden; 
     z-index: 2;
   } 
 </style>

@@ -1,13 +1,12 @@
-import IndexView from '@/views/HomeView.vue';
-import MemberCenter from '@/components/memberCenter.vue';
 import { createRouter, createWebHistory } from 'vue-router';
+import HomeView from '@/views/HomeView.vue';
 
 
 const routes = [
   {
     path: '/',
     name: 'home',
-    component: IndexView
+    component: HomeView
   },
   // 在這裡設定其他路由
 ];
