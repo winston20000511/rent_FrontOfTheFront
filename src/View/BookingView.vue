@@ -4,6 +4,7 @@ import 'bootstrap/dist/js/bootstrap.min.js'
 import BookingSlot from '@/components/BookingSlot.vue';
 import { ref, defineEmits } from 'vue';
 
+const houseId = 1; //由上一層提供,目前寫死
 
 const BASE_URL = import.meta.env.VITE_APIURL
 
@@ -26,7 +27,7 @@ const props = defineProps({
     <div class="modal-content" @click.stop>
       <button type="button" class="btn-close" @click="closeView"></button>
       <div class="modal-header">
-        <BookingSlot />
+        <BookingSlot :houseId="houseId"/>
       </div>
     </div>
   </div>

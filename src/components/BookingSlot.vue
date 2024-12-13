@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed , defineProps} from 'vue';
 import 'bootstrap/dist/css/bootstrap.min.css'
 import Datepicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
@@ -10,8 +10,14 @@ const someAction = async () => {
     console.log('提交預約');
 };
 
+const props = defineProps({
+    houseId: {
+    type: Number,
+    required: true
+  }
+});
 
-const houseId = 1;  //此由父層傳遞近來
+// const houseId = 1;  //此由父層傳遞近來
 const weekDays = ref('');
 const minDate = ref(null);
 const maxDate = ref(null);
@@ -30,7 +36,7 @@ const excludedTimes = ref([
 ]); 
 
 const load = async () => {
-    const response = await fetch(`${BASE_URL}/booking/list?houseId=1`);
+    const response = await fetch(`${BASE_URL}/booking/list?houseId=${props.houseId}`);
     const data = await response.json();
     console.log(data);
 
@@ -118,6 +124,10 @@ onMounted(() => {
     <div class="booking-slot container">
         <!-- section 1 -->
         <section v-if="currentSection === 1">
+            <header>
+            <h2>選擇您想要的看房時間</h2>
+            </header>
+            <hr/>
             <Datepicker id="select-date" 
                 locale="zh" 
                 format="yyyy-MM-dd"
@@ -132,7 +142,6 @@ onMounted(() => {
 
             <div v-if="!selectedDate">請先選擇日期</div>
             <div v-if="selectedDate">
-                <label for="select-time">選擇時間:</label>
                 <select v-model="selectedTime">
                     <option value="" disabled>請選擇時間</option>
                     <option v-for="time in timeSlots" :key="time" :value="time">
@@ -140,29 +149,53 @@ onMounted(() => {
                     </option>
                 </select>
             </div>
-            <button :disabled="!selectedDate || !selectedTime"  class="btn btn-primary" @click="goNextSection">下一步</button>
+            <hr/>
+            <footer>
+                <button :disabled="!selectedDate || !selectedTime"  
+                class="btn btn-primary" 
+                @click="goNextSection">下一步</button>
+            </footer>
         </section>
         <!-- section 2 -->
         <section v-if="currentSection === 2">
-            <div >{{ selectedDate }}　{{ selectedTime }}</div>
+            <header>
+                <h2>確認您的看房時間</h2>
+            </header>
+            <hr/>
+
+            <div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th class="col-2">日期</th>
+                            <th class="col-2">時間</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>{{ selectedDate }}</td>
+                            <td>{{ selectedTime }}</td>
+                        </tr>
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+
             
-            <button class="btn btn-info" type="button" @click="someAction" >完成預約</button>
-            <button @click="currentSection--">上一步</button>
+            <button class="btn btn-info" type="button" @click="someAction" >發送預約</button>
+            <hr/>
+            <footer>
+                <button class="btn btn-primary" @click="currentSection--">上一步</button>
+            </footer>
         </section>
     </div>
 
 </template>
 
 <style lang="css" scoped>
-.booking-slot {
-    display: flex;
-    flex-direction: column;
-     gap: 10px;
-}
 
 
-
-input[type="date"] {
-    padding: 10px;
-}
 </style>
