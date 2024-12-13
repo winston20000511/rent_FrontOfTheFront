@@ -1,6 +1,4 @@
-
 <template>
-    
     <div class="flex items-center">
         <label for="filter-type" class="text-sm font-medium text-gray-600">
             篩選方式：
@@ -17,55 +15,50 @@
         </select>
         <div class="flex items-center px-4" v-if="showInputBox">
             <label class="text-sm font-medium text-gray-600">
-                <input type="text" class="ml-2 px-3 py-2 text-sm border border-gray-300 rounded-lg" v-model="userInput" v-bind:placeholder="placeholder" 
-                @input="onUserInputUpdate"/>
+                <input 
+                    type="text" 
+                    class="ml-2 px-3 py-2 text-sm border border-gray-300 rounded-lg" 
+                    v-model="userInput" 
+                    :placeholder="placeholder" 
+                />
             </label>
         </div>
     </div>
-
 </template>
 
 <script>
-    export default{
-        props:["value", "page"], // 接收 parent component 的值
-        data(){
-            return{
-                selectedFilterType : "none",
-                showInputBox : false,
-                placeholder : "",
-                debounceTimeout: null,
-            };
+export default {
+    data() {
+        return {
+            selectedFilterType: "none",
+            userInput: "", // 儲存使用者輸入的內容
+            showInputBox: false,
+            placeholder: "",
+        };
+    },
+    methods: {
+        getPlaceholder() {
+            switch (this.selectedFilterType) {
+                case "orderid":
+                    return "請輸入訂單編號";
+                case "housetitle":
+                    return "請輸入房屋標題";
+                default:
+                    return "";
+            }
         },
-        methods: {
-            getPlaceholder(){
-                switch(this.selectedFilterType){
-                    case "orderid": return "請輸入訂單編號";
-                    case "housetitle": return "請輸入房屋標題";
-                    default: return "";
-                }
-            },
-            onSelectedFilterTypeChange(){
-                this.userInput = "";
-                this.placeholder = this.getPlaceholder();
-                this.showInputBox = this.selectedFilterType !== "none";
-                this.$emit("filter-change", "type", this.selectedFilterType);
-            },
-            onUserInputUpdate(){
-                this.$emit("input-update", this.userInput);
-            },
+
+        onSelectedFilterTypeChange() {
+            this.userInput = ""; // 重置輸入框的內容
+            this.placeholder = this.getPlaceholder();
+            this.showInputBox = this.selectedFilterType !== "none";
+            this.$emit("filter-change", "type", this.selectedFilterType);
         },
-        watch:{
-            // 要修重複觸發的bug
-            userInput(input){
-                clearTimeout(this.debounceTimeout);
-                this.debounceTimeout = setTimeout(() => {
-                    this.$parent.filters.page = 1; 
-                    this.filters.userInput = input;
-                }, 300); 
-            },
+    },
+    watch: {
+        userInput(newInput) {
+            this.$emit("input-update", newInput); // 傳遞輸入的值到父組件
         },
-    };
+    },
+};
 </script>
-
-
-<style scoped></style>
