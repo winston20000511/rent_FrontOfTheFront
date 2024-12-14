@@ -1,56 +1,152 @@
 <script setup>
-    import AdPageTitle from '@/components/Ads/AdPageTitle.vue';
-    import AdPaymentStatusFilter from '@/components/Ads/AdPaymentStatusFilter.vue';
-    import AdPaidDateFilter from '@/components/Ads/AdPaidDateFilter.vue';
-    import AdUserInputFilter from '@/components/Ads/AdUserInputFilter.vue';
-    import AddAdButton from '@/components/Ads/AddAdButton.vue';
-    import CheckCartListButton from '@/components/Ads/CheckCartListButton.vue';
-    import AdList from '@/components/Ads/AdList.vue';
-    import NoAdHouseList from '@/components/Ads/NoAdHouseList.vue';
-    import AdPopUpMessage from '@/components/Ads/AdPopUpMessage.vue';
-    import Overlay from '@/components/Ads/Overlay.vue';
-    import AdDetailModal from '@/components/Ads/AdDetailModal.vue';
-    import CartList from '@/components/Ads/CartList.vue';
+import { ref, reactive, watch, onMounted } from 'vue';
+import axios from 'axios';
+
+import AdPageTitle from '@/components/Ads/AdPageTitle.vue';
+import AdPaymentStatusFilter from '@/components/Ads/AdPaymentStatusFilter.vue';
+import AdPaidDateFilter from '@/components/Ads/AdPaidDateFilter.vue';
+import AdUserInputFilter from '@/components/Ads/AdUserInputFilter.vue';
+import AddAdButton from '@/components/Ads/AddAdButton.vue';
+import CheckCartListButton from '@/components/Ads/CheckCartListButton.vue';
+import AdList from '@/components/Ads/AdList.vue';
+import Pagination from '@/components/Ads/Pagination.vue';
+import NoAdHouseList from '@/components/Ads/NoAdHouseList.vue';
+import PopUpMessage from '@/components/Ads/PopUpMessage.vue';
+import Overlay from '@/components/Ads/Overlay.vue';
+import AdDetailModal from '@/components/Ads/AdDetailModal.vue';
+import CartList from '@/components/Ads/CartList.vue';
+
+const filters = reactive({
+    page: 1,
+    daterange: "all",
+    paymentstatus: "all",
+    userInput: "",
+});
+
+const ads = ref([]);
+const currentPage = ref(1);
+const totalPages = ref(1);
+const isLoading = ref(false);
+const showMessage = ref(false);
+const messageTitle = ref("");
+const messageContent = ref("");
+const showOverlay = ref(false);
+const showAdDetail = ref(false);
+const detail = ref({});
+
+// 初始化
+onMounted(async () => {
+    filterAds();
+});
+
+// 篩選條件變更
+const changeFilter = (filterName, filterValue) => {
+    filters[filterName] = filterValue;
+    filters.page = 1;
+    filters.userInput = "";
+    currentPage.value = 1;
+    filterAds();
+};
+
+const updateInput = (input) => {
+    currentPage.value = 1;
+    filters.userInput = input;
+};
+
+const filterAds = async () => {
+    console.log("篩選條件: ", filters);
+    try {
+        const response = await axios.post("/advertisements/filter", filters);
+        const {content, totalPages: total} = response.data;
+        ads.value = content;
+        totalPages.value = total;
+        console.log(response.data.content)
+    } catch (error) {
+        console.error("發送請求時發生錯誤: ", error);
+    }
+};
+
+// 換頁
+const onPageNumberChange = async (page) => {
+    currentPage.value = page;
+    filters.page = page;
+    await filterAds();
+};
+
+// 編輯
+const showAdDetailFunc = (adDetail) =>{
+    detail.value = adDetail;
+    showOverlay.value = true;
+    showAdDetail.value = true;
+}
+
+const closeAdDetail = () =>{
+    showOverlay.value = false;
+    showAdDetail.value = false;
+    detail.value = {};
+}
+
+// 加入購物車
+
+// 刪除
+const handleDeleteAdResult = (result) =>{
+    messageTitle.value = result.messageTitle;
+    messageContent.value = result.message;
+    showMessage.value = true;
+
+    if(result.sucess){
+        filterAds();
+    }
+}
+
+const closeMessage = () => {
+    showMessage.value = false;
+};
+
+watch(() => filters.userInput, () => {
+    filterAds();
+});
 </script>
 
 <template>
-
-    <AdPageTitle/>
+    <AdPageTitle />
 
     <div class="flex flex-wrap items-center space-x-6 mt-4 mb-6 px-6">
         <div class="flex items-center space-x-6 flex-grow">
-            <AdPaymentStatusFilter/>
-            <AdPaidDateFilter/>
+            <!-- 這裡需要確保 filter-change 事件傳遞的是正確的篩選值 -->
+            <AdPaymentStatusFilter v-model="filters.paymentstatus" @filter-change="changeFilter" />
+            <AdPaidDateFilter v-model="filters.daterange" @filter-change="changeFilter" />
         </div>
 
         <div class="flex items-center justify-end w-full sm:w-auto">
-            <AddAdButton/>
+            <AddAdButton />
         </div>
     </div>
-    
+
     <div class="flex flex-wrap items-center space-x-6 mt-4 mb-6 px-6">
         <div class="flex items-center space-x-6 flex-grow">
-            <AdUserInputFilter/>
+            <AdUserInputFilter @filter-change="changeFilter" @input-update="updateInput" />
         </div>
 
         <div class="flex items-center justify-end w-full sm:w-auto">
-            <CheckCartListButton/>
+            <CheckCartListButton />
         </div>
     </div>
 
     <main class="m-3">
         <div id="view-box" class="border border-gray-400 py-2 px-2 rounded-md">
-            <AdList/>
-            <NoAdHouseList/>
+            <AdList :ads="ads" @ad-delete-result="handleDeleteAdResult" @detail="showAdDetailFunc"/>
+            <Pagination :current-page="currentPage"
+            :total-pages="totalPages"
+            @page-change="onPageNumberChange"/>
+            <NoAdHouseList />
         </div>
     </main>
 
-    <Overlay/>
-    <AdPopUpMessage/>
-    <AdDetailModal/>
-
-    <CartList/>
-
+    <Overlay v-if="showOverlay"/>
+    <PopUpMessage v-show="showMessage" :showMessage="showMessage" :messageTitle="messageTitle" :message="messageContent" @close-message="closeMessage" />
+    <AdDetailModal v-show="showAdDetail" :detail="detail" @close-detail="closeAdDetail"/>
+    <CartList />
 </template>
 
 <style scoped>
@@ -62,5 +158,4 @@
     @import url("https://fonts.googleapis.com/css2?family=Pacifico&display=swap");
 
     @import url("/src/assets/adAndOrderFront.css");
-
 </style>

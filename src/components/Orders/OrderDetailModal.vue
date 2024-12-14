@@ -1,3 +1,20 @@
+<script setup>
+  import { defineProps, defineEmits } from 'vue';
+
+  const props = defineProps({
+    detail: {
+      type: Object,
+      required: true,
+    },
+  });
+
+  const emit = defineEmits();
+
+  const closeDetail = () => {
+    emit('close-detail');
+  };
+</script>
+
 <template>
   <div class="fixed inset-0 z-20 bg-gray-500/75 flex items-center justify-center">
     <div class="bg-white rounded-lg shadow-lg w-4/5 h-4/5 p-8">
@@ -38,41 +55,25 @@
               <th class="bg-gray-200 text-center">折扣</th>
               <th class="bg-gray-200 text-center">小計</th>
             </tr>
-            <tr v-for="(item, index) in detail.adIds" v-bind:key="index">
-            <td class="px-4 py-2 text-center">{{ item }}</td>
-            <td class="px-4 py-2 text-center">{{ detail.adtypes[index] }}</td>
-            <td class="px-4 py-2 text-center">{{ detail.prices[index] }}</td>
-            <td class="px-4 py-2 text-center">{{ detail.houseTitles[index] }}</td>
-            <td class="px-4 py-2 text-center">discount</td>
-            <td class="px-4 py-2 text-center">{{ detail.prices[index] }}</td>
-          </tr>
+            <tr v-for="(item, index) in detail.adIds" :key="index">
+              <td class="px-4 py-2 text-center">{{ item }}</td>
+              <td class="px-4 py-2 text-center">{{ detail.adtypes[index] }}</td>
+              <td class="px-4 py-2 text-center">{{ detail.prices[index] }}</td>
+              <td class="px-4 py-2 text-center">{{ detail.houseTitles[index] }}</td>
+              <td class="px-4 py-2 text-center">discount</td>
+              <td class="px-4 py-2 text-center">{{ detail.prices[index] }}</td>
+            </tr>
             <tr>
-            <td colspan="4"></td>
-            <td class="py-1 text-center font-bold">總金額</td>
-            <td class="py-1 text-center">{{ detail.totalAmount }}</td>
-          </tr>
+              <td colspan="4"></td>
+              <td class="py-1 text-center font-bold">總金額</td>
+              <td class="py-1 text-center">{{ detail.totalAmount }}</td>
+            </tr>
           </tbody>
         </table>
       </div>
     </div>
   </div>
 </template>
-
-<script>
-export default {
-  props: {
-    detail: {
-      type: Object,
-      required: true,
-    },
-  },
-  methods: {
-    closeDetail() {
-      this.$emit('close-detail');
-    },
-  },
-};
-</script>
 
 <style scoped>
 </style>

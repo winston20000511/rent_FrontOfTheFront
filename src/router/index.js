@@ -5,6 +5,7 @@ import EditUserPage from '@/components/User/EditUserPage.vue';
 import ForgotPassword from '@/components/User/ForgotPassword.vue';
 import LoginPage from '@/components/User/LoginPage.vue';
 import MyOrders from '@/components/Orders/MyOrders.vue';
+import MyAds from '@/components/Ads/MyAds.vue';
 
 const routes = [
   {
@@ -34,9 +35,14 @@ const routes = [
   },
   // 其他路由可以在這裡添加
   {
-    path:"/orders",
+    path:"/orders", // 開發用，之後會刪掉
     name:"orders",
     component: MyOrders,
+  },
+  {
+    path:"/ads", // 開發用，之後刪掉
+    name:"ads",
+    component: MyAds,
   },
 ];
 

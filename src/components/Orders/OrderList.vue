@@ -1,6 +1,78 @@
+<script setup>
+  import {ref} from "vue";
+  import axios from "axios";
+  
+  const props = defineProps({
+    orders: {
+      type: Array,
+      required: true,
+    },
+    currentPage: {
+      type: Number,
+      required: true,
+    },
+    totalPages: {
+      type: Number,
+      required: true,
+    },
+  });
+
+  const emit = defineEmits(["close-message", "pageChange", "orderCancelResult", "detail", "order-cancel-result"]);
+
+  const changePage = (page) => {
+    if (page >= 1 && page <= props.totalPages) {
+      emit('pageChange', page);
+    }
+  };
+
+  const check = async (merchantTradNo) => {
+    try {
+      const response = await axios.post('/api/orders/merchantTradNo', merchantTradNo, {
+        headers: { 'Content-Type': 'text/plain' },
+      });
+      emit('detail', response.data);
+    } catch (error) {
+      console.error('系統錯誤: ', error);
+    }
+  };
+
+  const cancel = async (merchantTradNo) => {
+    const userConfirmed = window.confirm('確定要申請取消訂單嗎？');
+    if (userConfirmed) {
+      try {
+        const response = await axios.put('/api/orders/merchantTradNo', merchantTradNo, {
+          headers: { 'Content-Type': 'text/plain' },
+        });
+        emit('order-cancel-result', {
+          success: response.data,
+          merchantTradNo,
+          messageTitle: response.data ? '已提出取消申請' : '未成功訂單取消，請稍後再試',
+          message: response.data ? '請待服務人員確認，方能取消訂單' : '或請聯繫客服人員',
+        });
+      } catch (error) {
+        console.error('伺服器錯誤: ', error);
+        emit('order-cancel-result', {
+          success: false,
+          merchantTradNo,
+          messageTitle: '系統錯誤，取消訂單失敗',
+          message: '請稍後再試',
+        });
+      }
+    } else {
+      emit('order-cancel-result', {
+        success: false,
+        merchantTradNo,
+        messageTitle: '尚未取消訂單',
+        message: '',
+      });
+    }
+  };
+
+</script>
+
 <template>
-  <div id="order-box" class="border border-gray-400 py-2 px-2 rounded-md">
-    <table id="order-table" class="table-auto w-full border-collapse border border-gray-300">
+  <div class="border border-gray-400 py-2 px-2 rounded-md">
+    <table class="table-auto w-full border-collapse border border-gray-300">
       <thead class="bg-gray-100">
         <tr>
           <th class="px-4 py-2 text-center text-sm font-medium text-gray-600">訂單編號</th>
@@ -61,81 +133,9 @@
   </div>
 </template>
 
-<script>
-export default {
-  emits: ["pageChange", "detail"],
-  props: {
-    orders: {
-      type: Array,
-      required: true,
-    },
-    currentPage: {
-      type: Number,
-      required: true,
-    },
-    totalPages: {
-      type: Number,
-      required: true,
-    },
-  },
-  data() {
-    return {};
-  },
-  methods: {
-    changePage(page) {
-      if (page >= 1 && page <= this.totalPages) {
-        this.$emit("pageChange", page);
-      }
-    },
-    async check(merchantTradNo) {
-      try {
-        const response = await this.$axios.post("/api/orders/merchantTradNo", merchantTradNo, { headers: { 'Content-Type': 'text/plain' } });
-        const data = await response.data;
-        this.$emit("detail", data);
-      } catch (error) {
-        console.error("伺服器錯誤: ", error);
-      }
-    },
-    async cancel(merchantTradNo) {
-      const userConfirmed = window.confirm("確定要申請取消訂單嗎？");
-      if (userConfirmed) {
-        try {
-          const response = await this.$axios.put('/api/orders/merchantTradNo', merchantTradNo, {
-            headers: { 'Content-Type': 'text/plain' }
-          });
-          const result = response.data;
-          console.log("result: ", result);
-          this.$emit("order-cancel-result", {
-            success: result,
-            merchantTradNo,
-            messageTitle: result ? "已提出取消申請" : "訂單取消失敗，請稍後再試",
-            message: result ? "請待服務人員確認，方能取消訂單" : "或請聯繫客服人員協助處理",
-          });
-        } catch (error) {
-          console.error("伺服器錯誤: ", error);
-          this.$emit("order-cancel-result", {
-            success: false,
-            merchantTradNo,
-            messageTitle: "系統錯誤，取消訂單失敗",
-            message: "請稍後再試",
-          });
-        }
-      } else {
-        this.$emit("order-cancel-result", {
-          success: false,
-          merchantTradNo,
-          messageTitle: "尚未取消訂單",
-          message: "",
-        });
-      }
-    }
-  },
-};
-</script>
-
 <style scoped>
-  .pagination button:disabled {
-    cursor: not-allowed;
-    opacity: 0.5;
-  }
+.pagination button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
 </style>
