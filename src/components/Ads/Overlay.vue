@@ -4,7 +4,7 @@
 
 <template lang="">
 
-    <div id="modal-background" class="overlay hidden"></div>
+    <div id="modal-background" class="overlay"></div>
 
 </template>
 

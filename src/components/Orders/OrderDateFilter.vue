@@ -28,7 +28,7 @@
         },
         methods:{
             onDateFilterChange() {
-            this.$emit("filter-change", "dateRange", this.selectedDateRange);
+            this.$emit("filter-change", "daterange", this.selectedDateRange);
             },
         },
     };

@@ -4,7 +4,7 @@
             篩選方式：
         </label>
         <select 
-            name="type"
+            name="inputcondition"
             class="condition-filter ml-2 px-3 py-2 text-sm border border-gray-300 rounded-lg"
             v-model="selectedFilterType"
             @change="onSelectedFilterTypeChange"
@@ -52,7 +52,7 @@ export default {
             this.userInput = ""; // 重置輸入框的內容
             this.placeholder = this.getPlaceholder();
             this.showInputBox = this.selectedFilterType !== "none";
-            this.$emit("filter-change", "type", this.selectedFilterType);
+            this.$emit("filter-change", "inputcondition", this.selectedFilterType);
         },
     },
     watch: {

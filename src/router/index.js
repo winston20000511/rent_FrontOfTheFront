@@ -4,6 +4,8 @@ import MemberCenter from '@/components/User/memberCenter.vue';
 import EditUserPage from '@/components/User/EditUserPage.vue';
 import ForgotPassword from '@/components/User/ForgotPassword.vue';
 import LoginPage from '@/components/User/LoginPage.vue';
+import MyOrders from '@/components/Orders/MyOrders.vue';
+
 const routes = [
   {
     path: '/',
@@ -29,8 +31,13 @@ const routes = [
     path:"/MemberCenter",
     name:"MemberCenter",
     component: MemberCenter
-  }
+  },
   // 其他路由可以在這裡添加
+  {
+    path:"/orders",
+    name:"orders",
+    component: MyOrders,
+  },
 ];
 
 const router = createRouter({

@@ -20,6 +20,7 @@
     methods: {
         addAd(){
             this.$emit("click-create-btn");
+            // window.location.href = "/advertisements/mylist?action=addAd";
         }
     }
   };
