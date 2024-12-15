@@ -1,4 +1,5 @@
 <script setup>
+/* 待補: 加入購物車 & 更新 noAdHouses 的分頁 */
 import { ref, reactive, watch, onMounted } from 'vue';
 import axios from 'axios';
 
@@ -23,16 +24,38 @@ const filters = reactive({
     userInput: "",
 });
 
+// 確保載入(還沒用到)
+const isLoading = ref(false);
+
+// 廣告列表
+const showAdList = ref(true);
 const ads = ref([]);
+
+// 篩選項目
 const currentPage = ref(1);
 const totalPages = ref(1);
-const isLoading = ref(false);
+
+// 背景遮罩
+const showOverlay = ref(false);
+
+// 提示訊息
 const showMessage = ref(false);
 const messageTitle = ref("");
 const messageContent = ref("");
-const showOverlay = ref(false);
+
+// 廣告詳細
 const showAdDetail = ref(false);
 const detail = ref({});
+
+// 沒有廣告推播的物件
+const showNoAdHouses = ref(false);
+const noAdHouses = ref([]);
+const adtypes = ref([]);
+
+// 購物車
+const showCart = ref(false);
+const cartItems = ref([]);
+
 
 // 初始化
 onMounted(async () => {
@@ -60,7 +83,6 @@ const filterAds = async () => {
         const {content, totalPages: total} = response.data;
         ads.value = content;
         totalPages.value = total;
-        console.log(response.data.content)
     } catch (error) {
         console.error("發送請求時發生錯誤: ", error);
     }
@@ -70,6 +92,7 @@ const filterAds = async () => {
 const onPageNumberChange = async (page) => {
     currentPage.value = page;
     filters.page = page;
+    // 判斷filterAd還是noAdHouses
     await filterAds();
 };
 
@@ -86,7 +109,76 @@ const closeAdDetail = () =>{
     detail.value = {};
 }
 
+// 點選查看可以加廣告的房子
+const toggleNoAdHousesTable = () =>{
+    filters.page = 1;
+    currentPage.value = 1;
+
+    if(showAdList.value === false){
+        showAdList.value = true;
+        showNoAdHouses.value = false;
+        filterAds();
+    }else{
+        showAdList.value = false;
+        showNoAdHouses.value = true;
+        filterNoAdHouses();
+        getAdtypeAndId();
+    }
+}
+
+// 取得廣告類型
+const getAdtypeAndId = async() =>{
+    const response = await axios.get("/advertisements/adtypes");
+    adtypes.value = response.data;
+    console.log("ad types: ", response.data);
+}
+
+// 取得目前沒有掛廣告的物件（沒有廣告或已過期）
+const filterNoAdHouses = async() =>{
+    const url = "/advertisements/houseswithoutadds";
+    try{
+        const response = await axios.post(url, 
+            filters.page,
+            {headers: {'Content-Type': 'application/json'}}
+        );
+        noAdHouses.value = response.data.content;
+        console.log("no ad houses: ", response.data);
+    }catch(error){
+        console.error("請求錯誤: ", error);
+    }
+};
+
+// 接收NoAdHouse中選的houseId及adtypeId
+const handleSelectedHouseAndAdtypInfo = ({houseId, adtypeId}) =>{
+    console.log("House ID:", houseId);
+    console.log("Adtype ID:", adtypeId);
+};
+
+// 開關購物車
+const toggleCart = () =>{
+    if(showCart.value === true){
+        showCart.value = false;
+    }else{
+        getCartItems();
+        showCart.value = true;
+    }
+};
+
+// 取得購物車資料
+async function getCartItems() {
+  try {
+    const response = await axios.post("/api/cart/list", filters);
+    cartItems.value = await response.data;
+
+    console.log("get cart items: ", response.data);
+
+  } catch (error) {
+    console.error("無法取得購物車內容: ", error);
+  }
+}
+
 // 加入購物車
+
 
 // 刪除
 const handleDeleteAdResult = (result) =>{
@@ -119,7 +211,7 @@ watch(() => filters.userInput, () => {
         </div>
 
         <div class="flex items-center justify-end w-full sm:w-auto">
-            <AddAdButton />
+            <AddAdButton @toggle-no-ad-houses="toggleNoAdHousesTable" :show-ad-list="showAdList"/>
         </div>
     </div>
 
@@ -129,24 +221,24 @@ watch(() => filters.userInput, () => {
         </div>
 
         <div class="flex items-center justify-end w-full sm:w-auto">
-            <CheckCartListButton />
+            <CheckCartListButton @toggle-cart="toggleCart"/>
         </div>
     </div>
 
     <main class="m-3">
         <div id="view-box" class="border border-gray-400 py-2 px-2 rounded-md">
-            <AdList :ads="ads" @ad-delete-result="handleDeleteAdResult" @detail="showAdDetailFunc"/>
+            <AdList v-show="showAdList" :ads="ads" @ad-delete-result="handleDeleteAdResult" @detail="showAdDetailFunc"/>
+            <NoAdHouseList v-show="showNoAdHouses" :noAdHouses="noAdHouses" :adtypes="adtypes" @selected-house-adtype-id="handleSelectedHouseAndAdtypInfo"/>
             <Pagination :current-page="currentPage"
             :total-pages="totalPages"
             @page-change="onPageNumberChange"/>
-            <NoAdHouseList />
         </div>
     </main>
 
     <Overlay v-if="showOverlay"/>
     <PopUpMessage v-show="showMessage" :showMessage="showMessage" :messageTitle="messageTitle" :message="messageContent" @close-message="closeMessage" />
     <AdDetailModal v-show="showAdDetail" :detail="detail" @close-detail="closeAdDetail"/>
-    <CartList />
+    <CartList v-show="showCart" @toggle-cart="toggleCart" :cart-items="cartItems"/>
 </template>
 
 <style scoped>

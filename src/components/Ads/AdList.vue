@@ -9,8 +9,6 @@ const props = defineProps({
   },
 });
 
-// const emit = defineEmits(["close-message", "pageChange", "orderCancelResult", "detail", "order-cancel-result"]);
-
 const emit = defineEmits(["close-message", "adDeleteResult", "detail", "ad-delete-result"]);
 
 const isAdded = ref(false);
