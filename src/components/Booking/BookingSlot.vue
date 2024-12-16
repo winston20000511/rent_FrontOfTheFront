@@ -3,6 +3,8 @@ import { ref, onMounted, computed , defineProps} from 'vue';
 import 'bootstrap/dist/css/bootstrap.min.css'
 import Datepicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
+import BookingAgreement from './bookingAgreement.vue';
+
 
 const BASE_URL = import.meta.env.VITE_APIURL
 
@@ -10,6 +12,7 @@ const someAction = async () => {
     console.log('提交預約');
 };
 
+const isAgreed = ref(false);
 const props = defineProps({
     houseId: {
     type: Number,
@@ -24,26 +27,25 @@ const maxDate = ref(null);
 const selectedDate = ref(null);
 const selectedTime = ref('');
 const timeSlots = ref([]);
+const excludedTimes = ref([]); 
 const currentSection = ref(1);
+const message = ref('');
 
 let startTime; 
 let endTime; 
 let duration; 
-
-const excludedTimes = ref([
-    '2024-12-12T12:00:00', // 需要排除的时间点
-    '2024-12-13T13:00:00', // 示例：另一个排除的时间点
-]); 
 
 const load = async () => {
     const response = await fetch(`${BASE_URL}/booking/list?houseId=${props.houseId}`);
     const data = await response.json();
     console.log(data);
 
-    minDate.value = new Date(data.fromDate);
-    maxDate.value = new Date(data.toDate);
+    minDate.value = new Date(data.fromDate + 'T00:00:00');
+    maxDate.value = new Date(data.toDate + 'T00:00:00');
 
     weekDays.value = data.weekDay;
+
+    excludedTimes.value = data.excludedTime;
 
     startTime = data.fromTime;
     endTime = data.toTime;
@@ -51,13 +53,12 @@ const load = async () => {
 
 }
 
-// 當選擇日期後觸發的邏輯
+// 當選擇日期時
 const onDateChange = (date) => {
-    
     if (date) {
-        // 格式化日期为 YYYY-MM-DD
-        selectedDate.value = date.toISOString().split('T')[0]; // 获取 ISO 字符串并提取日期部分
-        selectedTime.value = ''; // 清空时间
+        const utcDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+        selectedDate.value = utcDate.toISOString().split('T')[0];
+        selectedTime.value = '';
         generateTimeSlots(startTime, endTime, duration);
     } else {
         selectedDate.value = null;
@@ -73,8 +74,8 @@ const generateTimeSlots = (startTime, endTime, duration) => {
 
     while (start <= end) {
         const timeString = start.toTimeString().substring(0, 5);
-        const fullDateTimeString = `${selectedDate.value}T${timeString}:00`;
-        // 检查当前生成的时间是否在排除列表中
+        const fullDateTimeString = `${selectedDate.value} ${timeString}:00`;
+        // 排除已被預約的時間
         if (!excludedTimes.value.includes(fullDateTimeString)) {
             times.push(timeString);
         }
@@ -84,24 +85,23 @@ const generateTimeSlots = (startTime, endTime, duration) => {
     timeSlots.value = times;
 };
 
-const isDateAllowed = (date) => {
-    const day = date.getDay();
-    const convertedDay = (day === 0) ? 6 : (day - 1);
-    const isDisabled = weekDays.value.charAt(convertedDay) === '0';
-    return !isDisabled;
-};
+
 const disabledWeekDays = computed(() => {
     const disabledDays = [];
     for (let i = 0; i < 7; i++) {
         const date = new Date();
         date.setDate(date.getDate() + i);
-        if (!isDateAllowed(date)) {
+        const day = date.getDay();
+        const convertedDay = (day === 0) ? 6 : (day - 1);
+
+        const isDateAllowed = weekDays.value.charAt(convertedDay) === '0';
+
+        if (isDateAllowed) {
             disabledDays.push(i);
         }
     }
     return disabledDays;
 });
-
 
 const goNextSection = () => {
     if (selectedDate.value && selectedTime.value) {
@@ -124,10 +124,10 @@ onMounted(() => {
             <header>
             <h2>選擇您想要看房的時間</h2>
             </header>
-            <hr/>
+            <hr class="w-100"/>
             <Datepicker id="select-date" 
                 locale="zh" 
-                format="yyyy-MM-dd"
+                value-format="yyyy-MM-dd HH:mm:ss"
                 v-model="selectedDate" 
                 :min-date="minDate" 
                 :max-date="maxDate"
@@ -137,8 +137,8 @@ onMounted(() => {
                 :enable-time-picker="false" 
                 @update:modelValue="onDateChange" />
 
-            <div v-if="!selectedDate">請先選擇日期</div>
-            <div v-if="selectedDate">
+            <div v-if="!selectedDate">💡先選擇日期</div>
+            <div v-if="selectedDate">💡
                 <select v-model="selectedTime">
                     <option value="" disabled>請選擇時間</option>
                     <option v-for="time in timeSlots" :key="time" :value="time">
@@ -146,7 +146,7 @@ onMounted(() => {
                     </option>
                 </select>
             </div>
-            <hr/>
+            <hr class="w-100"/>
             <footer>
                 <button :disabled="!selectedDate || !selectedTime"  
                 class="btn btn-primary" 
@@ -158,7 +158,7 @@ onMounted(() => {
             <header>
                 <h2>確認您的看房時間</h2>
             </header>
-            <hr/>
+            <hr class="w-100"/>
 
             <div>
                 <table class="table">
@@ -178,12 +178,19 @@ onMounted(() => {
                 </table>
 
             </div>
+            <div class="mb-3">
+                <label for="message" class="form-label">可填寫留言</label>
+                <textarea id="message" class="form-control" v-model="message" rows="4" style="resize: none;" placeholder="請輸入對房東的留言..."></textarea>
+            </div>
 
+            <BookingAgreement v-model:isAgreed="isAgreed" />
 
+            <!-- 發送預約按鈕 -->
+            <div class="d-flex justify-content-end">
+                <button class="btn btn-info" type="button" @click="someAction" :disabled="!isAgreed">發送預約</button>
+            </div>
 
-            
-            <button class="btn btn-info" type="button" @click="someAction" >發送預約</button>
-            <hr/>
+            <hr class="w-100"/>
             <footer>
                 <button class="btn btn-primary" @click="currentSection--">上一步</button>
             </footer>

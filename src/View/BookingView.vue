@@ -21,8 +21,8 @@ const props = defineProps({
 </script>
 
 <template>
-  <div class="modal-overlay" @click="closeView" v-if="isVisible">
-    <div class="modal-content" @click.stop>
+  <div class="modal-overlay " @click="closeView" v-if="isVisible">
+    <div class="modal-content mb-3" @click.stop>
       <button type="button" class="btn-close" @click="closeView"></button>
       <div class="modal-header">
         <BookingSlot :houseId="houseId"/>
@@ -52,9 +52,10 @@ h2 {
 .modal-content {
   background-color: white;
   border-radius: 8px;
-  padding: 20px;
+  padding: 15px 5px;
   width: 400px;
-
+  overflow-y: auto; 
+  max-height: 600px;
 }
 
 .modal-header {
