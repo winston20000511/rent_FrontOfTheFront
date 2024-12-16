@@ -1,9 +1,15 @@
 <script setup>
-import HomeCardList from '@/components/Home/HomeCardList.vue';
-import HomeFilter from '@/components/Home/HomeFilter.vue';
-import HomeMap from '@/components/Home/HomeMap.vue';
-import HomeNavbar from '@/components/Home/HomeNavbar.vue';
+  import HomeCardList from '@/components/Home/HomeCardList.vue';
+  import HomeFilter from '@/components/Home/HomeFilter.vue';
+  import HomeMap from '@/components/Home/HomeMap.vue';
+  import HomeNavbar from '@/components/Home/HomeNavbar.vue';
+import { ref } from 'vue';
 
+  const markers = ref([]);
+
+  const addMarker = (locations)=>{
+    markers.value = locations
+  }
 
 </script>
 <template>
@@ -11,17 +17,16 @@ import HomeNavbar from '@/components/Home/HomeNavbar.vue';
       <HomeNavbar></HomeNavbar>
     </header>
     <div class="filter">
-      <HomeFilter></HomeFilter>
+      <HomeFilter @add-marker="addMarker"></HomeFilter>
     </div>
     <main>
       <div class="main-left">
-        <HomeMap></HomeMap>
+        <HomeMap :markers="markers"></HomeMap>
       </div>
       <div class="main-right">
         <HomeCardList></HomeCardList>
       </div>
     </main>
-    
 </template>
 
 <style scoped>

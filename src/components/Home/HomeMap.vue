@@ -1,52 +1,112 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onUnmounted, watch, toRef, nextTick, shallowRef } from 'vue';
 import { Loader } from '@googlemaps/js-api-loader';
 
-const map = ref(null); // 地圖容器
-const canvas = ref(null);
-const refbtnDraw = ref(null)
-const isDrawingMode = ref(false);
-let isDrawing = false;
+const map = shallowRef(null); // 地圖容器
+const mapMarkers = ref([]); //地圖標記
+const canvas = ref(null); //繪筆
+const refbtnDraw = ref(null) //繪圖按鈕
+const isDrawingMode = ref(false); //按鈕切換繪圖模式
+
+let isDrawing = false; //判斷是否正在繪圖
 let context = null;
-let points = []; // 存储 Canvas 路径点
+let points = []; //儲存 Canvas 路徑點
 
+const props = defineProps({
+  markers: Array
+})
+const markers = toRef(props, 'markers');
+
+//進行Google Map初始化
 onMounted(() => {
-  // Google Maps API 加載器
-  const loader = new Loader({
-    apiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY, 
-    version: 'weekly',
-  });
+    // Google Maps API 加載器
 
-  loader.load().then(() => {
-    // 初始化地圖
-    map.value = new google.maps.Map(document.querySelector('.map-container'), {
-      center: { lat: 23.023535, lng: 120.222776 }, // 設置地圖中心
-      zoom: 13, // 設置縮放級別
+    const loader = new Loader({
+      apiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY, 
+      version: 'weekly', // 使用 beta 或更新版本
+      libraries: ['marker'], // 加載 'marker' 庫
     });
 
-    map.value.addListener('idle',()=>{
-      refbtnDraw.value.style.display='block';
-      // google.maps.event.removeListener(idleListener);
-    })
-    console.log(map);
-    // 初始化 Canvas
-    const canvasElement = canvas.value;
-    context = canvasElement.getContext('2d');
+    loader.load().then((google) => {
+      // 初始化地圖
+      map.value = new google.maps.Map(document.querySelector('.map-container'), {
+        center: { lat: 23.023535, lng: 120.222776 }, // 設置地圖中心
+        zoom: 13, // 設置縮放級別
+        mapId: "DEMO_MAP_ID",
+        clickableIcons: false,
+        streetViewControl: false,
+        mapTypeControl: false,
+      });
+      //地圖按鈕在初始化完才顯示
+      refbtnDraw.value.style.display = 'block'
+      // 初始化 Canvas  
+      const canvasElement = canvas.value;
+      context = canvasElement.getContext('2d');
 
-    // 设置 Canvas 的大小和透明背景
-    canvasElement.width = map.value.getDiv().offsetWidth;
-    canvasElement.height = map.value.getDiv().offsetHeight;
+      //設置 Canvas 的大小和透明背景
+      canvasElement.width = map.value.getDiv().offsetWidth;
+      canvasElement.height = map.value.getDiv().offsetHeight;
 
-    // 添加绘图事件
-    canvasElement.addEventListener('mousedown', startDrawing);
-    canvasElement.addEventListener('mousemove', draw);
-    canvasElement.addEventListener('mouseup', stopDrawing);
-    canvasElement.addEventListener('mouseout', stopDrawing);
+      // 添加繪圖事件
+      canvasElement.addEventListener('mousedown', startDrawing);
+      canvasElement.addEventListener('mousemove', draw);
+      canvasElement.addEventListener('mouseup', stopDrawing);
+      canvasElement.addEventListener('mouseout', stopDrawing);
+
+
+      // const content = document.createElement('div');
+      // content.textContent = '📍';
+      // content.style.fontSize = '20px';
+      // content.style.color = 'black';
+      // content.style.backgroundColor = 'yellow';
+      // content.style.padding = '5px';
+      // content.style.borderRadius = '50%';
+      
+      // const qq = new google.maps.marker.AdvancedMarkerElement({
+      //   position: {  lat: 23.023535, lng: 120.222776 },
+      //   map: map.value,
+      //   // content: content,
+      // });
+
+      // console.log('AdvancedMarkerElement 實例:', qq);
+
+      // map.value.addListener('click', (event) => {
+      //   console.log('地圖點擊:', event.latLng.toJSON());
+      // });
+
+
+    });
   });
-});
+  onUnmounted(()=>{
+      canvasElement.removeEventListener('mousedown', startDrawing);
+      canvasElement.removeEventListener('mousemove', draw);
+      canvasElement.removeEventListener('mouseup', stopDrawing);
+      canvasElement.removeEventListener('mouseout', stopDrawing);
+  })
 
-  // 开始绘图
+  // =========================================標記功能=================================================================
+
+  watch(markers, (newMarkers) => {
+
+    mapMarkers.value.forEach((marker) => marker.map = null);
+    mapMarkers.value = [];
+
+    newMarkers.forEach((marker) => {
+      var latlng = new google.maps.LatLng(marker.lat, marker.lng);
+      console.log('標記位置:', latlng.toJSON());
+      var mapMark = new google.maps.marker.AdvancedMarkerElement({
+        position: latlng,
+        map: map.value,
+        title: marker.street,
+      });
+      mapMarkers.value.push(mapMark);
+    });
+  });
+
+  // =========================================繪圖功能=================================================================
+  // 開始繪圖
   function startDrawing(event) {
+    
     isDrawing = true;
     points = [];
     addPoint(event);
@@ -55,7 +115,7 @@ onMounted(() => {
     context.moveTo(offsetX, offsetY);
   }
 
-  // 绘制中
+  // 繪製中
   function draw(event) {
     if (!isDrawing) return;
 
@@ -67,7 +127,7 @@ onMounted(() => {
     context.stroke();
   }
 
-  // 停止绘图
+  // 停止繪圖
   function stopDrawing() {
     if (!isDrawing) return;
     isDrawing = false;
@@ -82,8 +142,8 @@ onMounted(() => {
   } 
 
   //Draw模式切換
-  function toggleDrawingMode(){
-    console.log(map);
+  function toggleDrawingMode(event){
+    event.stopPropagation();
     isDrawingMode.value = !isDrawingMode.value;
     const canvasElement = canvas.value;
     if (isDrawingMode.value) {
@@ -93,7 +153,6 @@ onMounted(() => {
         draggable: false,
         gestureHandling: 'none',
       });
-      console.log(map);
     } else {
       // 關閉繪圖模式
       canvasElement.style.pointerEvents = 'none';
@@ -109,6 +168,7 @@ onMounted(() => {
     points.push({ x: event.offsetX, y: event.offsetY });
   }
 
+  //XY轉成LatLng
   function pixelToLatLng(mapInstance, x, y) {
     return new Promise((resolve, reject) => {
       const overlay = new google.maps.OverlayView();
@@ -123,7 +183,7 @@ onMounted(() => {
           const latLng = projection.fromContainerPixelToLatLng(point);
           const latitude = latLng.lat();
           const lngitude = latLng.lng();
-          // console.log('Converted LatLng:', {lat: latitude , lng: lngitude})
+          console.log('Converted LatLng:', {lat: latitude , lng: lngitude})
 
           resolve({lat: latitude , lng:lngitude});
           overlay.setMap(null); // 释放 OverlayView
@@ -136,6 +196,7 @@ onMounted(() => {
     });
   }
 
+  //XY陣列轉成LatLng陣列
   async function convertPointsToLatLng(map, points) {
     const latLngArray = await Promise.all(
       points.map((point) => pixelToLatLng(map, point.x, point.y))
@@ -143,6 +204,7 @@ onMounted(() => {
     return latLngArray;
   }
 
+  //
   function drawPolygonOnMap(map, latLngPoints) {
     new google.maps.Polygon({
       paths: latLngPoints,
@@ -165,15 +227,13 @@ onMounted(() => {
     clearCanvas(canvasElement);
   }
 </script>
+
 <template>
   <div>
-    <!-- <button @click="toggleDrawingMode">
-      {{ isDrawingMode ? '退出绘图模式' : '启用绘图模式' }}
-    </button> -->
     <button class="btn btn-outline-secondary btnDraw" ref="refbtnDraw" @click="toggleDrawingMode">
       {{ isDrawingMode ? '關閉繪圖模式' : '啟動繪圖模式' }}
     </button>
-    <div ref="map" class="map-container"></div>
+    <div ref="map" class="map-container" v-once></div>
     <canvas ref="canvas" class="drawing-canvas"></canvas>
   </div>
 </template>
@@ -191,10 +251,10 @@ onMounted(() => {
   top: 0;
   left: 0;
   background: transparent;
-  pointer-events: auto; /* 确保鼠标事件只针对 Canvas */
+  pointer-events: none; /* 确保鼠标事件只针对 Canvas */
 }
 .btnDraw{
-  display: block;
+  display: none;
   position: absolute;
   top: 10px;
   left: 60%;
