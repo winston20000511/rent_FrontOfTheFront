@@ -1,9 +1,10 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import HomeView from '@/views/HomeView.vue';
+import HomeView from '@/View/HomeView.vue';
 import MemberCenter from '@/components/User/memberCenter.vue';
 import EditUserPage from '@/components/User/EditUserPage.vue';
 import ForgotPassword from '@/components/User/ForgotPassword.vue';
 import LoginForm from '@/components/User/LoginForm.vue';
+import HouseView from '@/View/HouseView.vue';
 
 const routes = [
   {
@@ -30,6 +31,11 @@ const routes = [
     path:"/MemberCenter",
     name:"MemberCenter",
     component: MemberCenter
+  },
+  {
+    path:"/HouseVue",
+    name:"HouseVue",
+    component:HouseView
   }
   // 其他路由可以在這裡添加
 ];
