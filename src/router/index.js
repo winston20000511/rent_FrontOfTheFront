@@ -3,8 +3,8 @@ import HomeView from '@/View/HomeView.vue';
 import MemberCenter from '@/components/User/memberCenter.vue';
 import EditUserPage from '@/components/User/EditUserPage.vue';
 import ForgotPassword from '@/components/User/ForgotPassword.vue';
-
 import LoginForm from '@/components/User/LoginForm.vue';
+import HouseView from '@/View/HouseView.vue';
 
 const routes = [
   {
@@ -15,8 +15,8 @@ const routes = [
   {
     path: '/login', // 登入頁面的路徑設定
     name: 'LoginForm',
-    component: LoginForm // 使用 LoginPage 組件
-  },
+    component: LoginForm}
+    ,
   {
     path: '/forgot-password', // 忘記密碼頁面的路徑設定
     name: 'ForgotPassword',
@@ -31,6 +31,11 @@ const routes = [
     path:"/MemberCenter",
     name:"MemberCenter",
     component: MemberCenter
+  },
+  {
+    path:"/HouseVue",
+    name:"HouseVue",
+    component:HouseView
   }
   // 其他路由可以在這裡添加
 ];
