@@ -4,9 +4,7 @@ import MemberCenter from '@/components/User/memberCenter.vue';
 import EditUserPage from '@/components/User/EditUserPage.vue';
 import ForgotPassword from '@/components/User/ForgotPassword.vue';
 
-
 import LoginForm from '@/components/User/LoginForm.vue';
-import IndexTestView from '@/View/IndexTestView.vue';
 
 const routes = [
   {
