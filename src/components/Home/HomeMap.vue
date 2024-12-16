@@ -78,10 +78,10 @@ onMounted(() => {
     });
   });
   onUnmounted(()=>{
-      canvasElement.removeEventListener('mousedown', startDrawing);
-      canvasElement.removeEventListener('mousemove', draw);
-      canvasElement.removeEventListener('mouseup', stopDrawing);
-      canvasElement.removeEventListener('mouseout', stopDrawing);
+      // canvasElement.removeEventListener('mousedown', startDrawing);
+      // canvasElement.removeEventListener('mousemove', draw);
+      // canvasElement.removeEventListener('mouseup', stopDrawing);
+      // canvasElement.removeEventListener('mouseout', stopDrawing);
   })
 
   // =========================================標記功能=================================================================
@@ -92,12 +92,27 @@ onMounted(() => {
     mapMarkers.value = [];
 
     newMarkers.forEach((marker) => {
+
+      const buttonElement = document.createElement("div");
+			buttonElement.innerHTML = `<button id="infoWindowButton"   style="
+            background-color: #9333EA;
+            color: white;
+            border-radius: 0.5rem;
+            padding: 10px;
+            border: none;
+          "
+          onmouseover="this.style.backgroundColor='#5A189A';"
+          onmouseout="this.style.backgroundColor='#9333EA';"
+        >
+			    ${Number(marker.price)/1000}K
+			  </button>`;
+
       var latlng = new google.maps.LatLng(marker.lat, marker.lng);
-      console.log('標記位置:', latlng.toJSON());
       var mapMark = new google.maps.marker.AdvancedMarkerElement({
         position: latlng,
         map: map.value,
         title: marker.street,
+        content: buttonElement,
       });
       mapMarkers.value.push(mapMark);
     });
@@ -259,5 +274,16 @@ onMounted(() => {
   top: 10px;
   left: 60%;
   z-index: 2;
+}
+.btn-purple {
+    background-color: #9333EA; /* purple-500 */
+    color: white;
+    border-radius: 0.5rem; /* 圓角效果 */
+    padding: 10px; /* 增加按鈕內邊距 */
+    border: none; /* 去掉邊框 */
+}
+
+.btn-purple:hover {
+    background-color: #5A189A; /* purple-700 */
 }
 </style>

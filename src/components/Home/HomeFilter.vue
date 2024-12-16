@@ -119,7 +119,6 @@
 
         const data = await response.json();
         emits('add-marker',data)
-        
     }
 
     const handleListClick = (item)=>{
