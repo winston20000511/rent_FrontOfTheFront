@@ -1,16 +1,18 @@
 <script setup>
 import { ref, reactive, watch } from "vue";
+import { useCart } from "@/stores/cartStore";
+import router from "@/router";
 
 const emit = defineEmits(["toggle-cart"]);
 
 const props = defineProps({
-  cartItems: {
+    cartStore: {
     type: Object,
     required: true,
   },
 });
 
-const selectedPaymentMethod = ref("");
+const selectedPaymentMethod = ref("linepay");
 
 // 關閉購物車
 const toggleCart = () => {
@@ -19,6 +21,10 @@ const toggleCart = () => {
 
 // 處理時間顯示格式
 function formatAddedDate(datetime) {
+    if(!datetime){
+        return;
+    }
+
   const dateTimeArr = datetime.split("T");
   const date = dateTimeArr[0];
   const time = dateTimeArr[1].substring(0, 5);
@@ -26,7 +32,23 @@ function formatAddedDate(datetime) {
   return `${date} ${time}`;
 }
 
-// 收到父組件來的資料
+// 將產品放入購物車 > 在ADLIST處理
+
+// 刪除購物車內容
+const cartStore = useCart();
+function removeFromCart(adId){
+  cartStore.removeFromCart(adId);
+};
+
+// 清空購物車
+
+// 前往結帳
+function checkOut() {
+    cartStore.setPaymentMethod(selectedPaymentMethod.value);
+    
+    router.push({ name: 'orderConfirm'});
+}
+
 </script>
 
 <template>
@@ -46,13 +68,13 @@ function formatAddedDate(datetime) {
 
     <div class="p-4 flex-1 overflow-y-auto">
       <div
-        v-for="(cartItem, index) in cartItems"
+        v-for="(cartItem, index) in cartStore.cartItems"
         :key="index"
         class="p-4 border rounded-lg shadow-sm mb-4 relative"
       >
         <button
           class="absolute top-2 right-2 bg-red-500 text-white w-6 h-6 rounded-lg hover:bg-red-400"
-          @click="removeFromCart(cartItem)"
+          @click="removeFromCart(cartItem.adId)"
         >
           x
         </button>
@@ -80,6 +102,7 @@ function formatAddedDate(datetime) {
             type="radio"
             name="payment-method"
             value="linepay"
+            v-model="selectedPaymentMethod"
             class="mr-2"
             checked
           />
@@ -93,6 +116,7 @@ function formatAddedDate(datetime) {
             type="radio"
             name="payment-method"
             value="Credit"
+            v-model="selectedPaymentMethod"
             class="mr-2"
           />
           <span class="text-gray-700"
@@ -104,7 +128,7 @@ function formatAddedDate(datetime) {
 
     <div class="p-4 text-right border-t mt-auto">
       <button
-        class="bg-green-600 text-white px-6 py-2 rounded-lg shadow hover:bg-green-700"
+        class="bg-green-600 text-white px-6 py-2 rounded-lg shadow hover:bg-green-700" @click="checkOut"
       >
         前往結帳
       </button>

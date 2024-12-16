@@ -1,7 +1,8 @@
 <script setup>
+import axios from "axios";
 import { ref, watch } from "vue";
 
-const emit = defineEmits(["filter-no-ad-houses", "selected-house-adtype-id"]);
+const emit = defineEmits(["filter-no-ad-houses"]);
 
 const props = defineProps({
   noAdHouses: {
@@ -15,8 +16,11 @@ const props = defineProps({
 });
 
 const isDataLoaded = ref(false);
-
 const selectedAdtypes = ref([]);
+
+// 使用者選取的房屋及廣告類別
+const selectedHouseId = ref("");
+const selectedAdtype = ref("");
 
 const initializeData = () => {
   if (props.noAdHouses.length > 0 && props.adtypes.length > 0) {
@@ -36,19 +40,42 @@ watch(
   { immediate: true }
 );
 
-// 更新價格的方法
+// 取得用戶選擇的房屋和廣告方案資訊
 const getHouseAndAdtypeInfo = (index) => {
-  const selectedAdtype = selectedAdtypes.value[index];
-  const houseId = props.noAdHouses[index].houseId;
+  selectedAdtype.value = selectedAdtypes.value[index];
+  selectedHouseId.value = props.noAdHouses[index].houseId;
 
-  console.log("House ID: ", houseId, "Adtype Price: ", selectedAdtype?.adPrice, "Index: ", index);
-
-
-  if (selectedAdtype) {
-    emit("selected-house-adtype-id", 
-        { houseId: houseId, adtypeId: selectedAdtype.adtypeId });
-  }
+  console.log(
+    "House ID: ", selectedHouseId.value,
+    "Adtype Price: ", selectedAdtype.value?.adPrice,
+    "Index: ", index,
+    "selectedAdtypeId: ", selectedAdtype.value?.adtypeId
+  );
 };
+
+// 插入廣告資料表
+async function addAd(houseId, adtypeId) {
+  if (!houseId || !adtypeId) {
+    console.error("House ID: ", houseId, " or Adtype ID is missing: ", adtypeId);
+    return;
+  }
+
+  const selectedInfo = {
+    houseId,
+    adtypeId,
+  };
+
+  try {
+    const response = await axios.post("/advertisements", selectedInfo, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    console.log("Ad added successfully:", response.data);
+  } catch (error) {
+    console.error("Error adding ad:", error);
+  }
+}
 </script>
 
 <template>
@@ -92,7 +119,7 @@ const getHouseAndAdtypeInfo = (index) => {
             </td>
             <td class="px-4 py-3">
               <select
-                @change="getHouseAndAdtypeInfo(index)"
+                @input="getHouseAndAdtypeInfo(index)"
                 v-model="selectedAdtypes[index]"
               >
                 <option
@@ -108,6 +135,7 @@ const getHouseAndAdtypeInfo = (index) => {
             <td class="px-4 py-3 text-center">
               <button
                 class="px-4 py-2 text-white bg-green-500 rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400"
+                @click="addAd(noAdHouse.houseId, selectedAdtypes[index]?.adtypeId)"
               >
                 新增
               </button>

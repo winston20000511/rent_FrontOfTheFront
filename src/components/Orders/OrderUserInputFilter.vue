@@ -1,3 +1,40 @@
+<script>
+    export default {
+        data() {
+            return {
+                selectedFilterType: "none",
+                userInput: "", // 儲存使用者輸入的內容
+                showInputBox: false,
+                placeholder: "",
+            };
+        },
+        methods: {
+            getPlaceholder() {
+                switch (this.selectedFilterType) {
+                    case "orderid":
+                        return "請輸入訂單編號";
+                    case "housetitle":
+                        return "請輸入房屋標題";
+                    default:
+                        return "";
+                }
+            },
+
+            onSelectedFilterTypeChange() {
+                this.userInput = ""; // 重置輸入框的內容
+                this.placeholder = this.getPlaceholder();
+                this.showInputBox = this.selectedFilterType !== "none";
+                this.$emit("filter-change", "inputcondition", this.selectedFilterType);
+            },
+        },
+        watch: {
+            userInput(newInput) {
+                this.$emit("input-update", newInput); // 傳遞輸入的值到父組件
+            },
+        },
+    };
+</script>
+
 <template>
     <div class="flex items-center">
         <label for="filter-type" class="text-sm font-medium text-gray-600">
@@ -26,39 +63,3 @@
     </div>
 </template>
 
-<script>
-export default {
-    data() {
-        return {
-            selectedFilterType: "none",
-            userInput: "", // 儲存使用者輸入的內容
-            showInputBox: false,
-            placeholder: "",
-        };
-    },
-    methods: {
-        getPlaceholder() {
-            switch (this.selectedFilterType) {
-                case "orderid":
-                    return "請輸入訂單編號";
-                case "housetitle":
-                    return "請輸入房屋標題";
-                default:
-                    return "";
-            }
-        },
-
-        onSelectedFilterTypeChange() {
-            this.userInput = ""; // 重置輸入框的內容
-            this.placeholder = this.getPlaceholder();
-            this.showInputBox = this.selectedFilterType !== "none";
-            this.$emit("filter-change", "inputcondition", this.selectedFilterType);
-        },
-    },
-    watch: {
-        userInput(newInput) {
-            this.$emit("input-update", newInput); // 傳遞輸入的值到父組件
-        },
-    },
-};
-</script>
