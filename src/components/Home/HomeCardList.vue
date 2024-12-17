@@ -1,4 +1,12 @@
 <script setup>
+    
+    const props = defineProps({
+        markers: Object
+    })
+
+    const markers = toRef(props,'markers')
+
+    
 
 </script>
 
@@ -7,49 +15,55 @@
   <div class="row gy-4">
     <div class="col-12 col-md-6" >
         <div class="card card-shadow" style="width: 100%;">
-            <img src="/src/assets/img/view1.jpg" class="card-img-top" alt="...">
+            <RouterLink to="#"><img src="/src/assets/img/view1.jpg" class="card-img-top" alt="..."></RouterLink>
             <div class="card-body">
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                <p class="card-text">Price: </p>
+                <p class="card-text">Address: </p>
             </div>
         </div>
     </div>
     <div class="col-12 col-md-6" >
         <div class="card card-shadow" style="width: 100%;">
-            <img src="/src/assets/img/view1.jpg" class="card-img-top" alt="...">
+            <RouterLink to="#"><img src="/src/assets/img/view1.jpg" class="card-img-top" alt="..."></RouterLink>
             <div class="card-body">
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                <p class="card-text">Price: </p>
+                <p class="card-text">Address: </p>
             </div>
         </div>
     </div>
     <div class="col-12 col-md-6" >
         <div class="card card-shadow" style="width: 100%;">
-            <img src="/src/assets/img/view1.jpg" class="card-img-top" alt="...">
+            <RouterLink to="#"><img src="/src/assets/img/view1.jpg" class="card-img-top" alt="..."></RouterLink>
             <div class="card-body">
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                <p class="card-text">Price: </p>
+                <p class="card-text">Address: </p>
             </div>
         </div>
     </div>
     <div class="col-12 col-md-6">
         <div class="card card-shadow" style="width: 100%;">
-            <img src="/src/assets/img/view1.jpg" class="card-img-top" alt="...">
+            <RouterLink to="#"><img src="/src/assets/img/view1.jpg" class="card-img-top" alt="..."></RouterLink>
             <div class="card-body">
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                <p class="card-text">Price: </p>
+                <p class="card-text">Address: </p>
             </div>
         </div>
     </div>
     <div class="col-12 col-md-6">
         <div class="card card-shadow" style="width: 100%;">
-            <img src="/src/assets/img/view1.jpg" class="card-img-top" alt="...">
+            <RouterLink to="#"><img src="/src/assets/img/view1.jpg" class="card-img-top" alt="..."></RouterLink>
             <div class="card-body">
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                <p class="card-text">Price: </p>
+                <p class="card-text">Address: </p>
             </div>
         </div>
     </div>
     <div class="col-12 col-md-6">
         <div class="card card-shadow" style="width: 100%;">
-            <img src="/src/assets/img/view1.jpg" class="card-img-top" alt="...">
+            <RouterLink to="#"><img src="/src/assets/img/view1.jpg" class="card-img-top" alt="..."></RouterLink>
             <div class="card-body">
-                <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                <p class="card-text">Price: </p>
+                <p class="card-text">Address: </p>
             </div>
         </div>
     </div>

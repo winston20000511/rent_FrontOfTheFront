@@ -24,7 +24,7 @@ import { ref } from 'vue';
         <HomeMap :markers="markers"></HomeMap>
       </div>
       <div class="main-right">
-        <HomeCardList></HomeCardList>
+        <HomeCardList :markers="markers"></HomeCardList>
       </div>
     </main>
 </template>
