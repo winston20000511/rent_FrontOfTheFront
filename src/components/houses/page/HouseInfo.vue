@@ -1,7 +1,7 @@
 <template>
-    <div class="house-details">
-      <!-- 房屋基本資料 -->
-      <div class="house-basic-info" v-if="houseDetails">
+  <div class="house-details">
+    <!-- 房屋基本資料 -->
+    <div class="house-basic-info" v-if="houseDetails">
       <h3>房屋基本資料</h3>
       <p><strong>價格：</strong>{{ houseDetails.price }} 元</p>
       <p><strong>坪數：</strong>{{ houseDetails.size }} 坪</p>
@@ -12,20 +12,22 @@
       <p><strong>廚房數：</strong>{{ houseDetails.kitchens }} 間</p>
       <p><strong>樓層數：</strong>{{ houseDetails.floors }} 樓</p>
     </div>
-  
-      <!-- 家具與服務 -->
+
+    <!-- 家具與服務 -->
     <h3>提供家具與服務</h3>
-    <div v-if="furnitureServices">
+    <div class="furniture-services">
       <div v-for="(item, index) in furnitureServices" :key="index" class="icon-label">
-        <img :src="item.src" :alt="item.alt" class="icon-image" /> {{ item.name }}
+        <img :src="getFurnitureImage(item)" :alt="item.alt" class="icon-image" />
+        <span>{{ item.name }}</span>
       </div>
     </div>
 
     <!-- 房屋限制 -->
     <h3>房屋限制</h3>
-    <div v-if="houseRestrictions">
+    <div class="house-restrictions">
       <div v-for="(item, index) in houseRestrictions" :key="index" class="icon-label">
-        <img :src="item.src" :alt="item.alt" class="icon-image" /> {{ item.name }}
+        <img :src="getRestrictionImage(item)" :alt="item.alt" class="icon-image" />
+        <span>{{ item.name }}</span>
       </div>
     </div>
   </div>
@@ -37,29 +39,29 @@ export default {
     return {
       houseDetails: null, // 存儲從後端獲取的資料
       furnitureServices: [
-        { src: 'img/washing-machine.jpg', alt: '洗衣機', name: '洗衣機' },
-        { src: 'img/air-conditioner.jpg', alt: '空調', name: '空調' },
-        { src: 'img/internet.jpg', alt: '網路', name: '網路' },
-        { src: 'img/bedding.jpg', alt: '床架', name: '床架' },
-        { src: 'img/mattress.jpg', alt: '床墊', name: '床墊' },
-        { src: 'img/fridge.jpg', alt: '冰箱', name: '冰箱' },
-        { src: 'img/electric-water-heater.jpg', alt: '電熱水器', name: '電熱水器' },
-        { src: 'img/gas-water-heater.jpg', alt: '瓦斯熱水器', name: '瓦斯熱水器' },
-        { src: 'img/tv.jpg', alt: '電視', name: '電視' },
-        { src: 'img/cable-tv.jpg', alt: '第四台', name: '第四台' },
-        { src: 'img/sofa.jpg', alt: '沙發', name: '沙發' },
-        { src: 'img/tables-chairs.jpg', alt: '桌椅', name: '桌椅' },
+        { src: 'washingMachine.ico', alt: '洗衣機', name: '洗衣機', available: true },
+        { src: 'airConditioner.ico', alt: '空調', name: '空調', available: true },
+        { src: 'network.ico', alt: '網路', name: '網路', available: false },
+        { src: 'bed.png', alt: '床架', name: '床架', available: true },
+        { src: 'mattress.ico', alt: '床墊', name: '床墊', available: true },
+        { src: 'refrigerator.ico', alt: '冰箱', name: '冰箱', available: true },
+        { src: 'ewaterHeater.ico', alt: '電熱水器', name: '電熱水器', available: false },
+        { src: 'gas.ico', alt: '瓦斯熱水器', name: '瓦斯熱水器', available: true },
+        { src: 'TV.ico', alt: '電視', name: '電視', available: true },
+        { src: 'cannel4.ico', alt: '第四台', name: '第四台', available: false },
+        { src: 'sofa.cio', alt: '沙發', name: '沙發', available: true },
+        { src: 'desk.ico', alt: '桌椅', name: '桌椅', available: true },
       ],
       houseRestrictions: [
-        { src: 'img/pet-friendly.jpg', alt: '允許養寵物', name: '允許養寵物' },
-        { src: 'img/parking.jpg', alt: '提供停車位', name: '提供停車位' },
-        { src: 'img/elevator.jpg', alt: '有電梯', name: '有電梯' },
-        { src: 'img/balcony.jpg', alt: '有陽台', name: '有陽台' },
-        { src: 'img/short-term-rent.jpg', alt: '允許短期租賃', name: '允許短期租賃' },
-        { src: 'img/cooking.jpg', alt: '允許烹飪', name: '允許烹飪' },
-        { src: 'img/water-dispenser.jpg', alt: '提供飲水機', name: '提供飲水機' },
-        { src: 'img/management-fee.jpg', alt: '管理費', name: '管理費' },
-        { src: 'img/gender-restriction.jpg', alt: '性別限制', name: '性別限制' },
+        { src: 'PET.ico', alt: '允許養寵物', name: '允許養寵物', allowed: true },
+        { src: 'Parking.ico', alt: '提供停車位', name: '提供停車位', allowed: false },
+        { src: 'elevator.ico', alt: '有電梯', name: '有電梯', allowed: true },
+        { src: 'balcony.ico', alt: '有陽台', name: '有陽台', allowed: false },
+        { src: 'shortTerm.ico', alt: '允許短期租賃', name: '允許短期租賃', allowed: true },
+        { src: 'cooking.ico', alt: '允許烹飪', name: '允許烹飪', allowed: false },
+        { src: 'waterDispenser.ico', alt: '提供飲水機', name: '提供飲水機', allowed: true },
+        { src: 'FEE.ico', alt: '管理費', name: '管理費', allowed: false },
+        { src: 'gender.ico', alt: '性別限制', name: '性別限制', allowed: true },
       ],
       isLoading: true, // 加載狀態
       hasError: false, // 錯誤狀態
@@ -70,6 +72,22 @@ export default {
     this.fetchHouseDetails(houseId);
   },
   methods: {
+    // 根據 available 屬性判斷是否顯示 "on" 或 "off" 圖片
+    getFurnitureImage(item) {
+      const imagePath = item.available 
+        ? `../../../assets/icon/house-on/${item.src}`
+        : `../../../assets/icon/house-off/${item.src}`;
+      return imagePath;
+    },
+
+    // 根據 allowed 屬性判斷是否顯示 "on" 或 "off" 圖片
+    getRestrictionImage(item) {
+      const imagePath = item.allowed 
+        ? `../../../assets/icon/house-on/${item.src}`
+        : `../../../assets/icon/house-off/${item.src}`;
+      return imagePath;
+    },
+
     // 使用 fetch 從後端獲取房屋詳細資料
     fetchHouseDetails(houseId) {
       this.isLoading = true; // 開始加載
@@ -94,7 +112,6 @@ export default {
 };
 </script>
 
-  
 <style scoped>
 .house-details {
   padding: 20px;
@@ -107,12 +124,20 @@ export default {
 .icon-label {
   display: flex;
   align-items: center;
+  margin-right: 15px;
 }
 
 .icon-image {
   width: 24px;
   height: 24px;
   margin-right: 10px;
+}
+
+.furniture-services,
+.house-restrictions {
+  display: flex;
+  flex-wrap: wrap; /* 使元素橫向排列，並換行 */
+  gap: 15px; /* 控制間距 */
 }
 
 .error-message {
