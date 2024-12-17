@@ -31,7 +31,7 @@
       async fetchHouseTitle() {
         this.error = ""; // 清空錯誤訊息
         try {
-          const response = await fetch(`http://localhost:8080/Title/${this.houseId}`);
+          const response = await fetch(`http://localhost:8080/api/houses/Title/${this.houseId}`);
           if (!response.ok) {
             throw new Error("無法獲取標題，錯誤代碼：" + response.status);
           }

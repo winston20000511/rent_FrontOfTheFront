@@ -2,29 +2,39 @@
     <div v-if="visible" class="modal-overlay" @click.self="closeModal">
       <div class="modal-content">
         <button class="close-btn" @click="closeModal">X</button>
+        
+        <!-- 房屋標題 -->
         <HouseTitle :houseId="houseId" />
         <hr />
-        <HousePhotos :houseId="houseId"/>
+        
+        <!-- 房屋圖片 -->
+        <HousePhotos :houseId="houseId" />
         <hr />
+        
         <div class="info-container">
+          <!-- 房屋信息 -->
           <HouseInfo :houseId="houseId" />
+          
+          <!-- 房東信息 -->
           <OwnerInfo :houseId="houseId" />
         </div>
         <hr />
+        
+        <!-- 房屋描述 -->
         <HouseDescription :houseId="houseId" />
       </div>
     </div>
   </template>
   
   <script setup>
+  import { defineProps, defineEmits } from 'vue';
   import HouseTitle from "@/components/houses/page/HouseTitle.vue";
-
   import HouseInfo from "@/components/houses/page/HouseInfo.vue";
   import OwnerInfo from "@/components/houses/page/OwnerInfo.vue";
   import HouseDescription from "@/components/houses/page/HouseDescription.vue";
-import HousePhotos from "@/components/houses/housePhotos.vue";
   
-  defineProps({
+  // 定義接收的 props
+  const props = defineProps({
     houseId: {
       type: Number,
       required: true,
@@ -35,8 +45,10 @@ import HousePhotos from "@/components/houses/housePhotos.vue";
     },
   });
   
+  // 定義 emits 事件
   const emit = defineEmits(["close"]);
   
+  // 關閉彈窗
   const closeModal = () => {
     emit("close"); // 通知父組件關閉彈窗
   };

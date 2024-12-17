@@ -46,7 +46,7 @@ export default {
     },
     baseUrl: {
       type: String,
-      default: '/api/houses/getPhotos',
+      default: 'http://localhost:8080/api/houses/getPhotos',
     },
   },
   data() {
