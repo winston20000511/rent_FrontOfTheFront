@@ -8,12 +8,7 @@ import BookingAgreement from './bookingAgreement.vue';
 
 const BASE_URL = import.meta.env.VITE_APIURL
 
-const someAction = async () => {
-    console.log("houseId: "+houseId.value);
-};
 
-
-const isAgreed = ref(false);
 const props = defineProps({
     houseId: {
         type: Number,
@@ -21,7 +16,8 @@ const props = defineProps({
     }
 });
 
-// const houseId = 1;  //此由父層傳遞近來
+
+const isAgreed = ref(false);
 const weekDays = ref('');
 const minDate = ref(null);
 const maxDate = ref(null);
@@ -31,6 +27,9 @@ const timeSlots = ref([]);
 const excludedTimes = ref([]);
 const currentSection = ref(1);
 const message = ref('');
+const responseStatus = ref(null);
+const responseMsg = ref('');
+const loading = ref(false);
 
 let startTime;
 let endTime;
@@ -41,7 +40,9 @@ const load = async () => {
     const data = await response.json();
     console.log(data);
 
-    minDate.value = new Date(data.fromDate + 'T00:00:00');
+    const currentDate = new Date();
+    const fromDate = new Date(data.fromDate + 'T00:00:00');
+    minDate.value = fromDate < currentDate ? currentDate + 1 : fromDate + 1;    //如起始日較小，則使用當下日期
     maxDate.value = new Date(data.toDate + 'T00:00:00');
 
     weekDays.value = data.weekDay;
@@ -54,34 +55,53 @@ const load = async () => {
 
 }
 
+const sendBooking = async () => {
+    const bookingData = {
+        houseId: props.houseId,
+        userId: 20,
+        bookingDate: selectedDate.value,
+        bookingTime: selectedTime.value,
+        message: message.value
+    }
+    loading.value = true;
+
+    try {
+        const response = await fetch(`${BASE_URL}/booking/host`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(bookingData)
+        });
+
+        const data = await response.json();
+
+        responseStatus.value = data.status;
+        responseMsg.value = data.message;
+        goNextSection();
+
+    } catch (error) {
+        console.error('Error:', error);
+        console.error('BookingSlot.vue sendBooking fail');
+    } finally {
+        loading.value = false;
+    }
+
+};
+
 // 當選擇日期時
 const onDateChange = (date) => {
     if (date) {
-        // const utcDate = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
-        // selectedDate.value = utcDate.toISOString().split('T')[0];
         selectedDate.value = date;
         selectedTime.value = '';
         generateTimeSlots(startTime, endTime, duration);
 
-        // nextTick(()=>{
-        //     const contentTime  = document.querySelector('#content-time');
-        //     console.log(contentTime );
-        //     if (contentTime ) {
-        //         contentTime .scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        //     }
-        // })
         nextTick(() => {
             const contentTime = document.querySelector('#content-time');
-            const header = document.querySelector('.header'); // 獲取 header
-            if (contentTime && header) {
-                const headerHeight = header.offsetHeight; // 獲取 header 的高度
-                const contentTimePosition = contentTime.getBoundingClientRect().top + window.scrollY; // 獲取 content-time 的位置
-                window.scrollTo({
-                    top: contentTimePosition - headerHeight, // 減去 header 高度
-                    behavior: 'smooth' // 平滑滾動
-                });
+            if (contentTime) {
+                contentTime.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
-        });
+        })
 
     } else {
         selectedDate.value = null;
@@ -90,7 +110,7 @@ const onDateChange = (date) => {
 };
 
 // 產生時間段
-const  generateTimeSlots = (startTime, endTime, duration) => {
+const generateTimeSlots = (startTime, endTime, duration) => {
     const start = new Date(`1970-01-01T${startTime}`);
     const end = new Date(`1970-01-01T${endTime}`);
     const times = [];
@@ -135,15 +155,16 @@ const goNextSection = () => {
 
 // 設置所選時間
 const selectTime = (time) => {
-    selectedTime.value = time; 
+    selectedTime.value = time + ':00';
 
-    nextTick(()=>{
+    // move to footer
+    nextTick(() => {
         const footer = document.querySelector('.booking-slot');
         if (footer) {
             footer.scrollIntoView({ behavior: 'smooth', block: 'end' });
         }
     })
-    
+
 };
 
 
@@ -182,90 +203,102 @@ onMounted(() => {
             <header class="header">
                 <h2>選擇您想要看房的時間</h2>
             </header>
-            
+
             <div class="content mb-3">
                 <hr class="w-100" />
                 <div class="mb-2">
-                    
                     <Datepicker id="select-date" locale="zh" model-type="yyyy-MM-dd" v-model="selectedDate"
                         :min-date="minDate" :max-date="maxDate" :disabled-week-days="disabledWeekDays" inline auto-apply
                         :enable-time-picker="false" @update:modelValue="onDateChange" :markers="markers" />
                 </div>
                 <div class="mb-2" id="content-time">
-                    <div v-if="!selectedDate" class="form-control" >💡　先選擇日期</div>
+                    <div v-if="!selectedDate" class="form-control">💡　先選擇日期</div>
                     <div v-if="selectedDate">
-                        
-                        <!-- <select id="time-select" class="form-select" v-model="selectedTime">
-                            <option value="" disabled>💡　選擇時間點　</option>
-                            <option v-for="time in timeSlots" :key="time" :value="time">
-                                <span class="d-block">{{ time }}</span>
-                            </option>
-                        </select>
-                        <hr> -->
-                        
+
                         <div class="time-slot-container form-control">
-                            <button v-for="time in timeSlots" :key="time" class="time-slot-btn" 
-                            :class="{ 'selected': selectedTime === time }" @click="selectTime(time)">
+                            <button v-for="time in timeSlots" :key="time" class="time-slot-btn"
+                                :class="{ 'selected': selectedTime === time + ':00' }" @click="selectTime(time)">
                                 {{ time }}
                             </button>
                         </div>
-                        
+
                     </div>
                 </div>
             </div>
-            
+
             <footer class="row">
                 <hr class="w-100" />
                 <div class="col"></div>
-                <button :disabled="!selectedDate || !selectedTime" class="btn btn-primary col"
-                    @click="goNextSection" id="nextButton">下一步</button>
+                <button :disabled="!selectedDate || !selectedTime" class="btn btn-primary col" @click="goNextSection"
+                    id="nextButton">下一步</button>
             </footer>
 
         </section>
         <!-- section 2 -->
         <section v-if="currentSection === 2">
-            <header>
+            <header class="header">
                 <h2>確認您的看房時間</h2>
             </header>
             <hr class="w-100" />
+            <div class="content mb-3">
+                <div>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th class="col-2">日期</th>
+                                <th class="col-2">時間</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>{{ selectedDate }}</td>
+                                <td>{{ selectedTime }}</td>
+                            </tr>
+                        </tbody>
 
-            <div>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th class="col-2">日期</th>
-                            <th class="col-2">時間</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>{{ selectedDate }}</td>
-                            <td>{{ selectedTime }}</td>
-                        </tr>
-                    </tbody>
+                    </table>
 
-                </table>
+                </div>
+                <div class="mb-3">
+                    <label for="message" class="form-label ">可填寫留言</label>
+                    <textarea id="message" class="form-control" v-model="message" rows="4" style="resize: none;"
+                        placeholder="輸入對房東的留言..."></textarea>
+                </div>
 
+                <BookingAgreement v-model:isAgreed="isAgreed" />
+
+                <!-- 發送預約按鈕 -->
+                <div class="d-flex justify-content-end">
+                    <button class="btn btn-info w-100" type="button" @click="sendBooking"
+                        :disabled="!isAgreed || loading">
+                        <span v-if="loading" class="spinner-grow spinner-border-sm" role="status"
+                            aria-hidden="true"></span>
+                        {{ loading ? '發送中...' : '發送預約' }}</button>
+                </div>
             </div>
-            <div class="mb-3">
-                <label for="message" class="form-label">可填寫留言</label>
-                <textarea id="message" class="form-control" v-model="message" rows="4" style="resize: none;"
-                    placeholder="請輸入對房東的留言..."></textarea>
-            </div>
-
-            <BookingAgreement v-model:isAgreed="isAgreed" />
-
-            <!-- 發送預約按鈕 -->
-            <div class="d-flex justify-content-end">
-                <button class="btn btn-info w-100" type="button" @click="someAction" :disabled="!isAgreed">發送預約</button>
-            </div>
-
             <hr class="w-100" />
-            <footer class="row">
+            <footer class="footer row">
                 <button class="btn btn-primary col" @click="currentSection--">上一步</button>
                 <div class=" col"></div>
-                
+
             </footer>
+        </section>
+
+        <!-- section 3 -->
+        <section v-if="currentSection === 3">
+            <header class="header">
+                <h2>發送狀態</h2>
+            </header>
+            <div class="content">
+                <div v-if="responseStatus === 'success'" class="alert alert-success">
+                    {{ responseMsg }}
+                </div>
+                <div v-if="responseStatus === 'danger'" class="alert alert-danger">
+                    {{ responseMsg }}
+                </div>
+            </div>
+            <footer v-if="responseStatus === 'success'">💡 等待房東回覆</footer>
+            <footer v-if="responseStatus === 'danger'">💡 請重新選擇</footer>
         </section>
     </div>
 
@@ -275,58 +308,62 @@ onMounted(() => {
 .dp__flex_display {
     display: block;
 }
+
 .form-select {
-    text-align: center; 
+    text-align: center;
 }
-.form-control{
-    text-align: center; 
+
+
+
+section {
+    margin: 10px;
 }
+
 .header {
-    background-color: #f8f9fa; /* Header 背景色 */
-    padding: 15px; /* Header 內邊距 */
-    position: sticky; /* 使 header 固定 */
-    top: 0; /* 距離頂部 */
+    background-color: white;
+    padding: 10px 10px;
+    text-align: center;
+    border-radius: 5px;
+    position: sticky;
+    top: 0;
     z-index: 1;
-    
-}
 
-section{
-    margin: 20px;
-}
-
-.footer {
-    background-color: #f8f9fa; /* Footer 背景色 */
-    padding: 10px; /* Footer 內邊距 */
 }
 
 .content {
-
-    overflow-y:hidden; /* 垂直滾動 */
-    flex-grow: 1; /* 填滿剩餘空間 */
+    overflow-y: hidden;
+    flex-grow: 1;
+    text-align: center;
+    font-weight: bold;
 }
 
+.footer {
+    background-color: white;
+}
 
 .time-slot-container {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); /* 自動填充，最小寬度100px */
-    gap: 10px; /* 按鈕之間的間距 */
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    /* 自動填充，最小寬度100px */
+    gap: 10px;
+    /* 按鈕之間的間距 */
 }
 
 .time-slot-btn {
     padding: 10px;
-    border: 1px solid #007bff; /* 按鈕邊框 */
-    background-color: #f8f9fa; /* 按鈕背景色 */
-    cursor: pointer; /* 鼠標指針變化 */
-    text-align: center; /* 文本居中 */
-    border-radius: 5px; /* 圓角 */
+    border: 1px solid #007bff;
+    background-color: #f8f9fa;
+    cursor: pointer;
+    text-align: center;
+    border-radius: 5px;
 }
 
 .time-slot-btn:hover {
-    background-color: #e2e6ea; /* 懸停效果 */
+    background-color: #e2e6ea;
 }
 
 .time-slot-btn.selected {
-    background-color: #007bff; /* 選擇後的背景顏色 */
-    color: white; /* 選擇後的文字顏色 */
+    background-color: #007bff;
+    color: white;
 }
 </style>

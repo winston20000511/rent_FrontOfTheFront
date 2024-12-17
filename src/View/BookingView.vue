@@ -63,10 +63,13 @@ h2 {
   justify-content: space-between;
 }
 .btn-close {
+  background-color: antiquewhite;
+  border-radius: 5rem;
   position: absolute;
   top: 10px;
   right: 10px;
   font-size: 20px;
   z-index: 1001;
+  text-align:start
 } 
 </style>
