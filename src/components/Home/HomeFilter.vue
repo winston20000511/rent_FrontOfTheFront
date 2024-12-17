@@ -35,6 +35,7 @@
         isComposing = false;
         showKeyWordFetch();
     }
+    
     const showSearchList = ()=>{
         if (searchInputRef.value){
             const listRect = searchInputRef.value.getBoundingClientRect();
@@ -228,9 +229,11 @@
                 data-bs-target="#offcanvasScrolling" 
                 aria-controls="offcanvasScrolling"
                 ref="searchInputRef"
+                v-on:input="showSearchList"
                 v-on:compositionstart="compositionStart"
                 v-on:compositionend="compostitionEnd"
-                v-on:click="showSearchList"> 
+                v-on:click="showSearchList"
+                > 
         <i class="fa-solid fa-magnifying-glass" ref="iconBtnRef" v-on:click="clickSearchBtn"></i>
     </div>
     <ul class="searchList position-absolute mt-1 bg-white border rounded shadow"

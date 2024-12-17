@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted, watch, toRef, nextTick, shallowRef } from 'vue';
+import { ref, onMounted, onUnmounted, watch, toRef, shallowRef } from 'vue';
 import { Loader } from '@googlemaps/js-api-loader';
 
 const map = shallowRef(null); // 地圖容器
@@ -12,8 +12,9 @@ let isDrawing = false; //判斷是否正在繪圖
 let context = null;
 let points = []; //儲存 Canvas 路徑點
 
+
 const props = defineProps({
-  markers: Array
+  markers: Object
 })
 const markers = toRef(props, 'markers');
 
@@ -54,27 +55,6 @@ onMounted(() => {
       canvasElement.addEventListener('mouseout', stopDrawing);
 
 
-      // const content = document.createElement('div');
-      // content.textContent = '📍';
-      // content.style.fontSize = '20px';
-      // content.style.color = 'black';
-      // content.style.backgroundColor = 'yellow';
-      // content.style.padding = '5px';
-      // content.style.borderRadius = '50%';
-      
-      // const qq = new google.maps.marker.AdvancedMarkerElement({
-      //   position: {  lat: 23.023535, lng: 120.222776 },
-      //   map: map.value,
-      //   // content: content,
-      // });
-
-      // console.log('AdvancedMarkerElement 實例:', qq);
-
-      // map.value.addListener('click', (event) => {
-      //   console.log('地圖點擊:', event.latLng.toJSON());
-      // });
-
-
     });
   });
   onUnmounted(()=>{
@@ -88,24 +68,20 @@ onMounted(() => {
 
   watch(markers, (newMarkers) => {
 
+    const list = newMarkers.searchList;
+    const origin = newMarkers.searchOrigin;
+    const avgPrice = newMarkers.avgPrice;
+    
     mapMarkers.value.forEach((marker) => marker.map = null);
     mapMarkers.value = [];
 
-    newMarkers.forEach((marker) => {
+    list.forEach((marker) => {
 
-      const buttonElement = document.createElement("div");
-			buttonElement.innerHTML = `<button id="infoWindowButton"   style="
-            background-color: #9333EA;
-            color: white;
-            border-radius: 0.5rem;
-            padding: 10px;
-            border: none;
-          "
-          onmouseover="this.style.backgroundColor='#5A189A';"
-          onmouseout="this.style.backgroundColor='#9333EA';"
-        >
-			    ${Number(marker.price)/1000}K
-			  </button>`;
+
+      const buttonElement = document.createElement("button");
+      buttonElement.className="btn-purple"
+      buttonElement.innerHTML=`${Number(marker.price)/1000}K`
+      buttonElement.style.pointerEvents = "auto";
 
       var latlng = new google.maps.LatLng(marker.lat, marker.lng);
       var mapMark = new google.maps.marker.AdvancedMarkerElement({
@@ -116,6 +92,21 @@ onMounted(() => {
       });
       mapMarkers.value.push(mapMark);
     });
+
+    const buttonOrigin = document.createElement("button");
+    buttonOrigin.className="btn-yellow"
+    buttonOrigin.innerHTML=`${(Number(avgPrice)/1000).toFixed(1)}K`
+    buttonOrigin.style.pointerEvents = "auto";
+    var latlng = new google.maps.LatLng(origin.lat, origin.lng);
+    var mapMark = new google.maps.marker.AdvancedMarkerElement({
+        position: latlng,
+        map: map.value,
+        title: origin.street,
+        content: buttonOrigin,
+      });
+      map.value.panTo(latlng);
+      map.value.setZoom(14);
+      mapMarkers.value.push(mapMark);
   });
 
   // =========================================繪圖功能=================================================================
@@ -253,7 +244,7 @@ onMounted(() => {
   </div>
 </template>
 
-<style scoped>
+<style>
 .map-container {
   width: 100%;
   height: 76vh;
@@ -279,11 +270,26 @@ onMounted(() => {
     background-color: #9333EA; /* purple-500 */
     color: white;
     border-radius: 0.5rem; /* 圓角效果 */
-    padding: 10px; /* 增加按鈕內邊距 */
+    padding: 3px; /* 增加按鈕內邊距 */
     border: none; /* 去掉邊框 */
+    transition: background-color 0.3s ease;
+    width: 30px;
 }
 
 .btn-purple:hover {
     background-color: #5A189A; /* purple-700 */
+}
+.btn-yellow {
+    background-color: #c2cf09; /* purple-500 */
+    color: white;
+    border-radius: 0.5rem; /* 圓角效果 */
+    padding: 5px; /* 增加按鈕內邊距 */
+    border: none; /* 去掉邊框 */
+    transition: background-color 0.3s ease;
+    width: 50px;
+}
+
+.btn-yellow:hover {
+    background-color: #afb922; /* purple-700 */
 }
 </style>

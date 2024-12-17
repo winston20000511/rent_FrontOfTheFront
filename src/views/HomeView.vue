@@ -5,7 +5,7 @@
   import HomeNavbar from '@/components/Home/HomeNavbar.vue';
 import { ref } from 'vue';
 
-  const markers = ref([]);
+  const markers = ref({});
 
   const addMarker = (locations)=>{
     markers.value = locations
