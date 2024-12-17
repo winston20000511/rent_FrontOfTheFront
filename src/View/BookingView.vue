@@ -1,9 +1,8 @@
 <script setup>
-import 'bootstrap/dist/css/bootstrap.min.css';
-import 'bootstrap/dist/js/bootstrap.min.js'
 import BookingSlot from '@/components/Booking/BookingSlot.vue';
 import { ref, defineEmits } from 'vue';
 
+const houseId = 1; //由上一層提供,目前寫死
 
 const BASE_URL = import.meta.env.VITE_APIURL
 
@@ -22,11 +21,11 @@ const props = defineProps({
 </script>
 
 <template>
-  <div class="modal-overlay" @click="closeView" v-if="isVisible">
-    <div class="modal-content" @click.stop>
-      <button type="button" class="btn-close" @click="closeView"></button>
+  <div class="modal-overlay " @click="closeView" v-if="isVisible">
+    <div class="modal-content mb-3" @click.stop>
+      <button type="button" class="btn-close" @click="closeView" ></button>
       <div class="modal-header">
-        <BookingSlot />
+        <BookingSlot :houseId="houseId"/>
       </div>
     </div>
   </div>
@@ -47,14 +46,16 @@ h2 {
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 1000;
 }
 
 .modal-content {
   background-color: white;
   border-radius: 8px;
-  padding: 20px;
+  padding: 0px 10px;
   width: 500px;
-  /* Adjust width as needed */
+  overflow-y: auto; 
+  max-height: 600px;
 }
 
 .modal-header {
@@ -62,9 +63,13 @@ h2 {
   justify-content: space-between;
 }
 .btn-close {
+  background-color: antiquewhite;
+  border-radius: 5rem;
   position: absolute;
   top: 10px;
   right: 10px;
   font-size: 20px;
+  z-index: 1001;
+  text-align:start
 } 
 </style>

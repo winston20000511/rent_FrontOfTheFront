@@ -1,11 +1,12 @@
 import { defineStore } from 'pinia'
-export const useExampleStore = defineStore('exampleStore', {
+export const useHouseCard = defineStore('houseCard', {
     state: () => ({
-      sharedData: '', // 共用的狀態
+      shareMarkers: [], // 共用的狀態
     }),
     actions: {
       updateData(newData) {
-        this.sharedData = newData; // 更新狀態
+        this.shareMarkers = newData; // 更新狀態
+        console.log(JSON.stringify(newData));
       },
     },
   });

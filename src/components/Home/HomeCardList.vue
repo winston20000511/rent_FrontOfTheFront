@@ -1,4 +1,6 @@
 <script setup>
+import { toRef, watch } from 'vue';
+
     
     const props = defineProps({
         markers: Object
@@ -6,64 +8,32 @@
 
     const markers = toRef(props,'markers')
 
+    watch(markers,(newMarkers)=>{
+
+
+
+    })
+
     
 
+//   const showBookingView = ref(false);
+//   const loadBookingView = () => {
+//     showBookingView.value = true;
+//   };
+//   const closeBookingView = () => {
+//     showBookingView.value = false;
+//   };
 </script>
 
 <template>
 <div class="container py-4 px-4 bg-body custom-shadow">
   <div class="row gy-4">
-    <div class="col-12 col-md-6" >
+    <div v-for="list in markers.searchList" class="col-12 col-md-6" >
         <div class="card card-shadow" style="width: 100%;">
             <RouterLink to="#"><img src="/src/assets/img/view1.jpg" class="card-img-top" alt="..."></RouterLink>
             <div class="card-body">
-                <p class="card-text">Price: </p>
-                <p class="card-text">Address: </p>
-            </div>
-        </div>
-    </div>
-    <div class="col-12 col-md-6" >
-        <div class="card card-shadow" style="width: 100%;">
-            <RouterLink to="#"><img src="/src/assets/img/view1.jpg" class="card-img-top" alt="..."></RouterLink>
-            <div class="card-body">
-                <p class="card-text">Price: </p>
-                <p class="card-text">Address: </p>
-            </div>
-        </div>
-    </div>
-    <div class="col-12 col-md-6" >
-        <div class="card card-shadow" style="width: 100%;">
-            <RouterLink to="#"><img src="/src/assets/img/view1.jpg" class="card-img-top" alt="..."></RouterLink>
-            <div class="card-body">
-                <p class="card-text">Price: </p>
-                <p class="card-text">Address: </p>
-            </div>
-        </div>
-    </div>
-    <div class="col-12 col-md-6">
-        <div class="card card-shadow" style="width: 100%;">
-            <RouterLink to="#"><img src="/src/assets/img/view1.jpg" class="card-img-top" alt="..."></RouterLink>
-            <div class="card-body">
-                <p class="card-text">Price: </p>
-                <p class="card-text">Address: </p>
-            </div>
-        </div>
-    </div>
-    <div class="col-12 col-md-6">
-        <div class="card card-shadow" style="width: 100%;">
-            <RouterLink to="#"><img src="/src/assets/img/view1.jpg" class="card-img-top" alt="..."></RouterLink>
-            <div class="card-body">
-                <p class="card-text">Price: </p>
-                <p class="card-text">Address: </p>
-            </div>
-        </div>
-    </div>
-    <div class="col-12 col-md-6">
-        <div class="card card-shadow" style="width: 100%;">
-            <RouterLink to="#"><img src="/src/assets/img/view1.jpg" class="card-img-top" alt="..."></RouterLink>
-            <div class="card-body">
-                <p class="card-text">Price: </p>
-                <p class="card-text">Address: </p>
+                <p class="card-text">{{"NT$" + list.price}}</p>
+                <p class="card-text">{{list.address}}</p>
             </div>
         </div>
     </div>

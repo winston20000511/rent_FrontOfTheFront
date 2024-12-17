@@ -272,7 +272,7 @@ onMounted(() => {
   top: 0;
   left: 0;
   background: transparent;
-  pointer-events: auto; /* 确保鼠标事件只针对 Canvas */
+  pointer-events: none; /* 确保鼠标事件只针对 Canvas */
 }
 .btnDraw{
   display: none;

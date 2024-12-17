@@ -1,0 +1,148 @@
+<script setup>
+import axios from "axios";
+import { ref, watch } from "vue";
+
+const emit = defineEmits(["filter-no-ad-houses"]);
+
+const props = defineProps({
+  noAdHouses: {
+    type: Array,
+    required: true,
+  },
+  adtypes: {
+    type: Array,
+    required: true,
+  },
+});
+
+const isDataLoaded = ref(false);
+const selectedAdtypes = ref([]);
+
+// 使用者選取的房屋及廣告類別
+const selectedHouseId = ref("");
+const selectedAdtype = ref("");
+
+const initializeData = () => {
+  if (props.noAdHouses.length > 0 && props.adtypes.length > 0) {
+    selectedAdtypes.value = props.noAdHouses.map(
+      () => props.adtypes[0] || null
+    );
+    isDataLoaded.value = true;
+  }
+};
+
+watch(
+  [() => props.noAdHouses, () => props.adtypes],
+  () => {
+    isDataLoaded.value = false;
+    initializeData();
+  },
+  { immediate: true }
+);
+
+// 取得用戶選擇的房屋和廣告方案資訊
+const getHouseAndAdtypeInfo = (index) => {
+  selectedAdtype.value = selectedAdtypes.value[index];
+  selectedHouseId.value = props.noAdHouses[index].houseId;
+
+  console.log(
+    "House ID: ", selectedHouseId.value,
+    "Adtype Price: ", selectedAdtype.value?.adPrice,
+    "Index: ", index,
+    "selectedAdtypeId: ", selectedAdtype.value?.adtypeId
+  );
+};
+
+// 插入廣告資料表
+async function addAd(houseId, adtypeId) {
+  if (!houseId || !adtypeId) {
+    console.error("House ID: ", houseId, " or Adtype ID is missing: ", adtypeId);
+    return;
+  }
+
+  const selectedInfo = {
+    houseId,
+    adtypeId,
+  };
+
+  try {
+    const response = await axios.post("/advertisements", selectedInfo, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+    console.log("Ad added successfully:", response.data);
+  } catch (error) {
+    console.error("Error adding ad:", error);
+  }
+}
+</script>
+
+<template>
+  <div>
+    <div v-if="!isDataLoaded" class="text-center py-6 text-gray-500">
+      數據加載中...
+    </div>
+
+    <div v-else>
+      <div
+        class="px-4 py-2 text-sm font-bold text-yellow-600 bg-yellow-100 rounded m-3"
+      >
+        請選擇想要升級為VIP的物件
+      </div>
+
+      <table
+        class="table-auto w-full text-sm border border-gray-300 rounded-lg"
+      >
+        <thead>
+          <tr class="bg-green-400 text-white text-center">
+            <th class="px-4 py-3 font-semibold">房屋標題</th>
+            <th class="px-4 py-3 font-semibold">查看房屋</th>
+            <th class="px-4 py-3 font-semibold">廣告方案</th>
+            <th class="px-4 py-3 font-semibold">廣告價格</th>
+            <th class="px-4 py-3 font-semibold">新增廣告</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="(noAdHouse, index) in props.noAdHouses"
+            :key="index"
+            class="text-center"
+          >
+            <td class="px-4 py-3">{{ noAdHouse.houseTitle }}</td>
+            <td class="px-4 py-3">
+              <button
+                class="px-3 py-1 text-sm text-blue-600 bg-blue-100 rounded hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              >
+                查看
+              </button>
+            </td>
+            <td class="px-4 py-3">
+              <select
+                @input="getHouseAndAdtypeInfo(index)"
+                v-model="selectedAdtypes[index]"
+              >
+                <option
+                  v-for="(adtype, adIndex) in props.adtypes"
+                  :key="adIndex"
+                  :value="adtype"
+                >
+                  {{ adtype.adName }}
+                </option>
+              </select>
+            </td>
+            <td>NTD {{ selectedAdtypes[index]?.adPrice }}</td>
+            <td class="px-4 py-3 text-center">
+              <button
+                class="px-4 py-2 text-white bg-green-500 rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400"
+                @click="addAd(noAdHouse.houseId, selectedAdtypes[index]?.adtypeId)"
+              >
+                新增
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</template>
