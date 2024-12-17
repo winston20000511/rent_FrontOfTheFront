@@ -11,6 +11,8 @@ import { ref } from 'vue';
     markers.value = locations
   }
 
+
+
 </script>
 <template>
     <header>

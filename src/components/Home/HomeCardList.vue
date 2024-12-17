@@ -1,5 +1,14 @@
 <script setup>
+import BookingView from '@/View/BookingView.vue';
+import { ref } from 'vue';
 
+  const showBookingView = ref(false);
+  const loadBookingView = () => {
+    showBookingView.value = true;
+  };
+  const closeBookingView = () => {
+    showBookingView.value = false;
+  };
 </script>
 
 <template>
@@ -26,6 +35,13 @@
             <img src="/src/assets/img/view1.jpg" class="card-img-top" alt="...">
             <div class="card-body">
                 <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+
+                <div class="modal-body">
+                    <button type="button" class="btn btn-primary" @click="loadBookingView">預約看房
+                    </button>
+                    <BookingView v-if="showBookingView" :isVisible="showBookingView"  @closeView="closeBookingView" />
+                </div>
+
             </div>
         </div>
     </div>
