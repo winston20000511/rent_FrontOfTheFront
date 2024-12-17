@@ -41,7 +41,7 @@ const routes = [
     path:"/HouseVue",
     name:"HouseVue",
     component:HouseView
-  }
+  },
   // 其他路由可以在這裡添加
   {
     path:"/orders", // 開發用，之後會刪掉
