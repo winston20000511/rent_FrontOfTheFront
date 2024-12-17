@@ -3,14 +3,14 @@ import { RouterLink, RouterView } from 'vue-router';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import 'bootstrap-icons/font/bootstrap-icons.min.css';
-import OwnerInfo from './components/houses/OwnerInfo.vue';
-
+import HouseCreate from './components/houses/HouseCreate.vue';
 
 
 
 </script>
 
 <template>
+  <HouseCreate></HouseCreate>
   <RouterView></RouterView>
 </template>
 

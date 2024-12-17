@@ -38,7 +38,8 @@
         <label for="floor">樓層</label>
         <input type="number" id="floor" class="form-control" v-model.number="form.floor" required min="-3" />
       </div>
-
+      <hr />
+      
       <!-- 提供家具與服務 -->
       <hr />
       <h3>提供家具與服務</h3>
@@ -145,6 +146,9 @@
         </label>
       </div>
 
+      <!-- 設定預約時段 -->
+      <BookingSlotSetting></BookingSlotSetting>
+
       <!-- 簡介 -->
       <hr />
       <h3>簡介</h3>
@@ -173,9 +177,13 @@
 
 <script>
 import { ref, reactive } from 'vue';
+import BookingSlotSetting from '../Booking/BookingSlotSetting.vue';
 
 export default {
   name: 'AddHouseForm',
+  components: {
+        BookingSlotSetting
+  },
   setup() {
     const form = reactive({
       title: '',
