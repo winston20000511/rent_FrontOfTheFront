@@ -5,6 +5,11 @@ import EditUserPage from '@/components/User/EditUserPage.vue';
 import ForgotPassword from '@/components/User/ForgotPassword.vue';
 import LoginForm from '@/components/User/LoginForm.vue';
 import HouseView from '@/View/HouseView.vue';
+import LoginPage from '@/components/User/LoginPage.vue';
+import MyOrders from '@/components/Orders/MyOrders.vue';
+import MyAds from '@/components/Ads/MyAds.vue';
+import OrderConfirmView from '@/View/OrderConfirmView.vue';
+import AdtypeView from '@/View/AdtypeView.vue';
 
 const routes = [
   {
@@ -38,6 +43,26 @@ const routes = [
     component:HouseView
   }
   // 其他路由可以在這裡添加
+  {
+    path:"/orders", // 開發用，之後會刪掉
+    name:"orders",
+    component: MyOrders,
+  },
+  {
+    path:"/adtype",
+    name:"adtypes",
+    component: AdtypeView,
+  },
+  {
+    path:"/order-confirm",
+    name:"orderConfirm",
+    component: OrderConfirmView,
+  },
+  {
+    path:"/ads", // 開發用，之後刪掉
+    name:"ads",
+    component: MyAds,
+  },
 ];
 
 const router = createRouter({
