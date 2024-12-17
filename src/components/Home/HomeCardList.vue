@@ -23,6 +23,10 @@ watch(markers, (newMarkers) => {
 
 // 打開房屋詳情頁面
 const openHouseView = (houseId, title) => {
+  console.log('openHouseView triggered');  // 確認方法是否被觸發
+  console.log('House ID:', houseId);      // 輸出選中的房屋 ID
+  console.log('Title:', title);            // 輸出選中的房屋標題
+  
   selectedHouseId.value = houseId;
   selectedTitle.value = title;
   showView.value = true;
@@ -31,9 +35,15 @@ const openHouseView = (houseId, title) => {
 
 <template>
     <div class="container py-4 px-4 bg-body custom-shadow">
-        <div class="row gy-4">
+        <!-- 在此顯示markers.searchList的結構 -->
+        <pre>{{ markers.searchList }}</pre>  <!-- 這裡可以檢查數據結構 -->
+
+        <div v-if="markers.searchList && markers.searchList.length">
             <div v-for="list in markers.searchList" :key="list.id" class="col-12 col-md-6">
-                <div class="card card-shadow" style="width: 100%;" @click="HouseView(list.id, list.title)">
+                <div 
+                    class="card card-shadow clickable-card" 
+                    style="width: 100%;" 
+                    @click="openHouseView(list.id, list.title)">
                     <img src="/src/assets/img/view1.jpg" class="card-img-top" alt="...">
                     <div class="card-body">
                         <p class="card-text">{{ "NT$" + list.price }}</p>
@@ -43,9 +53,8 @@ const openHouseView = (houseId, title) => {
             </div>
         </div>
     
-
     <!-- 房屋詳細頁面 (彈窗) -->
-    <HouseView  v-if="showModal" :houseId="selectedHouseId" :title="selectedTitle" @close="showModal = false" />
+    <HouseView v-if="showView" :houseId="selectedHouseId" :title="selectedTitle" @close="showView = false" />
     </div>
 </template>
 
@@ -54,13 +63,22 @@ const openHouseView = (houseId, title) => {
     position: relative;
     margin: 0px 0px 0px 5px;
     box-shadow: -5px 0px 5px -3px rgba(0, 0, 0, 0.4);
-    /* 浅灰色阴影 */
 }
 
 .card-shadow {
     position: relative;
     box-shadow: -5px 5px 5px -3px rgba(0, 0, 0, 0.4);
-    /* 浅灰色阴影 */
 }
 
+.card-body {
+    cursor: pointer;  /* 確保卡片可以被點擊 */
+}
+
+.clickable-card {
+    cursor: pointer; /* 改變鼠標樣式，表示該區域可點擊 */
+}
+
+.card-img-top {
+    cursor: pointer; /* 使圖片區域也可點擊 */
+}
 </style>

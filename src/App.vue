@@ -12,7 +12,7 @@ import CollectHouseList from './components/houses/CollectHouseList.vue';
 </script>
 
 <template>
-<CollectHouseList></CollectHouseList>
+
   <RouterView></RouterView>
 </template>
 
