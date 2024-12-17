@@ -11,7 +11,7 @@ const isDrawingMode = ref(false); //按鈕切換繪圖模式
 let isDrawing = false; //判斷是否正在繪圖
 let context = null;
 let points = []; //儲存 Canvas 路徑點
-
+let polygon = null;
 
 const props = defineProps({
   markers: Object
@@ -112,13 +112,20 @@ onMounted(() => {
   // =========================================繪圖功能=================================================================
   // 開始繪圖
   function startDrawing(event) {
-    
     isDrawing = true;
     points = [];
+
+    // if (polygon) {
+    //     polygon.setMap(null); // 移除多邊形
+    //     polygon = null;       // 清空變數
+    // }
+
     addPoint(event);
     const { offsetX, offsetY } = event;
     context.beginPath();
     context.moveTo(offsetX, offsetY);
+
+
   }
 
   // 繪製中
@@ -139,6 +146,14 @@ onMounted(() => {
     isDrawing = false;
     context.closePath();
     convertToPolygon();
+
+    // isDrawingMode.value = !isDrawingMode.value;
+    // const canvasElement = canvas.value;
+    // canvasElement.style.pointerEvents = 'none';
+    // map.value.setOptions({
+    //   draggable: true,
+    //   gestureHandling: 'auto',
+    // });
   }
 
   //清除畫筆
@@ -189,7 +204,7 @@ onMounted(() => {
           const latLng = projection.fromContainerPixelToLatLng(point);
           const latitude = latLng.lat();
           const lngitude = latLng.lng();
-          console.log('Converted LatLng:', {lat: latitude , lng: lngitude})
+          // console.log('Converted LatLng:', {lat: latitude , lng: lngitude})
 
           resolve({lat: latitude , lng:lngitude});
           overlay.setMap(null); // 释放 OverlayView
@@ -227,7 +242,7 @@ onMounted(() => {
   async function convertToPolygon() {
     if (!points.length) return;
     const latLngPoints = await convertPointsToLatLng(map.value, points);
-    console.log(latLngPoints);
+    // console.log(latLngPoints);
     drawPolygonOnMap(map.value, latLngPoints);
     const canvasElement = canvas.value;
     clearCanvas(canvasElement);

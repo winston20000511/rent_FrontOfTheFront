@@ -3,12 +3,15 @@
   import HomeFilter from '@/components/Home/HomeFilter.vue';
   import HomeMap from '@/components/Home/HomeMap.vue';
   import HomeNavbar from '@/components/Home/HomeNavbar.vue';
-import { ref } from 'vue';
+  import { useHouseCard } from '@/stores/CardHouseStore';
+  import { ref } from 'vue';
 
+  const store = useHouseCard();
   const markers = ref({});
 
   const addMarker = (locations)=>{
     markers.value = locations
+    store.updateData(markers.value.searchList)
   }
 
 
@@ -26,7 +29,7 @@ import { ref } from 'vue';
         <HomeMap :markers="markers"></HomeMap>
       </div>
       <div class="main-right">
-        <HomeCardList></HomeCardList>
+        <HomeCardList :markers="markers"></HomeCardList>
       </div>
     </main>
 </template>
