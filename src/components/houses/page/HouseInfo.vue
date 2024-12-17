@@ -106,7 +106,7 @@
   methods: {
     // 使用 fetch 從後端獲取房屋詳細資料
     fetchHouseDetails(houseId) {
-      fetch(`http://localhost:8080/details/${houseId}`)
+      fetch(`http://localhost:8080/api/houses/details/${houseId}`)
         .then(response => response.json())
         .then(data => {
           this.houseDetails = data; // 將資料存儲到 houseDetails 中

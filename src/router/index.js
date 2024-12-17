@@ -5,7 +5,6 @@ import EditUserPage from '@/components/User/EditUserPage.vue';
 import ForgotPassword from '@/components/User/ForgotPassword.vue';
 import LoginForm from '@/components/User/LoginForm.vue';
 import HouseView from '@/View/HouseView.vue';
-import LoginPage from '@/components/User/LoginPage.vue';
 import MyOrders from '@/components/Orders/MyOrders.vue';
 import MyAds from '@/components/Ads/MyAds.vue';
 import OrderConfirmView from '@/View/OrderConfirmView.vue';
