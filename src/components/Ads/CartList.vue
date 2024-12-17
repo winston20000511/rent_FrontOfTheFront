@@ -107,7 +107,7 @@ function checkOut() {
             checked
           />
           <span class="text-gray-700"
-            ><img width="70px" src="../../assets/Line_pay_logo.svg.png"
+            ><img width="70px"
           /></span>
         </label>
 
