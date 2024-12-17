@@ -1,3 +1,7 @@
+
+
+
+
 <script setup>
 import { RouterLink, RouterView } from 'vue-router';
 import { ref } from 'vue';
@@ -20,15 +24,16 @@ const toggleChatPopup = () => {
 <template>
   <RouterView></RouterView>
 
+  
   <!-- chat popup start -->
   <ChatPopup v-if="showChatPopup" @close="toggleChatPopup" />
-
   <button class="chat-button" @click="toggleChatPopup">
     聊天
   </button>
   <!-- chat popup end-->
-</template>
 
+
+</template>
 <style>
 /* 這裡可以添加你自定義的樣式 */
 

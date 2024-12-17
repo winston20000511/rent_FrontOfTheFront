@@ -7,12 +7,13 @@ import HomeNavbar from '@/components/Home/HomeNavbar.vue';
 
 </script>
 <template>
-    <header>
-      <HomeNavbar></HomeNavbar>
-    </header>
-    <div class="filter">
-      <HomeFilter></HomeFilter>
-    </div>
+  <header>
+    <HomeNavbar></HomeNavbar>
+  </header>
+  <div class="filter">
+    <HomeFilter></HomeFilter>
+  </div>
+  <!-- <div class="container-home"> -->
     <main>
       <div class="main-left">
         <HomeMap></HomeMap>
@@ -21,10 +22,21 @@ import HomeNavbar from '@/components/Home/HomeNavbar.vue';
         <HomeCardList></HomeCardList>
       </div>
     </main>
-    
+  <!-- </div> -->
 </template>
 
+<style>
+
+/* .container-home {
+  display: flex;
+
+  justify-content: center;
+  text-align: center;
+  margin: 0 auto;
+} */
+</style>
 <style scoped>
+
   header{
     display: flex;
     justify-content: space-between;

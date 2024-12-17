@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue';
+import { ref , computed  } from 'vue';
 
 const navLeft = ref(null);
 const linkOne = ref(null);
@@ -24,6 +24,9 @@ const linkMouseLeave=()=>{
     }
 }
 
+const isAuthenticated = computed(() => {
+  return !!localStorage.getItem("jwtToken");
+});
 </script>
 
 <template>
@@ -66,10 +69,15 @@ const linkMouseLeave=()=>{
 
 <!-- 右邊連結位置 -->
 <div class="nav-right">
-    <li><RouterLink to="#">Manage Rentals</RouterLink></li>
-    <li><RouterLink to="#">Advertise</RouterLink></li>
-    <li><RouterLink to="#">Help</RouterLink></li>
-    <li><RouterLink to="#">Sign In</RouterLink></li>
+    <ul>
+        <li><RouterLink to="#">Manage Rentals</RouterLink></li>
+        <li><RouterLink to="#">Advertise</RouterLink></li>
+        <li><RouterLink to="#">Help</RouterLink></li>
+        <!-- <li><RouterLink to="/login">Sign In</RouterLink></li> -->
+        <li v-if="!isAuthenticated"><router-link to="/login">Sign In</router-link></li>
+        <li v-if="isAuthenticated"><router-link to="/MemberCenter">member center</router-link></li>
+        
+    </ul>
 </div>
 
 </template>

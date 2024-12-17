@@ -2,8 +2,12 @@ import { createRouter, createWebHistory } from 'vue-router';
 import HomeView from '@/views/HomeView.vue';
 import MemberCenter from '@/components/User/memberCenter.vue';
 import EditUserPage from '@/components/User/EditUserPage.vue';
-import ForgotPassword from '@/components/User/ForgotPassword.vue';
-import LoginForm from '@/components/User/LoginForm.vue';
+// import ForgotPassword from '@/components/User/ForgotPassword.vue';
+// import LoginForm from '@/components/User/LoginForm.vue';
+import Login from '@/components/UserAuth/Login.vue';
+import register from '@/components/UserAuth/Register.vue';
+import ForgotPWD from '@/components/UserAuth/ForgotPassword.vue';
+
 
 const routes = [
   {
@@ -12,14 +16,19 @@ const routes = [
     component: HomeView
   },
   {
-    path: '/login', // 登入頁面的路徑設定
-    name: 'LoginForm',
-    component: LoginForm}
+    path: '/register', 
+    name: 'register',
+    component: register 
+  },
+  {
+    path: '/login', 
+    name: 'login',
+    component: Login}
     ,
   {
-    path: '/forgot-password', // 忘記密碼頁面的路徑設定
-    name: 'ForgotPassword',
-    component: ForgotPassword // 使用 ForgotPassword 組件
+    path: '/forgot-password', 
+    name: 'forgotPassword',
+    component: ForgotPWD 
   },
   {
     path: "/edit-user",
@@ -39,4 +48,13 @@ const router = createRouter({
   routes
 });
 
+
+router.beforeEach((to, from, next) => {
+  const jwtToken = localStorage.getItem("jwtToken");
+  if (to.matched.some((record) => record.meta.requiresAuth) && !jwtToken) {
+    next({ name: "Login" });
+  } else {
+    next();
+  }
+});
 export default router;
