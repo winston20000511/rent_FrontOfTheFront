@@ -1,6 +1,6 @@
 <script setup>
 import BookingSlot from '@/components/Booking/BookingViewComponent.vue';
-import { ref, defineEmits } from 'vue';
+import { ref } from 'vue';
 
 const houseId = 1; //由上一層提供,目前寫死
 

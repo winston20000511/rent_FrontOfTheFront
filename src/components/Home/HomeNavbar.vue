@@ -1,5 +1,5 @@
 <script setup>
-import { ref, defineEmits } from 'vue';
+import { ref} from 'vue';
 
 // 定義父層傳遞的事件
 const emit = defineEmits(['signInClicked']);

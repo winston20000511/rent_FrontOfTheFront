@@ -1,5 +1,4 @@
 <script setup>
-import { defineProps, defineEmits } from "vue";
 
 // 定義 Props
 const props = defineProps({

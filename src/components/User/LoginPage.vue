@@ -69,7 +69,6 @@
 </template>
 
 <script setup>
-import { defineEmits } from 'vue';
 import LoginForm from './LoginForm.vue';
 import RegisterForm from './RegisterForm.vue';
 

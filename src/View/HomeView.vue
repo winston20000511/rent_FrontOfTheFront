@@ -5,6 +5,7 @@ import HomeFilter from '@/components/Home/HomeFilter.vue';
 import HomeMap from '@/components/Home/HomeMap.vue';
 import HomeNavbar from '@/components/Home/HomeNavbar.vue';
 import LoginPage from '@/components/User/LoginPage.vue'; // 新增 LoginPage 引入
+import { useHouseCard } from '@/stores/CardHouseStore';
 
   const store = useHouseCard();
   const markers = ref({});
@@ -30,7 +31,7 @@ const toggleLoginPage = () => {
   </header>
 
   <div class="filter">
-    <HomeFilter></HomeFilter>
+    <HomeFilter @add-marker="addMarker"></HomeFilter>
   </div>
 
     <main>
