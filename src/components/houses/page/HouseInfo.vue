@@ -17,18 +17,25 @@
     <h3>提供家具與服務</h3>
     <div class="furniture-services">
       <div v-for="(item, index) in furnitureServices" :key="index" class="icon-label">
-        <img :src="getFurnitureImage(item)" :alt="item.alt" class="icon-image" />
+        <img :src="getFurnitureImage(item)" :alt="getFurnitureAltText(item)" class="icon-image" />
         <span>{{ item.name }}</span>
       </div>
     </div>
-
+    
     <!-- 房屋限制 -->
     <h3>房屋限制</h3>
     <div class="house-restrictions">
       <div v-for="(item, index) in houseRestrictions" :key="index" class="icon-label">
-        <img :src="getRestrictionImage(item)" :alt="item.alt" class="icon-image" />
+        <img :src="getRestrictionImage(item)" :alt="getRestrictionAltText(item)" class="icon-image" />
         <span>{{ item.name }}</span>
       </div>
+    </div>
+
+    <!-- 性別限制 -->
+    <h3>性別限制</h3>
+    <div v-if="genderRestriction !== 0">
+      <img :src="getGenderImage(genderRestriction)" :alt="genderRestriction === 1 ? '男' : '女'" class="icon-image" />
+      <span>{{ genderRestriction === 1 ? '男生' : '女生' }}</span>
     </div>
   </div>
 </template>
@@ -61,8 +68,9 @@ export default {
         { src: 'cooking.ico', alt: '允許烹飪', name: '允許烹飪', allowed: false },
         { src: 'waterDispenser.ico', alt: '提供飲水機', name: '提供飲水機', allowed: true },
         { src: 'FEE.ico', alt: '管理費', name: '管理費', allowed: false },
-        { src: 'gender.ico', alt: '性別限制', name: '性別限制', allowed: true },
+        { src: 'gender.ico', alt: '性別限制', name: '性別限制', allowed: null },
       ],
+      genderRestriction: " ", // 性別限制：0 不顯示，1 男性，2 女性
       isLoading: true, // 加載狀態
       hasError: false, // 錯誤狀態
     };
@@ -72,25 +80,39 @@ export default {
     this.fetchHouseDetails(houseId);
   },
   methods: {
-    // 根據 available 屬性判斷是否顯示 "on" 或 "off" 圖片
     getFurnitureImage(item) {
-      const imagePath = item.available 
+      const imagePath = item.available && item.available !== false
         ? `../../../assets/icon/house-on/${item.src}`
         : `../../../assets/icon/house-off/${item.src}`;
       return imagePath;
     },
 
-    // 根據 allowed 屬性判斷是否顯示 "on" 或 "off" 圖片
     getRestrictionImage(item) {
-      const imagePath = item.allowed 
+      const imagePath = item.allowed && item.allowed !== false
         ? `../../../assets/icon/house-on/${item.src}`
         : `../../../assets/icon/house-off/${item.src}`;
       return imagePath;
     },
 
-    // 使用 fetch 從後端獲取房屋詳細資料
+    getFurnitureAltText(item) {
+      return item.available ? item.alt : 'NO';
+    },
+
+    getRestrictionAltText(item) {
+      return item.allowed ? item.alt : 'NO';
+    },
+
+    getGenderImage(genderRestriction) {
+      if (genderRestriction === 1) {
+        return `../../../assets/icon/house-on/male.ico`;
+      } else if (genderRestriction === 2) {
+        return `../../../assets/icon/house-on/female.ico`;
+      }
+      return ''; // 如果是 0，不顯示任何圖示
+    },
+
     fetchHouseDetails(houseId) {
-      this.isLoading = true; // 開始加載
+      this.isLoading = true;
       fetch(`http://localhost:8080/api/houses/details/${houseId}`)
         .then((response) => {
           if (!response.ok) {
@@ -99,13 +121,14 @@ export default {
           return response.json();
         })
         .then((data) => {
-          this.houseDetails = data; // 將資料存儲到 houseDetails 中
-          this.isLoading = false; // 結束加載
+          this.houseDetails = data;
+          this.isLoading = false;
+          this.genderRestriction = data.genderRestriction; // 假設後端有性別限制資料
         })
         .catch((error) => {
           console.error('Error fetching house details:', error);
-          this.hasError = true; // 顯示錯誤信息
-          this.isLoading = false; // 結束加載
+          this.hasError = true;
+          this.isLoading = false;
         });
     },
   },
@@ -136,8 +159,14 @@ export default {
 .furniture-services,
 .house-restrictions {
   display: flex;
-  flex-wrap: wrap; /* 使元素橫向排列，並換行 */
-  gap: 15px; /* 控制間距 */
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.furniture-services .icon-label,
+.house-restrictions .icon-label {
+  display: inline-flex;
+  align-items: center;
 }
 
 .error-message {
