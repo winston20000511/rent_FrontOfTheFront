@@ -1,9 +1,18 @@
 <script setup>
-import HomeCardList from '@/components/Home/HomeCardList.vue';
-import HomeFilter from '@/components/Home/HomeFilter.vue';
-import HomeMap from '@/components/Home/HomeMap.vue';
-import HomeNavbar from '@/components/Home/HomeNavbar.vue';
+  import HomeCardList from '@/components/Home/HomeCardList.vue';
+  import HomeFilter from '@/components/Home/HomeFilter.vue';
+  import HomeMap from '@/components/Home/HomeMap.vue';
+  import HomeNavbar from '@/components/Home/HomeNavbar.vue';
+  import { useHouseCard } from '@/stores/CardHouseStore';
+  import { ref } from 'vue';
 
+  const store = useHouseCard();
+  const markers = ref({});
+
+  const addMarker = (locations)=>{
+    markers.value = locations
+    store.updateData(markers.value.searchList)
+  }
 
 
 
@@ -13,17 +22,16 @@ import HomeNavbar from '@/components/Home/HomeNavbar.vue';
       <HomeNavbar></HomeNavbar>
     </header>
     <div class="filter">
-      <HomeFilter></HomeFilter>
+      <HomeFilter @add-marker="addMarker"></HomeFilter>
     </div>
     <main>
       <div class="main-left">
-        <HomeMap></HomeMap>
+        <HomeMap :markers="markers"></HomeMap>
       </div>
       <div class="main-right">
-        <HomeCardList></HomeCardList>
+        <HomeCardList :markers="markers"></HomeCardList>
       </div>
     </main>
-    
 </template>
 
 <style scoped>
@@ -48,11 +56,12 @@ import HomeNavbar from '@/components/Home/HomeNavbar.vue';
   }
   .main-left{
     width: 45%;
-    z-index: 1;
+    position: relative;
   }
   .main-right{
     width: 55%;
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: hidden; 
     z-index: 2;
   } 
 </style>

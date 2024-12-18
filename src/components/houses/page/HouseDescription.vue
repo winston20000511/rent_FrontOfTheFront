@@ -17,7 +17,7 @@ export default {
   data() {
     return {
       houseDescription: null, // 用於存儲從後端獲取的房屋簡介資料
-      houseId: 1 // 假設 houseId 是固定的，你也可以根據需求從路由中提取
+     
     };
   },
   mounted() {
@@ -27,7 +27,7 @@ export default {
   methods: {
     // 使用 fetch 發送 GET 請求來獲取房屋簡介
     fetchHouseDescription(houseId) {
-      fetch(`/Title/${houseId}`)
+      fetch(`http://localhost:8080/api/houses/Description/${houseId}`)
         .then(response => {
           if (!response.ok) {
             throw new Error("Network response was not ok");

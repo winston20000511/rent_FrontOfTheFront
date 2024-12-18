@@ -47,7 +47,7 @@
 <script>
 import MyAds from '../Ads/MyAds.vue';
 import AppointmentsOverview from '../Booking/AppointmentsOverview.vue';
-import FavoriteHouses from '../houses/FavoriteHouses.vue';
+import CollectHouseList from '../houses/CollectHouseList.vue';
 import ProfileForm from './ProfileForm.vue';
 
 
@@ -57,7 +57,7 @@ export default {
   name: 'MemberCenter',
   components: {
     ProfileForm,
-    FavoriteHouses,
+    CollectHouseList,
     AppointmentsOverview,
     MyAds
   }
