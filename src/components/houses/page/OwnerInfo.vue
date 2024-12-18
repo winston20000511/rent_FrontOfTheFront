@@ -9,12 +9,9 @@
         </div>
       </div>
   
-      
-      <div class="appointment-section">
-        <label for="appointment-time">选择预约时间：</label>
-        <input type="datetime-local" v-model="appointmentTime" id="appointment-time" />
+      <div class="appointment-time">
+        <button @click="appointmentTime" class="send-button">預約看房</button>
       </div>
-  
       
       <div class="message-section">
         <button @click="sendMessage" class="send-message-button">发送信息</button>

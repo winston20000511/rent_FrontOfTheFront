@@ -1,62 +1,81 @@
 <template>
-    <div v-if="visible" class="modal-overlay" @click.self="closeModal">
-      <div class="modal-content">
-        <button class="close-btn" @click="closeModal">X</button>
-        
-        <!-- 房屋標題 -->
-        <HouseTitle :houseId="houseId" />
-        <hr />
-        
-        <!-- 房屋圖片 -->
-        <HousePhotos :houseId="houseId"></HousePhotos>
-        <hr />
-        
-        <div class="info-container">
-          <!-- 房屋信息 -->
-          <HouseInfo :houseId="houseId" />
-          
-          <!-- 房東信息 -->
-          <OwnerInfo :houseId="houseId" />
-        </div>
-        <hr />
-        
-        <!-- 房屋描述 -->
-        <HouseDescription :houseId="houseId" />
+  <div v-if="visible" class="modal-overlay" @click.self="handleOverlayClick">
+    <div class="modal-content">
+      <div class="header">
+        <button class="favorite-btn" @click="toggleFavorite">
+          <i :class="isFavorited ? 'bi bi-heart-fill' : 'bi bi-heart'"></i>
+        </button>
+        <button class="close-btn" @click="closeModal">
+          <i class="bi bi-x-circle"></i>
+        </button>
       </div>
-    </div>
-  </template>
-  
-  <script setup>
-  import { defineProps, defineEmits } from 'vue';
-  import HouseTitle from "@/components/houses/page/HouseTitle.vue";
-  import HouseInfo from "@/components/houses/page/HouseInfo.vue";
-  import OwnerInfo from "@/components/houses/page/OwnerInfo.vue";
-  import HouseDescription from "@/components/houses/page/HouseDescription.vue";
-  import HousePhotos from '@/components/houses/housePhotos.vue';
+      
+      <hr />
 
-  
-  // 定義接收的 props
-  const props = defineProps({
-    houseId: {
-      type: Number,
-      required: true,
-    },
-    visible: {
-      type: Boolean,
-      required: true,
-    },
-  });
-  
-  // 定義 emits 事件
-  const emit = defineEmits(["close"]);
-  
-  // 關閉彈窗
-  const closeModal = () => {
-    emit("close"); // 通知父組件關閉彈窗
-  };
-  </script>
-  
-  <style scoped>
+      <!-- 房屋圖片 -->
+      <HousePhotos :houseId="houseId" />
+      <hr />
+      <HouseTitle :houseId="houseId" />
+      <hr />
+      <div class="info-container">
+        <!-- 房屋信息 -->
+        <HouseInfo :houseId="houseId" />
+        
+        <!-- 房東信息 -->
+        <OwnerInfo :houseId="houseId" />
+      </div>
+      <hr />
+
+      <!-- 房屋描述 -->
+      <HouseDescription :houseId="houseId" />
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref } from 'vue';
+import { defineProps, defineEmits } from 'vue';
+import HouseTitle from "@/components/houses/page/HouseTitle.vue";
+import HouseInfo from "@/components/houses/page/HouseInfo.vue";
+import OwnerInfo from "@/components/houses/page/OwnerInfo.vue";
+import HouseDescription from "@/components/houses/page/HouseDescription.vue";
+import HousePhotos from '@/components/houses/housePhotos.vue';
+
+// 定義接收的 props
+const props = defineProps({
+  houseId: {
+    type: Number,
+    required: true,
+  },
+  visible: {
+    type: Boolean,
+    required: true,
+  },
+});
+
+// 定義 emits 事件
+const emit = defineEmits(["close"]);
+
+// 關閉彈窗
+const closeModal = () => {
+  emit("close"); // 通知父組件關閉彈窗
+};
+
+const handleOverlayClick = (event) => {
+  if (event.target.classList.contains('modal-overlay')) {
+    closeModal();
+  }
+};
+
+// 定義收藏狀態
+const isFavorited = ref(false);
+
+const toggleFavorite = () => {
+  isFavorited.value = !isFavorited.value;
+};
+</script>
+
+<style scoped>
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -68,47 +87,63 @@
   justify-content: center;
   align-items: center;
   z-index: 999;
-  padding: 20px; /* 增加間距防止彈窗貼邊 */
+  padding: 20px;
 }
 
 .modal-content {
   background: white;
   padding: 20px;
-  width: 100%; /* 改為百分比，使其適應屏幕大小 */
-  max-width: 800px; /* 控制最大寬度 */
-  max-height: 80vh; /* 限制最大高度 */
+  width: 100%;
+  max-width: 800px;
+  max-height: 80vh;
   border-radius: 10px;
   position: relative;
-  overflow: auto; /* 使內容超過最大高度時可以滾動 */
+  overflow: auto;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
 }
 
 .close-btn {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: red;
-  color: white;
+  background: none;
   border: none;
-  padding: 5px 10px;
   cursor: pointer;
+}
+
+.close-btn .bi {
+  font-size: 24px;
+  color: blue; /* 設置成藍色 */
+}
+
+.favorite-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.favorite-btn .bi {
+  font-size: 24px;
+  color: red;
 }
 
 .info-container {
   display: flex;
-  flex-direction: column; /* 調整為列布局，使信息不會過於擁擠 */
+  flex-direction: column;
   gap: 10px;
 }
 
 @media (max-width: 768px) {
   .modal-content {
-    max-width: 90%; /* 在小螢幕上設置較小的最大寬度 */
-    padding: 10px; /* 減小內邊距 */
+    max-width: 90%;
+    padding: 10px;
   }
 
   .close-btn {
-    padding: 3px 8px; /* 減小關閉按鈕的尺寸 */
+    padding: 3px 8px;
   }
 }
-
-  </style>
-  
+</style>

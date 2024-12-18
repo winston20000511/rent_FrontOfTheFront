@@ -53,11 +53,11 @@ const closeHouseView = () => {
         </div>
     
         <!-- 房屋詳細頁面 (彈窗) -->
-    <HouseView
+        <HouseView
           v-if="showView" 
           :houseId="selectedHouseId"
           :visible="showView" 
-          @onClose="closeHouseView"  
+          @close="closeHouseView"  
         />
     </div>
 </template>

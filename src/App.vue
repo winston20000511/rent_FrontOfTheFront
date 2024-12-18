@@ -3,6 +3,7 @@ import { RouterLink, RouterView } from 'vue-router';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import 'bootstrap-icons/font/bootstrap-icons.min.css';
+import HouseCreate from './components/houses/HouseCreate.vue';
 
 
 
@@ -10,6 +11,7 @@ import 'bootstrap-icons/font/bootstrap-icons.min.css';
 </script>
 
 <template>
+
   <RouterView></RouterView>
 </template>
 
