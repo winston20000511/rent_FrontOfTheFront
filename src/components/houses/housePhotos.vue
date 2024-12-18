@@ -2,33 +2,31 @@
   <div>
     <!-- 加載狀態 -->
     <div v-if="loading" class="loading">加載中...</div>
-    
+
     <!-- 錯誤提示 -->
-    <div v-if="error" class="error">{{ error.message }}</div>
-    
+    <div v-if="error" class="error">
+      {{ error.message }}
+      <button @click="fetchHousePhotos" class="retry-button">重試</button>
+    </div>
+
     <!-- 當有照片數據且未加載中或錯誤時顯示 -->
     <div v-if="!loading && !error && photos.length > 0">
       <!-- 主照片顯示 -->
       <img :src="currentPhoto" alt="房屋圖片" class="main-photo" />
-      
+
       <!-- 照片控制按鈕 -->
       <div class="photo-controls">
         <button @click="previousPhoto" :disabled="photos.length <= 1">上一張</button>
         <button @click="nextPhoto" :disabled="photos.length <= 1">下一張</button>
       </div>
-      
+
       <!-- 照片縮略圖 -->
       <div class="photo-thumbnails">
-        <img 
-          v-for="(photo, index) in photos" 
-          :key="index" 
-          :src="photo" 
-          :alt="'縮略圖 ' + (index + 1)"
-          :class="{ active: index === currentPhotoIndex }"
-          @click="selectPhoto(index)" />
+        <img v-for="(photo, index) in photos" :key="index" :src="photo" :alt="'縮略圖 ' + (index + 1)"
+          :class="{ active: index === currentPhotoIndex }" @click="selectPhoto(index)" />
       </div>
     </div>
-    
+
     <!-- 沒有照片的提示 -->
     <div v-if="!loading && !error && photos.length === 0" class="no-photos">
       暫無可顯示的照片。
@@ -46,7 +44,7 @@ export default {
     },
     baseUrl: {
       type: String,
-      default: '/api/houses/getPhotos',
+      default: 'http://localhost:8080/api/houses/getPhotos',
     },
   },
   data() {
@@ -59,7 +57,7 @@ export default {
   },
   computed: {
     currentPhoto() {
-      return this.photos[this.currentPhotoIndex] || '';
+      return `data:image/jpeg;base64,${this.photos[this.currentPhotoIndex]}` || '';
     },
   },
   methods: {
@@ -68,11 +66,23 @@ export default {
       this.error = null;
       try {
         const response = await fetch(`${this.baseUrl}/${this.houseId}`);
+        console.log("Response status:", response.status);
+        console.log("Response headers:", response.headers);
+
         if (!response.ok) {
           throw new Error(`HTTP 錯誤！狀態碼：${response.status}`);
         }
-        const data = await response.json();
-        this.photos = data || [];
+
+        const responseBody = await response.text();
+        console.log("Response body:", responseBody);
+
+        if (responseBody) {
+          const data = JSON.parse(responseBody);
+          this.photos = data || [];
+        } else {
+          this.photos = [];
+        }
+
         this.currentPhotoIndex = 0;
       } catch (err) {
         console.error('獲取房屋照片時發生錯誤：', err);
@@ -83,11 +93,11 @@ export default {
       }
     },
     nextPhoto() {
-      this.currentPhotoIndex = 
+      this.currentPhotoIndex =
         (this.currentPhotoIndex + 1) % this.photos.length;
     },
     previousPhoto() {
-      this.currentPhotoIndex = 
+      this.currentPhotoIndex =
         (this.currentPhotoIndex - 1 + this.photos.length) % this.photos.length;
     },
     selectPhoto(index) {
@@ -114,6 +124,20 @@ export default {
   text-align: center;
   color: red;
   font-size: 1.2rem;
+}
+
+.retry-button {
+  background-color: #007bff;
+  color: white;
+  padding: 5px 10px;
+  border: none;
+  cursor: pointer;
+  border-radius: 4px;
+  margin-top: 10px;
+}
+
+.retry-button:hover {
+  background-color: #0056b3;
 }
 
 .no-photos {

@@ -1,6 +1,6 @@
 <template>
     <div class="owner-info-container">
-      <!-- 屋主大头照和名字电话 -->
+      
       <div class="owner-info">
         <img :src="'data:image/jpeg;base64,' + ownerInfo.picture" alt="屋主照片" class="owner-avatar" />
         <div class="owner-details">
@@ -9,13 +9,13 @@
         </div>
       </div>
   
-      <!-- 预约时间选择 -->
+      
       <div class="appointment-section">
         <label for="appointment-time">选择预约时间：</label>
         <input type="datetime-local" v-model="appointmentTime" id="appointment-time" />
       </div>
   
-      <!-- 发送信息按钮 -->
+      
       <div class="message-section">
         <button @click="sendMessage" class="send-message-button">发送信息</button>
       </div>
@@ -27,36 +27,36 @@
     data() {
       return {
         ownerInfo: {
-          name: '',     // 屋主姓名
-          phone: '',    // 屋主电话
-          picture: '',  // Base64 编码的图片
+          name: '',     
+          phone: '',    
+          picture: '',  // Base64 編碼的图片
         },
-        appointmentTime: '',  // 用户选择的预约时间
+        appointmentTime: '', 
       };
     },
     methods: {
-      // 模拟发送信息
+     
       sendMessage() {
         alert(`发送信息给 ${this.ownerInfo.name}，预约时间：${this.appointmentTime}`);
-        // 在这里可以调用接口来发送信息
+      
       },
-      // 使用 fetch 获取屋主信息
+      // 使用 fetch 獲取屋主信息
       async fetchOwnerInfo() {
         const houseId = this.$route.params.houseId;  // 假设房屋ID通过路由传递
         try {
-          const response = await fetch(`/api/owner/${houseId}`);
+          const response = await fetch(`http://localhost:8080/api/houses/owner/${houseId}`);
           if (!response.ok) {
-            throw new Error('网络请求失败');
+            throw new Error('網路請求失敗');
           }
           const data = await response.json();
           this.ownerInfo = data;  // 将返回的数据赋值给 ownerInfo
         } catch (error) {
-          console.error('获取屋主信息失败:', error);
+          console.error('獲取屋主信息失敗:', error);
         }
       },
     },
     created() {
-      this.fetchOwnerInfo(); // 获取屋主信息
+      this.fetchOwnerInfo(); // 獲取屋主信息
     },
   };
   </script>
