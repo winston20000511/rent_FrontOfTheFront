@@ -13,9 +13,25 @@ import AdtypeView from '@/View/AdtypeView.vue';
 
 const routes = [
   {
-    path: '/',
-    name: 'home',
-    component: HomeView
+    path: '/', // 主框架頁面
+    component: HomeView, // 主框架組件
+    children: [
+      {
+        path: '', // 預設子路由，對應首頁內容
+        name: 'home',
+        component: HomeView, // 預設顯示 HomeView
+      },
+      {
+        path: '/login', // 登入頁面路徑
+        name: 'LoginPage',
+        component: LoginPage, // 顯示 LoginPage
+      },
+      {
+        path: 'edit-user', // 編輯用戶頁面路徑
+        name: 'EditUser',
+        component: EditUserPage,
+      },
+    ],
   },
   {
     path: '/login', // 登入頁面的路徑設定
@@ -26,11 +42,6 @@ const routes = [
     path: '/forgot-password', // 忘記密碼頁面的路徑設定
     name: 'ForgotPassword',
     component: ForgotPassword // 使用 ForgotPassword 組件
-  },
-  {
-    path: "/edit-user",
-    name: "EditUser",
-    component: EditUserPage
   },
   {
     path:"/MemberCenter",
@@ -67,7 +78,7 @@ const routes = [
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes
+  routes,
 });
 
 export default router;
