@@ -5,7 +5,7 @@ import HouseView from '@/View/HouseView.vue';
 // 接收 props 傳遞的 markers
 const props = defineProps({
   markers: {
-    type: Array,
+    type: Object,
     required: true,
   },
 });
