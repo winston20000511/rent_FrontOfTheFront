@@ -1,10 +1,10 @@
 <script setup>
-  import HomeCardList from '@/components/Home/HomeCardList.vue';
-  import HomeFilter from '@/components/Home/HomeFilter.vue';
-  import HomeMap from '@/components/Home/HomeMap.vue';
-  import HomeNavbar from '@/components/Home/HomeNavbar.vue';
-  import { useHouseCard } from '@/stores/CardHouseStore';
-  import { ref } from 'vue';
+import HomeCardList from '@/components/Home/HomeCardList.vue';
+import HomeFilter from '@/components/Home/HomeFilter.vue';
+import HomeMap from '@/components/Home/HomeMap.vue';
+import HomeNavbar from '@/components/Home/HomeNavbar.vue';
+import { useHouseCard } from '@/stores/CardHouseStore';
+import { ref } from 'vue';
 
   const store = useHouseCard();
   const markers = ref({});
@@ -13,8 +13,6 @@
     markers.value = locations
     store.updateData(markers.value.searchList)
   }
-
-
 
 </script>
 <template>
@@ -26,7 +24,8 @@
     </div>
     <main>
       <div class="main-left">
-        <HomeMap :markers="markers"></HomeMap>
+        <!-- <HomeMap :markers="markers"></HomeMap> -->
+         <HomeMap :markers="markers"></HomeMap>
       </div>
       <div class="main-right">
         <HomeCardList :markers="markers"></HomeCardList>
