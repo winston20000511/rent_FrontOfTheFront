@@ -1,6 +1,7 @@
 <script setup>
-import { toRef, watch } from 'vue';
+import { ref, toRef, watch } from 'vue';
 import HousePhotos from '../houses/housePhotos.vue';
+import HouseView from '@/View/HouseView.vue';
 
 // 接收 props 傳遞的 markers
 const props = defineProps({
@@ -52,7 +53,7 @@ const closeHouseView = () => {
         </div>
     
         <!-- 房屋詳細頁面 (彈窗) -->
-        <HouseView
+    <HouseView
           v-if="showView" 
           :houseId="selectedHouseId"
           :visible="showView" 

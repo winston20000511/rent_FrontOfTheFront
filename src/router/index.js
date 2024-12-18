@@ -21,11 +21,6 @@ const routes = [
         component: HomeView, // 預設顯示 HomeView
       },
       {
-        path: '/login', // 登入頁面路徑
-        name: 'LoginPage',
-        component: LoginPage, // 顯示 LoginPage
-      },
-      {
         path: 'edit-user', // 編輯用戶頁面路徑
         name: 'EditUser',
         component: EditUserPage,

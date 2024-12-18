@@ -32,7 +32,8 @@
   import HouseInfo from "@/components/houses/page/HouseInfo.vue";
   import OwnerInfo from "@/components/houses/page/OwnerInfo.vue";
   import HouseDescription from "@/components/houses/page/HouseDescription.vue";
-  import HousePhotos from '@/components/houses/HousePhotos.vue';
+  import HousePhotos from '@/components/houses/housePhotos.vue';
+
   
   // 定義接收的 props
   const props = defineProps({
