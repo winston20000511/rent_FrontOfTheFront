@@ -60,6 +60,11 @@
     const clickSearchBtn = ()=>{
         showMapFetch();
     }
+    const enterSearchBtn = (event)=>{
+        if (event.key === 'Enter'){
+		    showMapFetch();
+        }
+    }
     
     const showKeyWordFetch = async () =>{
         const response = await fetch(keywordUrl,{
@@ -233,7 +238,7 @@
                 v-on:compositionstart="compositionStart"
                 v-on:compositionend="compostitionEnd"
                 v-on:click="showSearchList"
-                > 
+                v-on:keyup="enterSearchBtn"> 
         <i class="fa-solid fa-magnifying-glass" ref="iconBtnRef" v-on:click="clickSearchBtn"></i>
     </div>
     <ul class="searchList position-absolute mt-1 bg-white border rounded shadow"
@@ -246,7 +251,7 @@
             v-bind:key="item.id"
             class="custom-list"
             v-on:click="handleListClick(item)">
-        
+
         {{ item.address }}</li>
     </ul>
     <!-- <div class="filter-right">

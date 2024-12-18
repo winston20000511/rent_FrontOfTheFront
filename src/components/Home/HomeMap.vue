@@ -4,14 +4,16 @@ import { Loader } from '@googlemaps/js-api-loader';
 
 const map = shallowRef(null); // 地圖容器
 const mapMarkers = ref([]); //地圖標記
-const canvas = ref(null); //繪筆
+const canvas = shallowRef(null); //繪筆
 const refbtnDraw = ref(null) //繪圖按鈕
 const isDrawingMode = ref(false); //按鈕切換繪圖模式
+const overlay = ref(null)
 
+let drawUrl='http://localhost:8080/api/draw';
 let isDrawing = false; //判斷是否正在繪圖
 let context = null;
 let points = []; //儲存 Canvas 路徑點
-
+let polygon = null;
 
 const props = defineProps({
   markers: Object
@@ -21,7 +23,6 @@ const markers = toRef(props, 'markers');
 //進行Google Map初始化
 onMounted(() => {
     // Google Maps API 加載器
-
     const loader = new Loader({
       apiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY, 
       version: 'weekly', // 使用 beta 或更新版本
@@ -66,6 +67,10 @@ onMounted(() => {
 
   // =========================================標記功能=================================================================
 
+  function forceRefresh() {
+    mapKey += 1;
+  }
+
   watch(markers, (newMarkers) => {
 
     const list = newMarkers.searchList;
@@ -104,6 +109,7 @@ onMounted(() => {
         title: origin.street,
         content: buttonOrigin,
       });
+      console.log(buttonOrigin);
       map.value.panTo(latlng);
       map.value.setZoom(14);
       mapMarkers.value.push(mapMark);
@@ -112,13 +118,19 @@ onMounted(() => {
   // =========================================繪圖功能=================================================================
   // 開始繪圖
   function startDrawing(event) {
-    
     isDrawing = true;
     points = [];
+    if (polygon) {
+        polygon.setMap(null); // 移除多邊形
+        polygon = null;       // 清空變數
+    }
+
     addPoint(event);
     const { offsetX, offsetY } = event;
     context.beginPath();
     context.moveTo(offsetX, offsetY);
+
+
   }
 
   // 繪製中
@@ -136,9 +148,20 @@ onMounted(() => {
   // 停止繪圖
   function stopDrawing() {
     if (!isDrawing) return;
+    
     isDrawing = false;
     context.closePath();
     convertToPolygon();
+
+    isDrawingMode.value = !isDrawingMode.value;
+    const canvasElement = canvas.value;
+    canvasElement.style.pointerEvents = 'none';
+    map.value.setOptions({
+      draggable: true,
+      gestureHandling: 'auto',
+    });
+
+
   }
 
   //清除畫筆
@@ -178,7 +201,12 @@ onMounted(() => {
   function pixelToLatLng(mapInstance, x, y) {
     return new Promise((resolve, reject) => {
       const overlay = new google.maps.OverlayView();
-      overlay.onAdd = function () {};
+      overlay.onAdd = function () {
+        const div = document.createElement('div');
+        div.className = 'custom-overlay';
+        this.getPanes().overlayLayer.appendChild(div); // 使用 overlayLayer 層
+        this.div = div;
+      };
       overlay.draw = function () {
         const projection = overlay.getProjection();
         if (projection) {
@@ -189,7 +217,6 @@ onMounted(() => {
           const latLng = projection.fromContainerPixelToLatLng(point);
           const latitude = latLng.lat();
           const lngitude = latLng.lng();
-          console.log('Converted LatLng:', {lat: latitude , lng: lngitude})
 
           resolve({lat: latitude , lng:lngitude});
           overlay.setMap(null); // 释放 OverlayView
@@ -197,7 +224,12 @@ onMounted(() => {
           reject(new Error('Projection is not available'));
         }
       };
-      overlay.onRemove = function () {};
+      overlay.onRemove = function () {
+        if (this.div) {
+          this.div.parentNode.removeChild(this.div);
+          this.div = null; // 釋放引用
+        }
+      };
       overlay.setMap(mapInstance); // 确保传入的 map 实例
     });
   }
@@ -212,13 +244,13 @@ onMounted(() => {
 
   //
   function drawPolygonOnMap(map, latLngPoints) {
-    new google.maps.Polygon({
+    polygon= new google.maps.Polygon({
       paths: latLngPoints,
-      strokeColor: '#FF0000',
+      strokeColor: '#0000FF',
       strokeOpacity: 0.8,
       strokeWeight: 2,
-      fillColor: '#FF0000',
-      fillOpacity: 0.35,
+      fillColor: '#0000FF',
+      fillOpacity: 0.05,
       map,
     });
   }
@@ -226,17 +258,47 @@ onMounted(() => {
   //將繪製的圖案轉成多邊形
   async function convertToPolygon() {
     if (!points.length) return;
+    forceRedrawMap(map.value)
     const latLngPoints = await convertPointsToLatLng(map.value, points);
-    console.log(latLngPoints);
+    // console.log(latLngPoints);
     drawPolygonOnMap(map.value, latLngPoints);
+    drawLatLngFetch(latLngPoints)
     const canvasElement = canvas.value;
     clearCanvas(canvasElement);
   }
+
+  async function drawLatLngFetch(latLngPoints){
+    const response = await fetch(drawUrl,{
+      method:"POST",
+      headers: {'Content-type': 'application/json'},
+      body:JSON.stringify(latLngPoints)
+    })
+
+    if (!response.ok){
+      throw new Error('Network response was not ok')
+    }
+
+    const data = await response.json();
+    console.log(data);
+  }
+
+  function forceRedrawMap(mapInstance) {
+    const center = mapInstance.getCenter();
+    let count = 0;
+    const interval = setInterval(() => {
+      mapInstance.panBy(1, 1)
+      mapInstance.panBy(-1, -1);; // 每次平移 100 像素
+      count++;
+      if (count >= 10) clearInterval(interval); // 平移 10 次後停止
+    }, 20); // 每 200 毫秒平移一次
+    mapInstance.setCenter(center); // 回到原中心
+  }
+
 </script>
 
 <template>
   <div>
-    <button class="btn btn-outline-secondary btnDraw" ref="refbtnDraw" @click="toggleDrawingMode">
+    <button class="btn btn-outline-danger btnDraw" ref="refbtnDraw" @click="toggleDrawingMode">
       {{ isDrawingMode ? '關閉繪圖模式' : '啟動繪圖模式' }}
     </button>
     <div ref="map" class="map-container" v-once></div>
@@ -258,6 +320,12 @@ onMounted(() => {
   left: 0;
   background: transparent;
   pointer-events: none; /* 确保鼠标事件只针对 Canvas */
+}
+.custom-overlay {
+  pointer-events: none; /* 確保事件穿透 */
+  position: absolute;   /* 避免其他元素干擾 */
+  z-index: 0;           /* 明確指定低層級 */
+  opacity: 1;
 }
 .btnDraw{
   display: none;
