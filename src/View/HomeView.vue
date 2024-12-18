@@ -12,8 +12,15 @@ import { ref } from 'vue';
   }
 
 
+// 控制 LoginPage 的顯示狀態
+const showLoginPage = ref(false);
 
+// 切換 LoginPage 的顯示狀態
+const toggleLoginPage = () => {
+  showLoginPage.value = !showLoginPage.value;
+};
 </script>
+
 <template>
     <header>
       <HomeNavbar></HomeNavbar>
