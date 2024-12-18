@@ -1,13 +1,10 @@
 <script setup>
 import { ref, onMounted, computed, defineProps, nextTick } from 'vue';
-import 'bootstrap/dist/css/bootstrap.min.css'
 import Datepicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
 import BookingAgreement from './bookingAgreement.vue';
 
-
 const BASE_URL = import.meta.env.VITE_APIURL
-
 
 const props = defineProps({
     houseId: {
@@ -15,7 +12,6 @@ const props = defineProps({
         required: true
     }
 });
-
 
 const isAgreed = ref(false);
 const weekDays = ref('');
