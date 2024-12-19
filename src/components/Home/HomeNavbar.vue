@@ -34,141 +34,86 @@ const handleSignInClick = () => {
 </script>
 
 <template>
-  <!-- 左邊連結位置 -->
-  <ul class="nav-left" ref="navLeft">
-    <li>
-      <RouterLink to="#">
-        <span>Buy</span>
-      </RouterLink>
-    </li>
-    <li>
-      <RouterLink to="#" class="link" v-on:mouseenter="linkMouseEnter">
-        <span ref="linkOne">Rent</span>
-      </RouterLink>
-    </li>
-  </ul>
-
-  <ul
-    ref="linkListOne"
-    v-on:mouseleave="linkMouseLeave"
-    v-bind:style="{ top: `${linkListOnePos.top}px`, left: `${linkListOnePos.left}px` }"
-    class="link-list"
-  >
-    <li><RouterLink to="#">item 1</RouterLink></li>
-    <li><RouterLink to="#">item 2</RouterLink></li>
-    <li><RouterLink to="#">item 3</RouterLink></li>
-    <li><RouterLink to="#">item 4</RouterLink></li>
-  </ul>
-
-  <div class="nav-middle">
-    <img src="../../assets/Logo3.jpg" alt="" />
-
-    <div class="nav-title">
-      <h1>house</h1>
+  <div class="navbar">
+    <!-- 左側：Logo 和標題 -->
+    <div class="nav-left">
+      <img src="../../assets/Logo3.jpg" alt="Logo" class="nav-logo" />
+      <div class="nav-title">
+        <h1>house</h1>
+      </div>
     </div>
-  </div>
 
-  <!-- 右邊連結位置 -->
-  <div class="nav-right">
-    <!-- 修改 MemberCenter 的 RouterLink -->
-    <li><RouterLink to="/member-center">MemberCenter</RouterLink></li>
-    <li>
-      <!-- Sign In 按鈕，點擊觸發事件 -->
-      <button @click="handleSignInClick">Sign In</button>
-    </li>
+    <!-- 右側：MemberCenter 和 Sign In -->
+    <ul class="nav-right">
+      <li><RouterLink to="/member-center">MemberCenter</RouterLink></li>
+      <li>
+        <button @click="handleSignInClick">Sign In</button>
+      </li>
+    </ul>
   </div>
 </template>
 
 <style scoped>
-/* 保留你現有的 CSS */
+/* Navbar 容器 */
+.navbar {
+  display: flex;
+  justify-content: space-between; /* 左右分佈 */
+  align-items: center;           /* 垂直居中 */
+  padding: 0 20px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* 提升視覺效果 */
+}
+
+/* 左側：Logo 和標題 */
 .nav-left {
-  height: 100%;
   display: flex;
-  justify-content: left;
-  align-items: center;
-  list-style-type: none;
-  padding: 0px;
-  margin-left: 20px;
-}
-.nav-left li {
-  padding-left: 15px;
-}
-.nav-left li a {
-  font-size: 20px;
-  font-weight: bold;
-  color: black;
-  text-decoration: none;
-}
-.nav-left li a:hover {
-  color: blue;
-  border-bottom: 3px solid blue;
+  align-items: center; /* 垂直居中 */
 }
 
-.link-list {
-  display: none;
-  position: absolute;
-  z-index: 3;
-  background-color: white;
-  width: 98%;
-  height: 200px;
-  list-style-type: none;
-  padding-left: 20px;
-}
-.link-list li {
-  padding: 10px 5px;
-}
-.link-list li a {
-  font-size: 20px;
-  color: black;
-  text-decoration: none;
-}
-.link-list > li > a:hover {
-  padding: 0px 10px;
-  color: blue;
+.nav-logo {
+  max-width: 150px; /* 設置最大寬度 */
+  max-height: 80px; /* 設置最大高度 */
+  object-fit: contain; /* 確保Logo顯示不會變形 */
+  margin-right: 10px; /* 與標題之間的間距 */
 }
 
-.nav-middle {
-  display: flex;
-  flex-direction: row;
-  padding: 10px 0px 0px;
-  margin-left: 100px;
-}
-.nav-middle img {
-  object-fit: cover;
-}
-.nav-title {
-  display: grid;
-  align-items: center;
-}
 .nav-title h1 {
   font-size: 60px;
   color: black;
   font-family: 'Pacifico', cursive;
   font-weight: 500;
   font-style: normal;
-  line-height: 30px;
+  line-height: 1; /* 調整行高 */
+  margin: 0; /* 移除預設外距 */
 }
 
+/* 右側：MemberCenter 和 Sign In */
 .nav-right {
-  height: 100%;
   display: flex;
-  justify-content: left;
   align-items: center;
   list-style-type: none;
-  padding: 0px;
-  margin-right: 20px;
+  padding: 0;
+  margin: 0;
 }
+
 .nav-right li {
-  padding-right: 15px;
+  margin-left: 15px; /* 元素間的間距 */
 }
-.nav-right li a {
-  font-size: 20px;
-  font-weight: bold;
-  color: black;
+
+.nav-right li a,
+.nav-right li button {
+  font-size: 16px;
+  padding: 8px 12px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
   text-decoration: none;
+  cursor: pointer;
 }
-.nav-right li a:hover {
-  color: blue;
-  border-bottom: 3px solid blue;
+
+.nav-right li a:hover,
+.nav-right li button:hover {
+  background-color: #0056b3;
 }
 </style>
