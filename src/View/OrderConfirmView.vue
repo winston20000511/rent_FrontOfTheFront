@@ -1,10 +1,9 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { useCart } from "@/stores/cartStore";
 import axios from 'axios';
 
 const cartStore = useCart();
-const paymentMethod = cartStore.paymentMethod;
 const cartId = cartStore.cartId;
 const cartItems = ref([]);
 
@@ -27,34 +26,34 @@ onMounted(async () => {
     cartItems.value = response.data;
     isLoading.value = false;
   } catch (error) {
-    loadError.value = "無法載入購物車資料";
+    loadError.value = "載入錯誤，請重新操作";
     isLoading.value = false;
   }
 
   // 載入時禁止返回上一頁
-  // 1. 推送當前頁面到歷史紀錄
-  window.history.pushState(null, "", window.location.href);
+  // // 1. 推送當前頁面到歷史紀錄
+  // window.history.pushState(null, "", window.location.href);
   
-  // 2. 設置 onpopstate 事件，防止返回上一頁
-  window.onpopstate = function(){
-    window.history.pushState(null, "", window.location.href)
-  };
+  // // 2. 設置 onpopstate 事件，防止返回上一頁
+  // window.onpopstate = function(){
+  //   window.history.pushState(null, "", window.location.href)
+  // };
 
-  onBeforeUnmount(() => {
-    window.onpopstate = null;  // 清理事件處理器
-  });
+  // onBeforeUnmount(() => {
+  //   window.onpopstate = null;  // 清理事件處理器
+  // });
 
 });
 
 // 處理付款邏輯
 const handlePayment = () => {
-  if (paymentMethod === "linepay") {
+  if (thirdParty === "linepay") {
     // 呼叫LINEPAY API
     console.log("呼叫LINEPAY");
 
   }
   
-  if (paymentMethod === "credit") {
+  if (thirdParty === "ecpay") {
     // 呼叫綠界支付 (ECPay)
     console.log("呼叫ECpay");
   }
@@ -67,6 +66,8 @@ const handlePayment = () => {
   <div class="text-xl mb-3 text-center border-b border-black py-2">
       訂單確認
     </div>
+
+    <div>檢驗選擇的付款方式 {{cartStore.thirdParty}} </div>
 
     <div v-if="isLoading" class="text-center mt-10">
       <p>資料加載中...</p>
@@ -108,7 +109,8 @@ const handlePayment = () => {
             <th class="px-4 py-2">VIP方案</th>
             <th class="px-4 py-2" colspan="2">VIP服務時間</th>
             <th class="px-4 py-2 text-right">金額</th>
-            <th class="px-4 py-2"></th>
+            <th class="px-4 py-2 text-right">折扣</th>
+            <th class="px-4 py-2">最終金額</th>
           </tr>
         </thead>
         <tbody>
@@ -118,16 +120,16 @@ const handlePayment = () => {
             <td class="px-4 py-2">{{ item.adName }}</td>
             <td class="px-4 py-2" colspan="2">{{ item.adPeriod }}</td>
             <td class="px-4 py-2 text-right">{{ item.adPrice }}</td>
-            <td class="px-4 py-2"></td>
+            <td class="px-4 py-2">{{ cartStore.couponUsage[item.adId]? `- ${cartStore.calculate.discountAmount} `: "" }}</td>
+            <td class="px-4 py-2 text-right">{{ cartStore.couponUsage[item.adId]? (item.adPrice-cartStore.calculate.discountAmount) : item.adPrice }}</td>
           </tr>
           <tr class="border-t border-gray-300">
-            <td class="px-4 py-2 text-right font-bold" colspan="5">總計</td>
-            <td class="px-4 py-2 text-right">{{ cartStore.cartItems.reduce((sum, item) => sum + item.adPrice, 0) }}</td>
-            <td class="px-4 py-2 text-center"></td>
+            <td class="px-4 py-2 text-right font-bold" colspan="7">總計</td>
+            <td class="px-4 py-2 text-right">{{ cartStore.calculate.totalPrice }}</td>
           </tr>
           <tr>
-            <td colspan="6" class="text-right">
-              <button @click="handlePayment" type="button" class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-400 transition duration-300">
+            <td colspan="8" class="text-right">
+              <button @click="handlePayment" type="button" class="px-4 py-2 m-4 bg-blue-500 text-white rounded-md hover:bg-blue-400 transition duration-300">
                 確認付款
               </button>
             </td>

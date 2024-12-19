@@ -40,9 +40,13 @@ const noAdHouses = ref([]);
 const adtypes = ref([]);
 const showCart = ref(false);
 
+// 取得購物車所需資料：購物車內容 + 使用者擁有的優惠券數量
+const cartStore = useCart();
+
 // 初始化
 onMounted(async () => {
     await filterAds();
+    cartStore.initializeCart();
 });
 
 // 篩選條件變更
@@ -145,15 +149,8 @@ const toggleCart = () => {
     if (showCart.value === true) {
         showCart.value = false;
     } else {
-        getCartInfo();
         showCart.value = true;
     }
-};
-
-// 取得購物車資料
-const cartStore = useCart();
-async function getCartInfo() {
-    cartStore.loadCart();
 };
 
 // 刪除廣告結果處理
