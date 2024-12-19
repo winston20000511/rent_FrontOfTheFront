@@ -69,7 +69,9 @@
     const showKeyWordFetch = async () =>{
         const response = await fetch(keywordUrl,{
             method:'POST',
-            headers: {'Content-Type': 'text/plain'},
+            headers: {'Content-Type': 'text/plain',
+                    'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMUBleGFtcGxlLmNvbSIsImV4cCI6MTczNDU4NjY5NX0.TsdmqtnL0zeFIld69FLBJeSrK7NCBh-9qjPrJTY9i7Q'
+            },
             body:searchInputRef.value.value
         });
 
@@ -115,7 +117,9 @@
 
         const response = await fetch(mapUrl,{
             method: 'POST',
-            headers:{'Content-Type': 'application/json'},
+            headers:{'Content-Type': 'application/json',
+                'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMUBleGFtcGxlLmNvbSIsImV4cCI6MTczNDU4NjY5NX0.TsdmqtnL0zeFIld69FLBJeSrK7NCBh-9qjPrJTY9i7Q'
+            },
             body: JSON.stringify(inputData)
         });
 
