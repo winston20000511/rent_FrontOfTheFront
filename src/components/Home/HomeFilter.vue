@@ -16,6 +16,8 @@
     let keywordUrl='http://localhost:8080/api/keyword'
     let mapUrl='http://localhost:8080/api/map'
 
+    let token = localStorage.getItem('jwt');
+
     onMounted(() => {
     document.addEventListener('click', closeSearchList);
     if (myOffcanvasRef.value) {
@@ -69,7 +71,9 @@
     const showKeyWordFetch = async () =>{
         const response = await fetch(keywordUrl,{
             method:'POST',
-            headers: {'Content-Type': 'text/plain'},
+            headers: {'Content-Type': 'text/plain',
+                    'authorization': `${token}`
+            },
             body:searchInputRef.value.value
         });
 
@@ -115,7 +119,9 @@
 
         const response = await fetch(mapUrl,{
             method: 'POST',
-            headers:{'Content-Type': 'application/json'},
+            headers:{'Content-Type': 'application/json',
+                'authorization': `${token}`
+            },
             body: JSON.stringify(inputData)
         });
 
