@@ -14,10 +14,15 @@
 
 <script>
 export default {
+  props: {
+    houseId: {
+      type: String,
+      required: true,
+    },
+  },
   data() {
     return {
       houseDescription: null, // 用於存儲從後端獲取的房屋簡介資料
-     
     };
   },
   mounted() {
@@ -40,8 +45,8 @@ export default {
         .catch(error => {
           console.error("There was a problem with the fetch operation:", error);
         });
-    }
-  }
+    },
+  },
 };
 </script>
 
