@@ -31,7 +31,7 @@ const form = ref({
 });
 
 // 初始化
-onMounted(()=>{
+onMounted(() => {
     // 
     dateOption.value = 'three-months';
     const current = new Date(form.value.minDate);
@@ -101,169 +101,154 @@ watch(timeOption, (newValue) => {
 </script>
 
 <template>
-    <div>
-        <button type="button" data-bs-toggle="collapse" data-bs-target="#BookingSetting"
-            aria-expanded="true" aria-controls="BookingSetting">ddd
-        </button>
-    </div>
-
-
     <div class="accordion" id="accordionExample">
-  <div class="accordion-item">
-    <h2 class="accordion-header">
-      <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-        Accordion Item #1
-      </button>
-    </h2>
-    <div id="collapseOne" class="accordion-collapse collapse show" data-bs-parent="#accordionExample">
-      <div class="accordion-body">
-        <strong>This is the first item's accordion body.</strong> It is shown by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
-      </div>
-    </div>
-  </div>
-  <div class="accordion-item">
-    <h2 class="accordion-header">
-      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-        Accordion Item #2
-      </button>
-    </h2>
-    <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
-      <div class="accordion-body">
-        <strong>This is the second item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
-      </div>
-    </div>
-  </div>
-  <div class="accordion-item">
-    <h2 class="accordion-header">
-      <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
-        Accordion Item #3
-      </button>
-    </h2>
-    <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
-      <div class="accordion-body">
-        <strong>This is the third item's accordion body.</strong> It is hidden by default, until the collapse plugin adds the appropriate classes that we use to style each element. These classes control the overall appearance, as well as the showing and hiding via CSS transitions. You can modify any of this with custom CSS or overriding our default variables. It's also worth noting that just about any HTML can go within the <code>.accordion-body</code>, though the transition does limit overflow.
-      </div>
-    </div>
-  </div>
-</div>
 
+        <div class="accordion-item">
 
+            <h2 class="accordion-header">
+                <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#BookingSetting" aria-expanded="true" aria-controls="BookingSetting">
+                    目前使用預設
+                </button>
+            </h2>
 
+            <div class="collapse " id="BookingSetting" data-bs-parent="#accordionExample">
+                <!-- 設定預約時段 -->
+                <div class="booking-child">
+                    <div class="align-items-center">
+                        <h5 class="flex-shrink-0 p-2">日期</h5>
+                        <div class="flex-grow-1 shadow-sm">
+                            <div class="row align-items-center" style="margin: 0;">
 
+                                <div class="col">
+                                    <VueDatePicker class="p-1 col" v-model="form.minDate" locale="zh"
+                                    model-type="yyyy-MM-dd" :min-date='new Date()' :enable-time-picker="false"
+                                    v-bind="datePickerProps" @update:model-value="onDateChangeAndOption" />
+                                </div>
 
-    <div class="collapse " id="BookingSetting" data-bs-parent="#accordionExample">
-        <!-- 設定預約時段 -->
-        <div class="booking-child">
-            <div class="d-flex align-items-center">
-                <h5 class="flex-shrink-0 p-2">日期</h5>
-                <div class="flex-grow-1 shadow-sm">
-                    <div class="row align-items-center" style="margin: 0;">
-                        <VueDatePicker class="p-1 col" v-model="form.minDate" locale="zh" model-type="yyyy-MM-dd"
-                            :min-date='new Date()' :enable-time-picker="false"  v-bind="datePickerProps"
-                            @update:model-value="onDateChangeAndOption" />
-                        -
-                        <VueDatePicker class="p-1 col" v-model="form.maxDate" locale="zh" model-type="yyyy-MM-dd"
-                            :min-date='form.minDate' :enable-time-picker="false"  v-bind="datePickerProps"
-                            @update:model-value="onDateOption" />
-                    </div>
-                    <div class="d-flex justify-content-end align-items-center">
-                        <div class="p-1">
-                            <span>　</span>
-                            <label class="btn p-1" for="date-dateOption-month">
-                                <input type="radio" id="date-dateOption-month" value="month" v-model="dateOption" />
-                                一個月
-                            </label>
-                            <label class="btn p-1" for="date-dateOption-three-months">
-                                <input type="radio" id="date-dateOption-three-months" value="three-months"
-                                    v-model="dateOption" />
-                                三個月
-                            </label>
-                            <label class="btn p-1" for="date-dateOption-six-months">
-                                <input type="radio" id="date-dateOption-six-months" value="six-months"
-                                    v-model="dateOption" />
-                                半年
-                            </label>
-                            <label class="btn p-1" for="date-dateOption-year">
-                                <input type="radio" id="date-dateOption-year" value="year" v-model="dateOption" />
-                                一年
-                            </label>
+                                    -
+
+                                <div class="col">
+                                    <VueDatePicker class="p-1 col" v-model="form.maxDate" locale="zh"
+                                    model-type="yyyy-MM-dd" :min-date='form.minDate' :enable-time-picker="false"
+                                    v-bind="datePickerProps" @update:model-value="onDateOption" />
+
+                                    
+                                </div>
+
+                            </div>
+                           
+                            <div class="d-flex align-items-center">
+                                <div class="p-1">
+                                    <span>　</span>
+                                    <label class="btn p-1" for="date-dateOption-month">
+                                        <input type="radio" id="date-dateOption-month" value="month"
+                                            v-model="dateOption" />
+                                        一個月
+                                    </label>
+                                    <label class="btn p-1" for="date-dateOption-three-months">
+                                        <input type="radio" id="date-dateOption-three-months" value="three-months"
+                                            v-model="dateOption" />
+                                        三個月
+                                    </label>
+                                    <label class="btn p-1" for="date-dateOption-six-months">
+                                        <input type="radio" id="date-dateOption-six-months" value="six-months"
+                                            v-model="dateOption" />
+                                        半年
+                                    </label>
+                                    <label class="btn p-1" for="date-dateOption-year">
+                                        <input type="radio" id="date-dateOption-year" value="year"
+                                            v-model="dateOption" />
+                                        一年
+                                    </label>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
+
+
                 </div>
-            </div>
 
-
-        </div>
-
-        <!-- 設定可看房時段 -->
-        <div class="booking-child">
-            <div class="d-flex align-items-center">
-                <h5 class="flex-shrink-0 p-2">時段</h5>
-                <div class="flex-grow-1 shadow-sm ">
-                    <div class="row mb-2 align-items-center " style="margin: 0;">
-                        <VueDatePicker class="p-1 col" locale="zh" v-model="form.minTime" :enable-minutes="false"
-                            time-picker :max-time="{ hours: 22, minutes: 59 }"  v-bind="datePickerProps"
-                            @update:model-value="onTimeChangeAndOption" />
-                        -
-                        <VueDatePicker class="p-1 col" locale="zh" v-model="form.maxTime" :enable-minutes="false"
-                            time-picker :min-time="{ hours: form.minTime?.hours ? form.minTime.hours + 1 : 8 }"
-                            :max-time="{ hours: 24 }"  v-bind="datePickerProps"
-                            @update:model-value="onTimeOption" />
-                    </div>
-                    <div class="d-flex align-items-center">
-                        <div class=" row mb-2" style="margin: 0;">
-                            <div class="p-1">
-                                <label class="btn p-1" for="date-timeOption-default">
-                                    <input type="radio" id="date-timeOption-default" value="default"
-                                        v-model="timeOption" />
-                                    預設時段
-                                </label>
-                                <label class="btn p-1" for="date-timeOption-all">
-                                    <input type="radio" id="date-timeOption-all" value="all" v-model="timeOption" />
-                                    全天
-                                </label>
-                                <!-- {{ form.minTime.hours }} - {{ form.maxTime.hours }} -->
+                <!-- 設定可看房時段 -->
+                <div class="booking-child">
+                    <div class="align-items-center">
+                        <h5 class="flex-shrink-0 p-2">時段</h5>
+                        <div class="flex-grow-1 shadow-sm ">
+                            <div class="row mb-2 align-items-center " style="margin: 0;">
+                                <VueDatePicker class="p-1 col" locale="zh" v-model="form.minTime"
+                                    :enable-minutes="false" time-picker :max-time="{ hours: 22, minutes: 59 }"
+                                    v-bind="datePickerProps" @update:model-value="onTimeChangeAndOption" />
+                                -
+                                <VueDatePicker class="p-1 col" locale="zh" v-model="form.maxTime"
+                                    :enable-minutes="false" time-picker
+                                    :min-time="{ hours: form.minTime?.hours ? form.minTime.hours + 1 : 8 }"
+                                    :max-time="{ hours: 24 }" v-bind="datePickerProps"
+                                    @update:model-value="onTimeOption" />
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <div class=" row mb-2" style="margin: 0;">
+                                    <div class="p-1">
+                                        <label class="btn p-1" for="date-timeOption-default">
+                                            <input type="radio" id="date-timeOption-default" value="default"
+                                                v-model="timeOption" />
+                                            預設時段
+                                        </label>
+                                        <label class="btn p-1" for="date-timeOption-all">
+                                            <input type="radio" id="date-timeOption-all" value="all"
+                                                v-model="timeOption" />
+                                            全天
+                                        </label>
+                                        <!-- {{ form.minTime.hours }} - {{ form.maxTime.hours }} -->
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
+
+                </div>
+
+                <!-- 設定可看房的星期 -->
+                <div class="booking-child">
+                    <div class="align-items-center">
+                        <h5 class="flex-shrink-0 p-2">星期</h5>
+                        <div class="flex-grow-1  mb-2 shadow-sm ">
+                            <fieldset class="btn-group p-2" role="group">
+                                <label v-for="(day, index) in daysOfWeek" :key="index" class="p-1">
+                                    <input type="checkbox" v-model="form.week[index]" />
+                                    {{ day }}
+                                </label>
+                            </fieldset>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 設定看房時間 -->
+                <div class="booking-child">
+                    <div class="align-items-center">
+                        <h5 class="flex-shrink-0 p-2">間隔:</h5>
+                        <div class="flex-grow-1  mb-2 shadow-sm">
+                            <select v-model="form.duration" class="form-select">
+                                <option value="" disabled>選擇預約間隔</option>
+                                <option v-for="duration in durationOptions" :key="duration" :value="duration">{{
+                                    duration }}分鐘
+                                </option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
             </div>
 
+
         </div>
 
-        <!-- 設定可看房的星期 -->
-        <div class="booking-child">
-            <div class="d-flex align-items-center">
-                <h5 class="flex-shrink-0 p-2">星期</h5>
-                <div class="flex-grow-1  mb-2 shadow-sm ">
-                    <fieldset class="btn-group p-2" role="group">
-                        <label v-for="(day, index) in daysOfWeek" :key="index" class="p-1">
-                            <input type="checkbox" v-model="form.week[index]" />
-                            {{ day }}
-                        </label>
-                    </fieldset>
-                </div>
-            </div>
-        </div>
-
-        <!-- 設定看房時間 -->
-        <div class="booking-child">
-            <div class="d-flex align-items-center">
-                <h5 class="flex-shrink-0 p-2">間隔:</h5>
-                <div class="flex-grow-1  mb-2 shadow-sm">
-                    <select v-model="form.duration" class="form-select">
-                        <option value="" disabled>選擇預約間隔</option>
-                        <option v-for="duration in durationOptions" :key="duration" :value="duration">{{ duration }}分鐘
-                        </option>
-                    </select>
-                </div>
-            </div>
-        </div>
     </div>
+
+
+
+
+
+
 </template>
 
-<style lang="css" scoped>
-.booking-child {
-    margin: 10px;
-}
-</style>
+<style lang="css" scoped></style>

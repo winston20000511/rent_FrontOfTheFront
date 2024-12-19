@@ -144,7 +144,7 @@
       
       <!-- 設定預約時段 -->
       <hr />
-      <h3 class="section-title">設定看房日曆</h3>
+      <h3 class="section-title">預約看房設定</h3>
       <BookingSlotSetting v-model="bookingForm"></BookingSlotSetting>
 
       <!-- 簡介 -->
