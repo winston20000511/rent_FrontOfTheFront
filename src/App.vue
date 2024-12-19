@@ -11,7 +11,7 @@ import HouseCreate from './components/houses/HouseCreate.vue';
 </script>
 
 <template>
-
+  <HouseCreate/>
   <RouterView></RouterView>
 </template>
 

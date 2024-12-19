@@ -141,8 +141,11 @@
         </label>
       </div>
 
+      
       <!-- 設定預約時段 -->
-      <BookingSlotSetting></BookingSlotSetting>
+      <hr />
+      <h3 class="section-title">設定看房日曆</h3>
+      <BookingSlotSetting v-model="bookingForm"></BookingSlotSetting>
 
       <!-- 簡介 -->
       <hr />
@@ -175,7 +178,7 @@ import { ref, reactive } from 'vue';
 import BookingSlotSetting from '../Booking/BookingSlotSetting.vue';
 
 export default {
-  name: 'AddHouseForm',
+  // name: 'AddHouseForm',
   components: {
         BookingSlotSetting
   },
@@ -224,6 +227,7 @@ export default {
 
     const genderOption = ref(null);
     const images = ref([]);
+    const bookingForm = ref({});
 
     const handleFileUpload = (event) => {
       const files = Array.from(event.target.files);
@@ -280,6 +284,17 @@ export default {
       formData.append('cooking', houseRestrictions.cooking ? '1' : '0');
       formData.append('waterDispenser', houseRestrictions.waterDispenser ? '1' : '0');
       formData.append('managementFee', houseRestrictions.fee ? '1' : '0');
+
+      // Booking Setting
+      formData.append('fromDate',bookingForm.value.fromDate);
+      formData.append('toDate',bookingForm.value.toDate);
+      formData.append('fromTime',bookingForm.value.fromTime);
+      formData.append('toTime',bookingForm.value.toTime);
+      formData.append('duration',bookingForm.value.duration);
+      formData.append('weekDay',bookingForm.value.weekDay);
+      // Object.keys(bookingForm.value).forEach((key) => {
+      //   formData.append(key, bookingForm.value[key]);
+      // });
 
       // Gender Restrictions (Specific BYTE values)
       const genderRestrictionsByte = houseRestrictions.genderRestrictions
@@ -341,6 +356,7 @@ export default {
       handleFileUpload,
       removeImage,
       submitForm,
+      bookingForm,
     };
   },
 };
