@@ -16,6 +16,8 @@
     let keywordUrl='http://localhost:8080/api/keyword'
     let mapUrl='http://localhost:8080/api/map'
 
+    let token = localStorage.getItem('jwt');
+
     onMounted(() => {
     document.addEventListener('click', closeSearchList);
     if (myOffcanvasRef.value) {
@@ -70,7 +72,7 @@
         const response = await fetch(keywordUrl,{
             method:'POST',
             headers: {'Content-Type': 'text/plain',
-                    'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMUBleGFtcGxlLmNvbSIsImV4cCI6MTczNDU4NjY5NX0.TsdmqtnL0zeFIld69FLBJeSrK7NCBh-9qjPrJTY9i7Q'
+                    'authorization': `${token}`
             },
             body:searchInputRef.value.value
         });
@@ -118,7 +120,7 @@
         const response = await fetch(mapUrl,{
             method: 'POST',
             headers:{'Content-Type': 'application/json',
-                'Authorization': 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyMUBleGFtcGxlLmNvbSIsImV4cCI6MTczNDU4NjY5NX0.TsdmqtnL0zeFIld69FLBJeSrK7NCBh-9qjPrJTY9i7Q'
+                'authorization': `${token}`
             },
             body: JSON.stringify(inputData)
         });
