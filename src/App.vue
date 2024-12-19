@@ -10,7 +10,7 @@ import HouseCreate from './components/houses/HouseCreate.vue';
 </script>
 
 <template>
-  <HouseCreate></HouseCreate>
+  <HouseCreate/>
   <RouterView></RouterView>
 </template>
 

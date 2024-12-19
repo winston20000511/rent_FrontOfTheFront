@@ -1,5 +1,6 @@
 <script setup>
-import { ref, watch } from 'vue';
+import { ref, toRef, watch } from 'vue';
+import HousePhotos from '../houses/housePhotos.vue';
 import HouseView from '@/View/HouseView.vue';
 
 // 接收 props 傳遞的 markers
@@ -56,7 +57,7 @@ const closeHouseView = () => {
           v-if="showView" 
           :houseId="selectedHouseId"
           :visible="showView" 
-          @onClose="closeHouseView"  
+          @close="closeHouseView"  
         />
     </div>
 </template>

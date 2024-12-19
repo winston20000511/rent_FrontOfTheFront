@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed, defineProps, nextTick } from 'vue';
+import { ref, onMounted, computed, nextTick } from 'vue';
 import Datepicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
 import BookingAgreement from './bookingAgreement.vue';
