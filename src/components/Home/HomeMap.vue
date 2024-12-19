@@ -7,7 +7,6 @@ const mapMarkers = ref([]); //地圖標記
 const canvas = shallowRef(null); //繪筆
 const refbtnDraw = ref(null) //繪圖按鈕
 const isDrawingMode = ref(false); //按鈕切換繪圖模式
-const overlay = ref(null)
 
 let drawUrl='http://localhost:8080/api/draw';
 let isDrawing = false; //判斷是否正在繪圖
@@ -109,7 +108,7 @@ onMounted(() => {
         title: origin.street,
         content: buttonOrigin,
       });
-      console.log(buttonOrigin);
+
       map.value.panTo(latlng);
       map.value.setZoom(14);
       mapMarkers.value.push(mapMark);
