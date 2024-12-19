@@ -26,7 +26,7 @@
       </div>
       <p v-if="errorMessage" class="error text-danger">{{ errorMessage }}</p>
       <button type="submit" class="btn btn-primary w-100">登入</button>
-      
+
       <!-- 修改「忘記密碼？」按鈕邏輯 -->
       <button
         type="button"
@@ -82,10 +82,44 @@ export default {
           error.response?.data?.message || "登入失敗，請檢查帳號或密碼。";
       }
     },
+    async validateJWT() {
+      try {
+        // 從 localStorage 取得 JWT
+        const token = localStorage.getItem("jwt");
+
+        if (!token) {
+          throw new Error("Token 不存在，請重新登入。");
+        }
+
+        // 使用 fetch 驗證 JWT
+        const response = await fetch("http://localhost:8080/api/user/validate", {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Token 驗證失敗，請重新登入。");
+        }
+
+        // 如果驗證成功
+        const data = await response.json();
+        console.log("Token 驗證成功：", data);
+      } catch (error) {
+        console.error(error.message);
+        alert(error.message);
+        localStorage.removeItem("jwt");
+        this.$router.push("/login");
+      }
+    },
     closeForgotPassword() {
       // 關閉 ForgotPassword 組件
       this.showForgotPassword = false;
     },
+  },
+  mounted() {
+    this.validateJWT(); // 組件加載時驗證 JWT
   },
 };
 </script>
