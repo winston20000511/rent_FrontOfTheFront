@@ -108,15 +108,24 @@ export default {
     async submitRegister() {
       this.isLoading = true; // 開始載入
       this.errorMessage = ""; // 清空錯誤訊息
+      const token = localStorage.getItem("token"); // 從 localStorage 取得 token
       try {
-        // 發送註冊請求到後端
-        await api.post("http://localhost:8080/api/user/register", {
-          name: this.name,
-          email: this.email,
-          password: this.password,
-          phone: this.phone,
-          gender: this.gender,
-        });
+        // 發送註冊請求到後端，並加入 Authorization 標頭
+        await api.post(
+          "http://localhost:8080/api/user/register",
+          {
+            name: this.name,
+            email: this.email,
+            password: this.password,
+            phone: this.phone,
+            gender: this.gender,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`, // JWT 驗證
+            },
+          }
+        );
 
         // 註冊成功提示
         alert("註冊成功！");

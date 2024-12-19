@@ -23,6 +23,7 @@
             name="email"
             placeholder="請輸入電子信箱"
             required
+            v-model="email"
           />
         </div>
 
@@ -36,6 +37,7 @@
             name="verificationCode"
             placeholder="請輸入下方「數字驗證碼」"
             required
+            v-model="verificationCode"
           />
         </div>
 
@@ -53,28 +55,63 @@
 </template>
 
 <script setup>
-// 定義可觸發的事件
-defineEmits(['close']);
+import { ref } from "vue";
 
-function submitForm() {
-  alert("系統已發送重設密碼信件至您的電子信箱，請至信箱收信。");
+// 定義可觸發的事件
+defineEmits(["close"]);
+
+// 綁定輸入欄位的資料
+const email = ref("");
+const verificationCode = ref("");
+
+async function submitForm() {
+  const token = localStorage.getItem("jwt");
+
+  if (!token) {
+    alert("尚未登入，請先登入！");
+    return;
+  }
+
+  try {
+    const response = await fetch("/api/forgot-password", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        authorization: `${token}`,
+      },
+      body: JSON.stringify({
+        email: email.value,
+        verificationCode: verificationCode.value,
+      }),
+    });
+
+    if (response.ok) {
+      alert("系統已發送重設密碼信件至您的電子信箱，請至信箱收信。");
+    } else {
+      const error = await response.json();
+      alert(`錯誤: ${error.message}`);
+    }
+  } catch (error) {
+    console.error("請求失敗：", error);
+    alert("發生錯誤，請稍後再試！");
+  }
 }
 </script>
 
 <style scoped>
-/* 外層容器，讓表單置中且靠上 */
+/* CSS樣式與原始碼相同 */
 .forgot-password-container {
   display: flex;
-  justify-content: center; /* 水平置中 */
-  align-items: flex-start; /* 靠上對齊 */
+  justify-content: center;
+  align-items: flex-start;
   height: 100vh;
-  padding: 50px 20px; /* 添加左右留白 */
+  padding: 50px 20px;
   background-color: #f9f9f9;
 }
 
 .forgot-password-form {
   width: 100%;
-  max-width: 400px; /* 限制表單最大寬度 */
+  max-width: 400px;
   padding: 20px;
   border: 1px solid #ddd;
   border-radius: 8px;
