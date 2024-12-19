@@ -2,7 +2,6 @@
 import BookingSlot from '@/components/Booking/BookingViewComponent.vue';
 import { ref } from 'vue';
 
-const houseId = 1; //由上一層提供,目前寫死
 
 const BASE_URL = import.meta.env.VITE_APIURL
 
@@ -15,7 +14,11 @@ const props = defineProps({
   isVisible: {
     type: Boolean,
     required: true
-  }
+  },
+  houseId: {
+    type: Number,
+    required: true,
+  },
 });
 
 </script>
@@ -23,9 +26,9 @@ const props = defineProps({
 <template>
   <div class="modal-overlay " @click="closeView" v-if="isVisible">
     <div class="modal-content mb-3" @click.stop>
-      <button type="button" class="btn-close" @click="closeView" ></button>
+      <button type="button" class="btn-close" @click="closeView"></button>
       <div class="modal-header">
-        <BookingSlot :houseId="houseId"/>
+        <BookingSlot :houseId="houseId" />
       </div>
     </div>
   </div>
@@ -54,7 +57,7 @@ h2 {
   border-radius: 8px;
   padding: 0px 10px;
   width: 500px;
-  overflow-y: auto; 
+  overflow-y: auto;
   max-height: 600px;
 }
 
@@ -62,6 +65,7 @@ h2 {
   display: flex;
   justify-content: space-between;
 }
+
 .btn-close {
   background-color: antiquewhite;
   border-radius: 5rem;
@@ -70,6 +74,6 @@ h2 {
   right: 10px;
   font-size: 20px;
   z-index: 1001;
-  text-align:start
-} 
+  text-align: start
+}
 </style>
