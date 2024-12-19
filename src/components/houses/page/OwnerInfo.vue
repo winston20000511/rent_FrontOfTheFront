@@ -1,7 +1,11 @@
 <template>
   <div class="owner-info-container">
     <div class="owner-info">
-      <img :src="'data:image/jpeg;base64,' + ownerInfo.picture" alt="屋主照片" class="owner-avatar" />
+      <img
+        :src="'data:image/jpeg;base64,' + ownerInfo.picture"
+        alt="屋主照片"
+        class="owner-avatar"
+      />
       <div class="owner-details">
         <p class="owner-name">{{ ownerInfo.name }}</p>
         <p class="owner-phone">{{ ownerInfo.phone }}</p>
@@ -11,7 +15,7 @@
     <div class="appointment-time">
       <button @click="appointmentTime" class="send-button">預約看房</button>
     </div>
-    
+
     <div class="message-section">
       <button @click="sendMessage" class="send-message-button">发送信息</button>
     </div>
@@ -29,28 +33,40 @@ export default {
   data() {
     return {
       ownerInfo: {
-        name: '',
-        phone: '',
-        picture: '',  // Base64 編碼的图片
+        name: "",
+        phone: "",
+        picture: "", // Base64 編碼的图片
       },
-      appointmentTime: '',
+      appointmentTime: "",
     };
   },
   methods: {
     sendMessage() {
-      alert(`发送信息给 ${this.ownerInfo.name}，预约时间：${this.appointmentTime}`);
+      alert(
+        `发送信息给 ${this.ownerInfo.name}，预约时间：${this.appointmentTime}`
+      );
     },
     // 使用 fetch 獲取屋主信息
     async fetchOwnerInfo() {
       try {
-        const response = await fetch(`http://localhost:8080/api/houses/owner/${this.houseId}`);
+        const token = localStorage.getItem("jwt"); // 假設 token 存在 localStorage 中
+        if (!token) {
+          throw new Error("未找到 token");
+        }
+        const response = await fetch(
+          `http://localhost:8080/api/houses/owner/${this.houseId}`,
+          {
+            method: "GET",
+            headers: { Authorization: ` ${token}` },
+          }
+        );
         if (!response.ok) {
-          throw new Error('網路請求失敗');
+          throw new Error("網路請求失敗");
         }
         const data = await response.json();
-        this.ownerInfo = data;  // 将返回的数据赋值给 ownerInfo
+        this.ownerInfo = data; // 将返回的数据赋值给 ownerInfo
       } catch (error) {
-        console.error('獲取屋主信息失敗:', error);
+        console.error("獲取屋主信息失敗:", error);
       }
     },
   },
@@ -102,7 +118,7 @@ export default {
 }
 
 .send-message-button {
-  background-color: #3579C0;
+  background-color: #3579c0;
   color: white;
   border: none;
   padding: 10px 20px;
