@@ -37,7 +37,7 @@ const toggleLoginPage = () => {
     <main>
       <div class="main-left">
         <!-- <HomeMap :markers="markers"></HomeMap> -->
-        <HomeMap :markers="markers"></HomeMap>
+        <HomeMap @add-marker="addMarker" :markers="markers"></HomeMap>
       </div>
       <div class="main-right">
         <HomeCardList :markers="markers"></HomeCardList>

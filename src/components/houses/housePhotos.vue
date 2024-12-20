@@ -9,34 +9,52 @@
       <button @click="fetchHousePhotos" class="retry-button">重試</button>
     </div>
 
-    <!-- 當有照片數據且未加載中或錯誤時顯示 -->
+    <!-- 照片輪播 -->
     <div v-if="!loading && !error && photos.length > 0">
-      <!-- 主照片顯示 -->
-      <img :src="currentPhoto" alt="房屋圖片" class="main-photo" />
-
-      <!-- 照片控制按鈕 -->
-      <div class="photo-controls">
-        <button @click="previousPhoto" :disabled="photos.length <= 1">上一張</button>
-        <button @click="nextPhoto" :disabled="photos.length <= 1">下一張</button>
-      </div>
-
-      <!-- 照片縮略圖 -->
-      <div class="photo-thumbnails">
-        <img v-for="(photo, index) in photos" :key="index" :src="photo" :alt="'縮略圖 ' + (index + 1)"
-          :class="{ active: index === currentPhotoIndex }" @click="selectPhoto(index)" />
-      </div>
+      <Splide
+        :options="splideOptions"
+        class="splide-container"
+        @arrows-mounted="addLoopArrows"
+      >
+        <SplideSlide v-for="(photo, index) in photos" :key="index">
+          <img
+            :src="`data:image/jpeg;base64,${photo}`"
+            alt="房屋圖片"
+            class="main-photo"
+            @click="openPhoto(photo)"
+          />
+        </SplideSlide>
+      </Splide>
     </div>
 
     <!-- 沒有照片的提示 -->
     <div v-if="!loading && !error && photos.length === 0" class="no-photos">
-      暫無可顯示的照片。
+      <img src="../../assets/no-image.png" alt="暫時無照片展示" />
+    </div>
+
+    <!-- 模態框：放大顯示圖片 -->
+    <div v-if="showModal" class="modal" @click="closeModal">
+      <div class="modal-content">
+        <img
+          :src="`data:image/jpeg;base64,${selectedPhoto}`"
+          alt="放大圖片"
+          class="enlarged-photo"
+        />
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import { Splide, SplideSlide } from '@splidejs/vue-splide';
+import '@splidejs/splide/dist/css/splide.min.css';
+
 export default {
   name: "HousePhotos",
+  components: {
+    Splide,
+    SplideSlide,
+  },
   props: {
     houseId: {
       type: [String, Number],
@@ -44,64 +62,65 @@ export default {
     },
     baseUrl: {
       type: String,
-      default: 'http://localhost:8080/api/houses/getPhotos',
+      default: "http://localhost:8080/api/houses/getPhotos",
     },
   },
   data() {
     return {
       photos: [], // 照片列表
-      currentPhotoIndex: 0, // 當前顯示的照片索引
       loading: true, // 是否加載中
-      error: null, // 加載過程中的錯誤信息
+      error: null, // 錯誤信息
+      showModal: false, // 是否顯示模態框
+      selectedPhoto: null, // 當前選擇的照片
+      splideOptions: {
+        type: "loop", // 啟用循環播放
+        perPage: 1,
+        focus: "center",
+        gap: "1rem",
+        padding: { left: "5rem", right: "5rem" },
+        pagination: true,
+      },
     };
-  },
-  computed: {
-    currentPhoto() {
-      return `data:image/jpeg;base64,${this.photos[this.currentPhotoIndex]}` || '';
-    },
   },
   methods: {
     async fetchHousePhotos() {
       this.loading = true;
       this.error = null;
       try {
-        const response = await fetch(`${this.baseUrl}/${this.houseId}`);
-        console.log("Response status:", response.status);
-        console.log("Response headers:", response.headers);
+        const token = localStorage.getItem("jwt");
+        const response = await fetch(`${this.baseUrl}/${this.houseId}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `${token}`,
+          },
+        });
 
         if (!response.ok) {
           throw new Error(`HTTP 錯誤！狀態碼：${response.status}`);
         }
 
         const responseBody = await response.text();
-        console.log("Response body:", responseBody);
-
         if (responseBody) {
-          const data = JSON.parse(responseBody);
-          this.photos = data || [];
+          this.photos = JSON.parse(responseBody) || [];
         } else {
           this.photos = [];
         }
-
-        this.currentPhotoIndex = 0;
       } catch (err) {
-        console.error('獲取房屋照片時發生錯誤：', err);
+        console.error("獲取房屋照片時發生錯誤：", err);
         this.error = err;
         this.photos = [];
       } finally {
         this.loading = false;
       }
     },
-    nextPhoto() {
-      this.currentPhotoIndex =
-        (this.currentPhotoIndex + 1) % this.photos.length;
+    openPhoto(photo) {
+      this.selectedPhoto = photo;
+      this.showModal = true;
     },
-    previousPhoto() {
-      this.currentPhotoIndex =
-        (this.currentPhotoIndex - 1 + this.photos.length) % this.photos.length;
-    },
-    selectPhoto(index) {
-      this.currentPhotoIndex = index;
+    closeModal() {
+      this.showModal = false;
+      this.selectedPhoto = null;
     },
   },
   watch: {
@@ -149,61 +168,55 @@ export default {
 .main-photo {
   display: block;
   margin: 0 auto;
-  max-width: 100%;
-  height: auto;
+  width: auto;
+  height: 300px; /* 恢復圖片原高度 */
   border: 1px solid #ddd;
   border-radius: 8px;
-}
-
-.photo-controls {
-  display: flex;
-  justify-content: space-between;
-  margin: 10px 0;
-}
-
-.photo-controls button {
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
   cursor: pointer;
-  transition: background-color 0.3s;
 }
 
-.photo-controls button:hover {
-  background-color: #0056b3;
+.splide-container {
+  background-color: #f5deb3;
+  padding: 1rem;
 }
 
-.photo-controls button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
+.splide__pagination {
+  bottom: -1.5rem;
 }
 
-.photo-thumbnails {
+.splide__pagination__page {
+  background-color: gray;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.splide__pagination__page.is-active {
+  background-color: red;
+}
+
+.modal {
   display: flex;
   justify-content: center;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-.photo-thumbnails img {
-  width: 50px;
-  height: 50px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.9);
+  z-index: 1000;
   cursor: pointer;
-  opacity: 0.7;
-  transition: opacity 0.3s, transform 0.3s;
 }
 
-.photo-thumbnails img.active {
-  opacity: 1;
-  border-color: #007bff;
-  transform: scale(1.1);
+.modal-content {
+  max-width: 90%;
+  max-height: 90%;
 }
 
-.photo-thumbnails img:hover {
-  opacity: 1;
+.enlarged-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 </style>
