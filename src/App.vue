@@ -5,7 +5,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import 'bootstrap-icons/font/bootstrap-icons.min.css';
 import HouseCreate from './components/houses/HouseCreate.vue';
 import CollectHouseList from './components/houses/CollectHouseList.vue';
-import HouseList from './components/houses/HouseList.vue';
+import HouseList from './components/houses/houselist.vue';
 
 
 
@@ -13,7 +13,9 @@ import HouseList from './components/houses/HouseList.vue';
 </script>
 
 <template>
+  <CollectHouseList></CollectHouseList>
   <HouseList></HouseList>
+  <HouseCreate></HouseCreate>
   <RouterView></RouterView>
 </template>
 

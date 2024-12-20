@@ -20,7 +20,7 @@ export default {
   },
   data() {
     return {
-      userId: 1,
+      userId: null,
       houseIds: [],
       houses: [],
       loading: false,
@@ -38,11 +38,17 @@ export default {
       return { Authorization: `${token}` };
     },
     async fetchHouseIds() {
-      const response = await fetch(`${this.baseUrl}/collect/${this.userId}`, {
+      const response = await fetch(`${this.baseUrl}/collect`, {
         method: "GET",
         headers: this.getAuthHeaders(),
       });
-      if (response.ok) this.houseIds = await response.json();
+      console.log("Authorization Header:", this.getAuthHeaders()); // 確認 Header
+  if (response.ok) {
+    const result = await response.json();
+    this.houseIds = Array.isArray(result) ? result : [];
+  } else {
+    console.error("Failed to fetch house IDs:", response.status, response.statusText);
+  }
     },
     async fetchHouseDetails(houseId) {
       const response = await fetch(`${this.baseUrl}/details/${houseId}`, {
@@ -60,7 +66,7 @@ export default {
       return base64Images.map((base64) => `data:image/jpeg;base64,${base64}`);
     },
     async deleteHouse(houseId) {
-      await fetch(`${this.baseUrl}/collect/delete/${this.userId}/${houseId}`, {
+      await fetch(`${this.baseUrl}/collect/delete/${houseId}`, {
         method: "DELETE",
         headers: this.getAuthHeaders(),
       });
@@ -100,10 +106,7 @@ export default {
     <div class="search-bar">
       <span class="p-input-icon-left">
         <i class="pi pi-search" />
-        <InputText
-          v-model="filters['global'].value"
-          placeholder="搜尋房屋..."
-        />
+        <InputText v-model="filters['global'].value" placeholder="搜尋房屋..." />
       </span>
     </div>
 
@@ -115,26 +118,13 @@ export default {
     <!-- 收藏列表 -->
     <div v-else>
       <div v-if="houses.length > 0">
-        <DataTable
-          :value="houses"
-          responsiveLayout="scroll"
-          :paginator="true"
-          :rows="5"
-          :rowsPerPageOptions="[5, 10, 20]"
-          v-model:filters="filters"
-          filterDisplay="menu"
-          class="custom-table"
-        >
+        <DataTable :value="houses" responsiveLayout="scroll" :paginator="true" :rows="5"
+          :rowsPerPageOptions="[5, 10, 20]" v-model:filters="filters" filterDisplay="menu" class="custom-table">
           <!-- 圖片 -->
           <Column header="圖片" style="width: 150px;">
             <template #body="slotProps">
-              <img
-                v-if="slotProps.data.images.length > 0"
-                :src="slotProps.data.images[0]"
-                alt="House Image"
-                width="100"
-                height="70"
-              />
+              <img v-if="slotProps.data.images.length > 0" :src="slotProps.data.images[0]" alt="House Image" width="100"
+                height="70" />
               <span v-else>無圖片</span>
             </template>
           </Column>
@@ -156,19 +146,11 @@ export default {
           <Column header="操作" style="width: 200px;">
             <template #body="slotProps">
               <!-- 刪除按鈕 -->
-              <Button
-                icon="pi pi-trash"
-                label="刪除"
-                class="p-button-danger p-mr-2"
-                @click="deleteHouse(slotProps.data.houseId)"
-              />
+              <Button icon="pi pi-trash" label="刪除" class="p-button-danger p-mr-2"
+                @click="deleteHouse(slotProps.data.houseId)" />
               <!-- 查看房屋按鈕 -->
-              <Button
-                icon="pi pi-eye"
-                label="查看"
-                class="p-button-secondary"
-                @click="openHouseView(slotProps.data.houseId)"
-              />
+              <Button icon="pi pi-eye" label="查看" class="p-button-secondary"
+                @click="openHouseView(slotProps.data.houseId)" />
             </template>
           </Column>
         </DataTable>
@@ -179,12 +161,7 @@ export default {
     </div>
 
     <!-- 房屋詳細頁面 (彈窗) -->
-    <HouseView
-      v-if="showView"
-      :houseId="selectedHouseId"
-      :visible="showView"
-      @close="closeHouseView"
-    />
+    <HouseView v-if="showView" :houseId="selectedHouseId" :visible="showView" @close="closeHouseView" />
   </div>
 </template>
 
@@ -192,7 +169,8 @@ export default {
 h2 {
   text-align: center;
   margin-bottom: 20px;
-  color: #333; /* 標題字體顏色 */
+  color: #333;
+  /* 標題字體顏色 */
 }
 
 .loading {
@@ -207,23 +185,31 @@ img {
 }
 
 .custom-table ::v-deep(.p-datatable) {
-  background-color: #f9f9f9; /* 表格背景顏色 */
-  color: #000; /* 表格內文字顏色設為黑色 */
+  background-color: #f9f9f9;
+  /* 表格背景顏色 */
+  color: #000;
+  /* 表格內文字顏色設為黑色 */
 }
 
 .custom-table ::v-deep(.p-datatable-thead > tr > th) {
-  background-color: #f0f0f0; /* 表頭背景顏色 */
-  color: #000; /* 表頭文字顏色設為黑色 */
+  background-color: #f0f0f0;
+  /* 表頭背景顏色 */
+  color: #000;
+  /* 表頭文字顏色設為黑色 */
   text-align: center;
-  font-weight: bold; /* 表頭字體加粗 */
+  font-weight: bold;
+  /* 表頭字體加粗 */
 }
 
 .custom-table ::v-deep(.p-datatable-tbody > tr) {
-  background-color: #ffffff; /* 表格每列的背景顏色 */
-  color: #000; /* 表格列中文字設為黑色 */
+  background-color: #ffffff;
+  /* 表格每列的背景顏色 */
+  color: #000;
+  /* 表格列中文字設為黑色 */
 }
 
 .custom-table ::v-deep(.p-datatable-tbody > tr:hover) {
-  background-color: #e6f7ff; /* 滑鼠懸停時的背景顏色 */
+  background-color: #e6f7ff;
+  /* 滑鼠懸停時的背景顏色 */
 }
 </style>

@@ -149,7 +149,7 @@ export default {
     },
     async loadHouses() {
       try {
-        const response = await fetch(`${this.baseUrl}/user/1`, {
+        const response = await fetch(`${this.baseUrl}/houses`, {
           headers: this.getAuthHeaders(),
         });
         const houseIds = await response.json();
