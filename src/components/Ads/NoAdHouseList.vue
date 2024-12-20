@@ -1,6 +1,7 @@
 <script setup>
-import axios from "axios";
-import { ref, watch } from "vue";
+import { ref, watch, defineComponent} from "vue";
+
+defineComponent({ name: 'noadhouselist' });
 
 const emit = defineEmits(["filter-no-ad-houses"]);
 
@@ -15,6 +16,8 @@ const props = defineProps({
   },
 });
 
+let token = localStorage.getItem('jwt');
+
 const isDataLoaded = ref(false);
 const selectedAdtypes = ref([]);
 
@@ -23,7 +26,9 @@ const selectedHouseId = ref("");
 const selectedAdtype = ref("");
 
 const initializeData = () => {
+  console.log("props.adtypes.length: ", props.adtypes.length)
   if (props.noAdHouses.length > 0 && props.adtypes.length > 0) {
+    console.log("初始化載入")
     selectedAdtypes.value = props.noAdHouses.map(
       () => props.adtypes[0] || null
     );
@@ -66,22 +71,32 @@ async function addAd(houseId, adtypeId) {
   };
 
   try {
-    const response = await axios.post("/advertisements", selectedInfo, {
-      headers: {
-        "Content-Type": "application/json",
-      },
+    const url = "http://localhost:8080/advertisements";
+    const response = await fetch(url,{
+      method: "POST",
+      headers: { "Content-Type": "application/json", authorization: `${token}` },
+      body: JSON.stringify(selectedInfo),
     });
-    console.log("Ad added successfully:", response.data);
+    const sucess = await response.json();
+
+    if(sucess){
+      alert("新增成功");
+      emit('filter-no-ad-houses');
+    }else{
+      alert("新增失敗");
+    }
+    
   } catch (error) {
     console.error("Error adding ad:", error);
   }
-}
+};
+
 </script>
 
 <template>
   <div>
     <div v-if="!isDataLoaded" class="text-center py-6 text-gray-500">
-      數據加載中...
+      數據載入中...
     </div>
 
     <div v-else>

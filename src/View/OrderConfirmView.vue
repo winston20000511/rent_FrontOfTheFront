@@ -1,15 +1,18 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import { useCart } from "@/stores/cartStore";
-import axios from 'axios';
 
 const cartStore = useCart();
 const cartId = cartStore.cartId;
 const cartItems = ref([]);
+// 接收表單
+const formContainer = ref(null);
 
 // 追蹤載入狀況
 const isLoading = ref(true);
 const loadError = ref(null);
+
+let token = localStorage.getItem('jwt');
 
 
 onMounted(async () => {
@@ -17,18 +20,25 @@ onMounted(async () => {
     console.log("order confirm view cartId: ", cartId);
     
   try {
-    const response = await axios.post("/api/orders/content/confirmation", cartId,
-        {headers: { 'Content-Type': 'application/json' }}
-    );
+    const url = "http://localhost:8080/api/orders/content/confirmation";
+    const response = await fetch(url,{
+      method: "POST",
+      headers: { "Content-Type": "application/json", authorization: `${token}` },
+      body: cartId,
+    });
+    const data = await response.json();
 
-    console.log("order confirm page: ", response.data);
+    console.log("order confirm page: ", data);
 
-    cartItems.value = response.data;
+    cartItems.value = data;
     isLoading.value = false;
   } catch (error) {
     loadError.value = "載入錯誤，請重新操作";
     isLoading.value = false;
-  }
+  };
+
+
+
 
   // 載入時禁止返回上一頁
   // // 1. 推送當前頁面到歷史紀錄
@@ -46,16 +56,102 @@ onMounted(async () => {
 });
 
 // 處理付款邏輯
-const handlePayment = () => {
-  if (thirdParty === "linepay") {
-    // 呼叫LINEPAY API
+const handlePayment = async () => {
+
+  await nextTick();
+
+  if(!formContainer.value){
+    throw new Error("formContainer尚未初始化");
+  }
+
+  if (cartStore.thirdParty === "linepay") {
     console.log("呼叫LINEPAY");
+
+    // 之後要在頁面設choosePayment的選項
+    let orderInfo = {
+      cartId: cartStore.cartId,
+      choosePayment: "linepay",
+      thirdParty: cartStore.thirdParty,
+    };
+
+    // 新增訂單
+    const submitOrderUrl = "http://localhost:8080/api/orders/create";
+    const orderResponse = await fetch(submitOrderUrl,{
+      method: "POST",
+      headers: {"Content-Type": "application/json", authorization: `${token}`},
+      body: JSON.stringify(orderInfo)
+    });
+
+    const orderData = await orderResponse.json();
+    console.log("訂單資料: ", orderData);
+    console.log("訂單號碼: ", orderData.merchantTradNo);
+
+    const merchantTradNo = orderData.merchantTradNo;
+
+    // 呼叫LINEPAY
+    const linepayUrl = "http://localhost:8080/api/linepay/request";
+    const linepayResponse = await fetch(linepayUrl,{
+      method: "POST",
+      headers: {"Content-Type": "application/json", authorization: `${token}`},
+      body: merchantTradNo
+    });
+
+    const linepayPaymentUrl = await linepayResponse.json();
+    // linepay會回傳paymentUrl
+    window.location.href = linepayPaymentUrl.paymentUrl;
+
+    console.log("付完款的回傳值: ", data);
 
   }
   
-  if (thirdParty === "ecpay") {
+  if (cartStore.thirdParty === "ecpay") {
     // 呼叫綠界支付 (ECPay)
     console.log("呼叫ECpay");
+
+    let orderInfo = {
+      cartId: cartStore.cartId,
+      choosePayment: "Credit",
+      thirdParty: cartStore.thirdParty,
+    };
+
+    const submitOrderUrl = "http://localhost:8080/api/orders/create";
+    const orderResponse = await fetch(submitOrderUrl,{
+      method: "POST",
+      headers: {"Content-Type": "application/json", authorization: `${token}`},
+      body: JSON.stringify(orderInfo)
+    });
+
+    const orderData = await orderResponse.json();
+    console.log("訂單資料: ", orderData);
+    console.log("訂單號碼: ", orderData.merchantTradNo);
+
+    const merchantTradNo = orderData.merchantTradNo;
+
+    // 呼叫ECPAY
+    try{
+      const ecpayUrl = "http://localhost:8080/api/ecpay/ecpayCheckout";
+      const ecpayResponse = await fetch(ecpayUrl, {
+        method: "POST",
+        headers: {"Content-Type": "application/json", authorization: `${token}`},
+        body: merchantTradNo
+      });
+
+      const formHtml = await ecpayResponse.text();
+      const tempDiv = document.createElement("div");
+      tempDiv.innerHTML = formHtml.trim();
+      const formElement = tempDiv.firstChild;
+
+      console.log("formElement", formElement);
+
+      formContainer.value.appendChild(formElement);
+
+      console.log("formContainer: ", formContainer);
+
+      formElement.submit();
+    }catch(error){
+      console.error("提交失敗: ", error);
+    }
+
   }
 };
 
@@ -66,8 +162,6 @@ const handlePayment = () => {
   <div class="text-xl mb-3 text-center border-b border-black py-2">
       訂單確認
     </div>
-
-    <div>檢驗選擇的付款方式 {{cartStore.thirdParty}} </div>
 
     <div v-if="isLoading" class="text-center mt-10">
       <p>資料加載中...</p>
@@ -110,7 +204,7 @@ const handlePayment = () => {
             <th class="px-4 py-2" colspan="2">VIP服務時間</th>
             <th class="px-4 py-2 text-right">金額</th>
             <th class="px-4 py-2 text-right">折扣</th>
-            <th class="px-4 py-2">最終金額</th>
+            <th class="px-4 py-2 text-right">最終金額</th>
           </tr>
         </thead>
         <tbody>
@@ -120,7 +214,7 @@ const handlePayment = () => {
             <td class="px-4 py-2">{{ item.adName }}</td>
             <td class="px-4 py-2" colspan="2">{{ item.adPeriod }}</td>
             <td class="px-4 py-2 text-right">{{ item.adPrice }}</td>
-            <td class="px-4 py-2">{{ cartStore.couponUsage[item.adId]? `- ${cartStore.calculate.discountAmount} `: "" }}</td>
+            <td class="px-4 py-2 text-right">{{ cartStore.couponUsage[item.adId]? `- ${cartStore.calculate.discountAmount} `: "" }}</td>
             <td class="px-4 py-2 text-right">{{ cartStore.couponUsage[item.adId]? (item.adPrice-cartStore.calculate.discountAmount) : item.adPrice }}</td>
           </tr>
           <tr class="border-t border-gray-300">
@@ -137,6 +231,8 @@ const handlePayment = () => {
         </tbody>
       </table>
     </div>
+
+    <div ref="formContainer" class="hidden"></div>
 
 </template>
 

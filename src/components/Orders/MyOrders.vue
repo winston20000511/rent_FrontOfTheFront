@@ -1,6 +1,5 @@
 <script setup>
-  import { ref, reactive, watch, onMounted } from 'vue';
-  import axios from 'axios';
+  import { ref, reactive, watch, onMounted} from 'vue';
   
   import OrderPageTitle from '@/components/Orders/OrderPageTitle.vue';
   import OrderStatusFilter from '@/components/Orders/OrderStatusFilter.vue';
@@ -30,6 +29,9 @@
   const detail = ref({});
   const showOverlay = ref(false);
 
+  let token = localStorage.getItem('jwt');
+
+
   const goToAddAd = () => {
     console.log("點到新增VIP服務的按鈕");
   };
@@ -50,10 +52,18 @@
   const filterOrders = async () => {
     console.log("變更的篩選條件: ", filters);
     try {
-      const response = await axios.post("/api/orders/filter", filters);
-      const { content, totalPages: total } = response.data;
+      const url = "http://localhost:8080/api/orders/filter";
+      const response = await fetch(url, {
+        method: "POST",
+        headers: {'Content-Type': 'application/json', 'authorization':  `${token}`},
+        body: JSON.stringify(filters),
+      });
+
+      const { content, totalPages: total } = await response.json();
+
       orders.value = content;
       totalPages.value = total;
+
     } catch (error) {
       console.error("發送請求時有錯誤: ", error);
     }
@@ -70,7 +80,7 @@
     messageContent.value = result.message;
     showMessage.value = true;
 
-    if (result.sucess) {
+    if (result) {
       const order = orders.value.find((order) => order.merchantTradNo === result.merchantTradNo);
       if (order) order.orderStatus = "取消中";
     }
@@ -134,9 +144,6 @@
   @import url("https://npmcdn.com/flatpickr/dist/themes/dark.css");
   @import url("https://cdn.jsdelivr.net/npm/tailwindcss@^2.2.19/dist/tailwind.min.css");
   @import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css");
-  @import url("https://fonts.googleapis.com");
-  @import url("https://fonts.gstatic.com");
-  @import url("https://fonts.googleapis.com/css2?family=Pacifico&display=swap");
 
   @import url("/src/assets/adAndOrderFront.css");
 </style>

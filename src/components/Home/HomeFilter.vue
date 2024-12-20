@@ -17,6 +17,13 @@
     let mapUrl='http://localhost:8080/api/map'
 
     let token = localStorage.getItem('jwt');
+    const response = await fetch(keywordUrl,{
+            method:'POST',
+            headers: {'Content-Type': 'text/plain',
+                    'authorization':  `${token}`
+            },
+            body:searchInputRef.value.value
+    });
 
     onMounted(() => {
     document.addEventListener('click', closeSearchList);

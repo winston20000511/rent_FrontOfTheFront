@@ -1,7 +1,8 @@
 <script setup>
-import { ref, computed } from "vue";
+import { computed } from "vue";
 import { useCart } from "@/stores/cartStore";
-import axios from "axios";
+
+let token = localStorage.getItem('jwt');
 
 // 插入購物車資料表
 const cartStore = useCart();
@@ -29,6 +30,11 @@ const emit = defineEmits([
 
 // 處理過的廣告資料
 const processedAds = computed(() => {
+
+  if(!props.ads){
+    return [];
+  };
+
   return props.ads.map((ad) => {
     const remainingDays = ad.remainingDays;
     const isPaid = ad.isPaid;
@@ -91,14 +97,15 @@ const deleteAd = async (adId) => {
   const userConfirmed = window.confirm("確定要刪除嗎？");
   if (userConfirmed) {
     try {
-      const response = await axios.delete("/advertisements", {
-        data: adId,
-        headers: {
-          "Content-Type": "application/json",
-        },
+      const url = "http://localhost:8080/advertisements";
+      const response = await fetch(url,{
+        method: "DELETE",
+        headers: { "Content-Type": "application/json", authorization: `${token}` },
+        body: JSON.stringify(adId),
       });
+      const sucess = await response.json();
 
-      if (response.data) {
+      if (sucess) {
         emit("ad-delete-result", {
           success: true,
           adId,
@@ -135,8 +142,13 @@ const deleteAd = async (adId) => {
 // 查看廣告詳細資料
 const checkAd = async (adId) => {
   try {
-    const response = await axios.get(`/advertisements/adId/${adId}`);
-    emit("detail", response.data);
+    const url = `http://localhost:8080/advertisements/adId/${adId}`;
+    const response = await fetch(url, {
+      headers: { "Content-Type": "application/json", authorization: `${token}` },
+    });
+    const data = await response.json();
+    emit("detail", data);
+
   } catch (error) {
     console.error("系統錯誤: ", error);
   }

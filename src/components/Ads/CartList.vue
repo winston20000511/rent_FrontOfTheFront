@@ -45,9 +45,9 @@ const cartStore = useCart();
 function removeFromCart(adId) {
   cartStore.removeFromCart(adId);
 
-  if(cartStore.couponUsage[adId]){
-    cartStore.clearCouponUsage;
-  }
+  // if(cartStore.couponUsage[adId]){
+  //   cartStore.clearCouponUsage;
+  // }
 };
 
 // 清空購物車

@@ -1,6 +1,7 @@
 <script setup>
 import { ref, reactive, computed, watch } from "vue";
-import axios from "axios";
+
+let token = localStorage.getItem('jwt');
 
 const props = defineProps({
   detail: {
@@ -95,10 +96,16 @@ function getAdValidation(startDateStr, adtype) {
 const editDetail = async () => {
   editableDetails.isEditing = true;
   try {
-    const response = await axios.get("/advertisements/adtypes");
-    adtypes.value = response.data;
+    const url = "http://localhost:8080/advertisements/adtypes";
+    const response = await fetch(url,{
+      headers: { "Content-Type": "application/json", authorization: `${token}` },
+    });
+    const data = response.json();
+    adtypes.value = data;
+
     selectedAdType.value = props.detail.adName;
     editableDetails.adName = props.detail.adName;
+    
   } catch (error) {
     console.error("系統錯誤: ", error);
   }
@@ -118,21 +125,19 @@ watch(
 
 // 儲存選擇的廣告方案
 const saveAdPlan = async () => {
+  const url = "http://localhost:8080/advertisements";
+  let request = {
+    adId: props.detail.adId,
+    newAdtypeId: editableDetails.adtypeId,
+  };
 
-  const response = await axios.put(
-    "/advertisements",
-    {
-      adId: props.detail.adId,
-      newAdtypeId: editableDetails.adtypeId,
-    },
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    }
-  );
+  const response = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", authorization: `${token}` },
+    body: JSON.stringify(request),
+  });
 
-  const updatedAd = await response.data;
+  const updatedAd = await response.json();
 
   props.detail.adName = updatedAd.adName;
   props.detail.adPrice = updatedAd.adPrice;

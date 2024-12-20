@@ -1,31 +1,31 @@
 <script setup>
 
-// 定義 Props
-const props = defineProps({
-  messageTitle: {
-    type: String,
-    required: true,
-    default: '',
-  },
-  message: {
-    type: String,
-    required: true,
-    default: '',
-  },
-  showMessage: {
-    type: Boolean,
-    required: true,
-    default: false,
-  },
-});
+  // 定義 Props
+  const props = defineProps({
+    messageTitle: {
+      type: String,
+      required: true,
+      default: '',
+    },
+    message: {
+      type: String,
+      required: true,
+      default: '',
+    },
+    showMessage: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+  });
 
-// 定義 Emits
-const emit = defineEmits(["close-message"]);
+  // 定義 Emits
+  const emit = defineEmits(["close-message"]);
 
-// 關閉訊息
-function closeMessage() {
-  emit("close-message");
-}
+  // 關閉訊息
+  function closeMessage() {
+    emit("close-message");
+  }
 
 </script>
 
