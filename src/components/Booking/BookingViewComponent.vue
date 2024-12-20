@@ -2,7 +2,7 @@
 import { ref, onMounted, computed, nextTick } from 'vue';
 import Datepicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
-import BookingAgreement from './bookingAgreement.vue';
+import BookingAgreement from './BookingAgreement.vue';
 
 
 const BASE_URL = import.meta.env.VITE_APIURL
@@ -134,19 +134,20 @@ const generateTimeSlots = (startTime, endTime, duration) => {
 
 
 const disabledWeekDays = computed(() => {
+    // 重新排列 weekDays，讓禮拜天為第一位
+    const adjustedWeekDays = weekDays.value.charAt(6) + weekDays.value.slice(0, 6);
+
     const disabledDays = [];
     for (let i = 0; i < 7; i++) {
-        const date = new Date();
-        date.setDate(date.getDate() + i);
-        const day = date.getDay();
-        const convertedDay = (day === 0) ? 6 : (day - 1);
-
-        const isDateAllowed = weekDays.value.charAt(convertedDay) === '0';
+        // 直接檢查 adjustedWeekDays 的對應位是否為 '0'
+        const isDateAllowed = adjustedWeekDays.charAt(i) === '0';
 
         if (isDateAllowed) {
             disabledDays.push(i);
         }
     }
+
+    console.log("Disabled days:", disabledDays);
     return disabledDays;
 });
 
@@ -196,7 +197,6 @@ const markers = computed(() => {
 
 onMounted(() => {
     load();
-    console.log(token);
 });
 </script>
 
@@ -205,7 +205,7 @@ onMounted(() => {
     <div class="booking-slot container" style="width: 100%;">
         <!-- section 1 -->
         <section v-if="currentSection === 1">
-            <header class="header">
+            <header class="header h2">
                 <h2>選擇您想要看房的時間</h2>
             </header>
 
@@ -241,7 +241,7 @@ onMounted(() => {
         </section>
         <!-- section 2 -->
         <section v-if="currentSection === 2">
-            <header class="header">
+            <header class="header h2">
                 <h2>確認您的看房時間</h2>
             </header>
             <hr class="w-100" />

@@ -26,7 +26,7 @@ const props = defineProps({
 <template>
   <div class="modal-overlay " @click="closeView" v-if="isVisible">
     <div class="modal-content mb-3" @click.stop>
-      <button type="button" class="btn-close" @click="closeView"></button>
+      <button type="button" class="btn-close btn btn-primary" @click="closeView"></button>
       <div class="modal-header">
         <BookingSlot :houseId="houseId" />
       </div>
@@ -67,7 +67,8 @@ h2 {
 }
 
 .btn-close {
-  background-color: antiquewhite;
+
+  background-color: rgb(216, 209, 111);
   border-radius: 5rem;
   position: absolute;
   top: 10px;
