@@ -62,7 +62,6 @@ const load = async () => {
 const sendBooking = async () => {
     const bookingData = {
         houseId: props.houseId,
-        userId: 20,
         bookingDate: selectedDate.value,
         bookingTime: selectedTime.value,
         message: message.value
@@ -197,6 +196,7 @@ const markers = computed(() => {
 
 onMounted(() => {
     load();
+    console.log(token);
 });
 </script>
 
@@ -276,8 +276,8 @@ onMounted(() => {
                 <div class="mb-3">
                     <button class="btn btn-info w-100 align-items-center" type="button" @click="sendBooking"
                         :disabled="!isAgreed || loading">
-                        <span v-if="!loading" class="spinner-grow spinner-grow-sm" aria-hidden="true"></span>
-                        <span role="status">{{ !loading ? '發送中...' : '發送預約' }}</span>
+                        <span v-if="loading" class="spinner-grow spinner-grow-sm" aria-hidden="true"></span>
+                        <span role="status">{{ loading ? '發送中...' : '發送預約' }}</span>
                     </button>
                 </div>
             </div>

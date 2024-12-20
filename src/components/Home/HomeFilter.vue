@@ -116,7 +116,6 @@
             origin: searchInputRef.value.value
         }
 
-
         const response = await fetch(mapUrl,{
             method: 'POST',
             headers:{'Content-Type': 'application/json',
