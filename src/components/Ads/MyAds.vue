@@ -15,6 +15,7 @@ import PopUpMessage from "@/components/Ads/PopUpMessage.vue";
 import Overlay from "@/components/Ads/Overlay.vue";
 import AdDetailModal from "@/components/Ads/AdDetailModal.vue";
 import CartList from "@/components/Ads/CartList.vue";
+import TestAdList from "./TestAdList.vue";
 
 const filters = reactive({
   page: 1,
@@ -284,6 +285,9 @@ watch(
     v-show="showCart"
     @toggle-cart="toggleCart"
   />
+
+  <TestAdList></TestAdList>
+  
 </template>
 
 <style scoped>
