@@ -2,12 +2,13 @@ import { defineStore } from "pinia";
 
 let token = localStorage.getItem('jwt');
 
+
 export const useCart = defineStore("cart", {
+
   state: () => ({
-    userId: null,
     cartId: null,
     cartItems: [],
-    couponUsage: {},
+    couponUsage: [],
     totalAmount: 0,
     itemDescription: "",
     productNames: "",
@@ -24,7 +25,7 @@ export const useCart = defineStore("cart", {
 
       const { totalPrice, discountAmount } = state.cartItems.reduce(
         (accumulator, item) => {
-          const discount = state.couponUsage[item.adId]
+          const discount = state.couponUsage.includes(item.adId)
             ? Math.floor(item.adPrice * 0.1)
             : 0;
           accumulator.totalPrice += item.adPrice - discount;
@@ -65,18 +66,14 @@ export const useCart = defineStore("cart", {
         const response = await fetch(url, {
           method: "POST",
           headers: { "Content-Type": "application/json", authorization: `${token}` },
-          // body: JSON.stringify(1),
         });
         const data = await response.json();
-        this.cartItems = data;
-        this.cartId = this.cartItems[0].cartId;
 
-        console.log(
-          "Pinia gets cart items: ",
-          data,
-          " cart id: ",
-          this.cartId
-        );
+        this.cartItems = data;
+        if(!(data.length === 0)) this.cartId = this.cartItems[0].cartId;
+
+        console.log(" Pinia gets cart items: ", this.cartItems," cart id: ", this.cartId);
+        
       } catch (error) {
         console.error("無法取得購物車內容: ", error);
       }
@@ -91,38 +88,32 @@ export const useCart = defineStore("cart", {
     },
 
     applyCouponToAd(adId) {
-      if (!this.couponUsage[adId]) {
-        this.couponUsage[adId] = 1;
+      if (!this.couponUsage.includes(adId)) {
+        this.couponUsage.push(adId);
       } else {
         console.error("該商品已使用優惠券");
       }
-
-      this.updateTotalAmount();
     },
 
     removeCoupon(adId) {
-      if (this.couponUsage[adId]) {
-        delete this.couponUsage[adId];
-      }
-    },
-
-    clearCouponUsage() {
-      this.couponUsage = {};
+      const index = this.couponUsage.indexOf(adId);
+      if (index !== -1) this.couponUsage.splice(index, 1); 
     },
 
     // 將商品加入購物車
     async addToCart(adId) {
       console.log("cartStore add to cart: ", adId);
 
-      if (!Array.isArray(this.cartItems)) {
-        this.cartItems = [];
+      let existingItem;
+      if(this.cartItems.length !== 0){
+        existingItem = this.cartItems.find((item) => item.adId === adId);
       }
-
-      const existingItem = this.cartItems.find((item) => item.adId === adId);
+      
+      console.log("existingItem: ", existingItem);
 
       if (!existingItem) {
         try {
-          const url = "http://localhost:8080/api/cart/additem";
+          const url = "http://localhost:8080/api/cart/add/item";
           const response = await fetch(url, {
             method: "POST",
             headers: { "Content-Type": "application/json", authorization: `${token}` },
@@ -131,6 +122,7 @@ export const useCart = defineStore("cart", {
           const success = await response.json();
 
           console.log("加入購物車結果: ", success);
+
 
           if (success) {
             this.cartItems.push(adId);
@@ -153,7 +145,7 @@ export const useCart = defineStore("cart", {
 
       if (existingItem) {
         try {
-          const url = "http://localhost:8080/api/cart/deleteitem";
+          const url = "http://localhost:8080/api/cart/delete/item";
           const response = await fetch(url, {
             method: "DELETE",
             headers: { "Content-Type": "application/json", authorization: `${token}` },
@@ -198,8 +190,10 @@ export const useCart = defineStore("cart", {
       // 檢查優惠券剩餘數量
       if (this.couponNumber === 0) {
         alert("已無可使用的優惠券");
+        return false;
       } else {
         this.couponNumber--;
+        return true;
       }
     },
 
@@ -218,29 +212,31 @@ export const useCart = defineStore("cart", {
     // 提交訂單: 要驗證提交訂單
     async createOrder() {
       const orderData = {
-        userId: this.userId,
         cartId: this.cartId,
-        cartItems: this.cartItems.map((item) => ({
-          adId: item.adId,
-          couponApplied: item.couponApplied,
-        })),
-        thirdPartry: this.thirdPartry,
+        adIds: this.cartItems.map((item) => item.adId),
+        couponApplied: this.couponUsage,
+        thirdParty: this.thirdParty,
+        choosePayment: this.choosePayment,
+        totalAmount: this.totalAmount,
       };
 
+      console.log("送出的訂單資料: ", orderData);
+
       try {
-        const url = "/api/orders/create";
+        const url = "http://localhost:8080/api/orders/create";
         const response = await fetch(url, {
           method: "POST",
-          headers: { "Content-Type": "text/plain", authorization: `${token}` },
+          headers: { "Content-Type": "application/json", authorization: `${token}` },
           body: JSON.stringify(orderData),
         });
 
-        const success = await response.data;
+        const dataResponse = await response.json();
 
-        if (success) {
-          console.log("定單提交成功");
+        if (response.ok) {
+          console.log("訂單提交成功");
+          return dataResponse;
         } else {
-          console.log("定單提交失敗");
+          console.log("訂單提交失敗");
         }
       } catch (error) {
         console.error("提交訂單時發生錯誤: ", error);

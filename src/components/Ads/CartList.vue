@@ -5,13 +5,6 @@ import router from "@/router";
 
 const emit = defineEmits(["toggle-cart"]);
 
-const props = defineProps({
-  cartStore: {
-    type: Object,
-    required: true,
-  },
-});
-
 const selectedThirdParty = ref("linepay");
 
 // 優惠券
@@ -45,12 +38,19 @@ const cartStore = useCart();
 function removeFromCart(adId) {
   cartStore.removeFromCart(adId);
 
-  // if(cartStore.couponUsage[adId]){
-  //   cartStore.clearCouponUsage;
-  // }
+  console.log("有進到刪除");
+  console.log("刪除的adId: ", adId);
+  console.log(cartStore.couponUsage);
+
+  if(cartStore.couponUsage.includes(adId)){
+    console.log("有進來");
+    cartStore.addCoupon(1);
+    cartStore.discountAmount = 0;
+  };
+
+  cartStore.loadCart();
 };
 
-// 清空購物車
 
 // 前往結帳
 function checkOut() {
@@ -58,13 +58,17 @@ function checkOut() {
   router.push({ name: "orderConfirm" });
 }
 
-// 待修：刪除以使用優惠券的廣告，會因為index改變，讓其他廣告吃到渲染畫面
+// 待修：刪除已使用優惠券的廣告，會因為index改變，讓其他廣告吃到渲染畫面
 function toggleCoupon(index) {
   const cartItem = cartStore.cartItems[index];
   if(activeCouponIndex.value === null){
-    cartStore.minusOneCoupon(1);
-    activeCouponIndex.value = index;
-    cartStore.applyCouponToAd(cartItem.adId);
+    const isCouponLeft = cartStore.minusOneCoupon(1);
+    if(isCouponLeft){
+      activeCouponIndex.value = index;
+      cartStore.applyCouponToAd(cartItem.adId);
+    }
+
+    cartStore.loadCart();
     return;
   };
   
@@ -74,9 +78,10 @@ function toggleCoupon(index) {
     cartStore.removeCoupon(cartItem.adId);
   } else {
     activeCouponIndex.value = index;
-    cartStore.clearCoupon();
     cartStore.applyCouponToAd(cartItem.adId);
   };
+
+  cartStore.loadCart();
   
 };
 

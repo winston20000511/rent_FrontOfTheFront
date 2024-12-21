@@ -48,6 +48,5 @@
   </template>
   
   <style scoped>
-  /* 在這裡添加樣式，如果需要覆蓋 Tailwind CSS 的預設樣式 */
   </style>
   

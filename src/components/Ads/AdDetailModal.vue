@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, computed, watch } from "vue";
+import { ref, reactive, computed, watch, nextTick } from "vue";
 
 let token = localStorage.getItem('jwt');
 
@@ -47,7 +47,7 @@ const adDetails = computed(() => [
   { label: "房屋標題", value: props.detail.houseTitle, editable: false },
   {
     label: "廣告方案",
-    value: editableDetails.adName,
+    value: `${props.detail.adName}`,
     editable: editableDetails.isEditing,
   },
   {
@@ -96,11 +96,12 @@ function getAdValidation(startDateStr, adtype) {
 const editDetail = async () => {
   editableDetails.isEditing = true;
   try {
-    const url = "http://localhost:8080/advertisements/adtypes";
-    const response = await fetch(url,{
+    const url = "http://localhost:8080/api/advertisements/adtypes";
+    const response = await fetch(url, {
+      method: "POST",
       headers: { "Content-Type": "application/json", authorization: `${token}` },
     });
-    const data = response.json();
+    const data = await response.json();
     adtypes.value = data;
 
     selectedAdType.value = props.detail.adName;
@@ -125,26 +126,42 @@ watch(
 
 // 儲存選擇的廣告方案
 const saveAdPlan = async () => {
-  const url = "http://localhost:8080/advertisements";
+  const url = "http://localhost:8080/api/advertisements";
   let request = {
     adId: props.detail.adId,
     newAdtypeId: editableDetails.adtypeId,
   };
 
-  const response = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", authorization: `${token}` },
-    body: JSON.stringify(request),
-  });
+  console.log("request: ", request);
 
-  const updatedAd = await response.json();
+  try{
+    const response = await fetch(url, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json", authorization: `${token}` },
+      body: JSON.stringify(request),
+    });
 
-  props.detail.adName = updatedAd.adName;
-  props.detail.adPrice = updatedAd.adPrice;
+    const updatedAd = await response.json();
 
-  // 更新 editableDetails 中的資料
-  editableDetails.adName = updatedAd.adName;
-  editableDetails.isEditing = false; // 儲存後關閉編輯
+    if(response.ok){
+      console.log("有收到通知")
+      console.log("updated ad: ", updatedAd);
+      props.detail.adName = updatedAd.adName;
+      props.detail.adPrice = updatedAd.adPrice;
+
+      // 更新 editableDetails 中的資料
+      editableDetails.adName = updatedAd.adName;
+      editableDetails.adPrice = updatedAd.adPrice;
+      editableDetails.isEditing = false; // 儲存後關閉編輯
+
+    }else{
+      alert("尚未更新");
+    }
+
+  }catch(error){
+    console.error("更新方案時出現錯誤", error);
+  }
+  
 };
 
 // 取消編輯
@@ -154,6 +171,7 @@ const cancelEdit = () => {
 };
 
 const closeDetail = () => {
+  editableDetails.isEditing=false;
   emit("close-detail");
 };
 </script>

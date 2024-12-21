@@ -16,7 +16,7 @@
     status: "all",
     daterange: "all",
     inputcondition: "none",
-    userInput: "",
+    input: "",
   });
 
   const orders = ref([]);
@@ -39,18 +39,19 @@
   const changeFilter = (filterName, filterValue) => {
     filters[filterName] = filterValue;
     filters.page = 1;
-    filters.userInput = "";
+    filters.input = "";
     currentPage.value = 1;
     filterOrders();
   };
 
   const updateInput = (input) => {
     currentPage.value = 1;
-    filters.userInput = input;
+    filters.input = input;
   };
 
   const filterOrders = async () => {
     console.log("變更的篩選條件: ", filters);
+
     try {
       const url = "http://localhost:8080/api/orders/filter";
       const response = await fetch(url, {
@@ -102,7 +103,7 @@
       detail.value = {};
   };
 
-  watch(() => filters.userInput, () => {
+  watch(() => filters.input, () => {
     filterOrders();
   });
 

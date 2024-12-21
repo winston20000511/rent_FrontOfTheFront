@@ -11,8 +11,7 @@ cartStore.loadCart();
 function addAdToCart(adId) {
   cartStore.addToCart(adId);
   cartStore.loadCart();
-  console.log("廣告已加入購物車", adId);
-}
+};
 
 const props = defineProps({
   ads: {
@@ -97,7 +96,7 @@ const deleteAd = async (adId) => {
   const userConfirmed = window.confirm("確定要刪除嗎？");
   if (userConfirmed) {
     try {
-      const url = "http://localhost:8080/advertisements";
+      const url = "http://localhost:8080/api/advertisements";
       const response = await fetch(url,{
         method: "DELETE",
         headers: { "Content-Type": "application/json", authorization: `${token}` },
@@ -142,9 +141,11 @@ const deleteAd = async (adId) => {
 // 查看廣告詳細資料
 const checkAd = async (adId) => {
   try {
-    const url = `http://localhost:8080/advertisements/adId/${adId}`;
+    const url = `http://localhost:8080/api/advertisements/adId`;
     const response = await fetch(url, {
+      method: "POST",
       headers: { "Content-Type": "application/json", authorization: `${token}` },
+      body: adId
     });
     const data = await response.json();
     emit("detail", data);

@@ -20,7 +20,7 @@ const filters = reactive({
   page: 1,
   daterange: "all",
   paymentstatus: "all",
-  input: "",
+  housetitle: "",
 });
 
 const isLoading = ref(false);
@@ -48,6 +48,7 @@ const cartStore = useCart();
 onMounted(async () => {
   await filterAds();
   cartStore.initializeCart();
+  await getAdtypeAndId();
 });
 
 // 篩選條件變更
@@ -55,7 +56,7 @@ const changeFilter = (filterName, filterValue) => {
   filters[filterName] = filterValue;
   ads.value = [];
   filters.page = 1;
-  filters.input = ""; // 重設 input
+  filters.housetitle = ""; // 重設 input
   currentPage.value = 1;
   filterAds();
 };
@@ -65,7 +66,7 @@ const filterAds = async () => {
   console.log("篩選條件: ", filters);
 
   try {
-    let url = "http://localhost:8080/advertisements/filter";
+    let url = "http://localhost:8080/api/advertisements/filter";
     const response = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json", authorization: `${token}` },
@@ -138,19 +139,21 @@ const toggleNoAdHousesTable = () => {
 
 // 取得廣告類型
 const getAdtypeAndId = async () => {
-  const url = "http://localhost:8080/advertisements/adtypes";
+  const url = "http://localhost:8080/api/advertisements/adtypes";
   const response = await fetch(url, {
-    method: "GET",
+    method: "POST",
     headers: { "Content-Type": "application/json", authorization: `${token}` }
   });
   const data = await response.json();
+
+  console.log("adtypes ", data);
 
   adtypes.value = data;
 };
 
 // 取得沒有掛廣告的房源
 const filterNoAdHouses = async () => {
-  const url = "http://localhost:8080/advertisements/houseswithoutadds";
+  const url = "http://localhost:8080/api/advertisements/houses/withoutads";
   try {
     const response = await fetch(url, {
       method: "POST",
@@ -196,9 +199,9 @@ const closeMessage = () => {
   showMessage.value = false;
 };
 
-// 監聽 input 變更
+// 監聽 input housetitle 變更
 watch(
-  () => filters.input,
+  () => filters.housetitle,
   async () => {
     filters.page = 1;
     currentPage.value = 1;
@@ -233,7 +236,7 @@ watch(
 
   <div class="flex flex-wrap items-center space-x-6 mt-4 mb-6 px-6">
     <div class="flex items-center space-x-6 flex-grow">
-      <AdUserInputFilter v-model="filters.input" />
+      <AdUserInputFilter v-model="filters.housetitle" />
     </div>
 
     <div class="flex items-center justify-end w-full sm:w-auto">
@@ -280,7 +283,6 @@ watch(
   <CartList
     v-show="showCart"
     @toggle-cart="toggleCart"
-    :cartStore="cartStore"
   />
 </template>
 
