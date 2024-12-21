@@ -46,32 +46,35 @@ const handleSignInClick = () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 20px;
+  padding: 20px 40px; /* 添加內距 */
   background-color: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 100%; /* 填滿整個頁面寬度 */
+  box-sizing: border-box;
 }
 
 /* 左側：Logo 和標題 */
 .nav-left {
   display: flex;
-  align-items: center;
+  align-items: center; /* 垂直居中 Logo 和標題 */
+  gap: 20px; /* 增加 Logo 與標題的距離 */
 }
 
 .nav-logo {
-  max-width: 150px;
-  max-height: 80px;
-  object-fit: contain;
-  margin-right: 10px;
+  max-width: 200px; /* 限制 Logo 寬度 */
+  max-height: 120px; /* 限制 Logo 高度 */
+  object-fit: contain; /* 確保圖片比例縮放 */
+  margin: 0; /* 移除外距，避免影響容器布局 */
 }
 
 .nav-title h1 {
-  font-size: 60px;
+  font-size: 60px; /* 標題字體大小 */
   color: black;
   font-family: 'Pacifico', cursive;
   font-weight: 500;
   font-style: normal;
   line-height: 1;
-  margin: 0;
+  margin: 0; /* 移除多餘外距 */
 }
 
 /* 右側：MemberCenter 和按鈕 */
@@ -84,17 +87,17 @@ const handleSignInClick = () => {
 }
 
 .nav-right li {
-  margin-left: 15px;
+  margin-left: 20px;
 }
 
 .nav-right li a,
 .nav-right li button {
-  font-size: 16px;
-  padding: 8px 12px;
+  font-size: 20px; /* 按鈕字體大小 */
+  padding: 10px 20px; /* 增加按鈕內距 */
   background-color: #007bff;
   color: #fff;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px; /* 圓角按鈕 */
   text-decoration: none;
   cursor: pointer;
 }
@@ -102,5 +105,45 @@ const handleSignInClick = () => {
 .nav-right li a:hover,
 .nav-right li button:hover {
   background-color: #0056b3;
+}
+
+/* 響應式樣式 */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column; /* 導航欄內容垂直排列 */
+    align-items: flex-start;
+    padding: 20px;
+  }
+
+  .nav-left {
+    flex-direction: column; /* Logo 和標題換行 */
+    align-items: flex-start;
+    margin-bottom: 20px; /* 與右側按鈕區域分隔 */
+  }
+
+  .nav-title h1 {
+    font-size: 48px; /* 小螢幕縮小標題字體 */
+  }
+
+  .nav-logo {
+    max-width: 150px; /* 小螢幕縮小 Logo */
+    max-height: 100px;
+  }
+
+  .nav-right {
+    flex-wrap: wrap; /* 將導航按鈕換行 */
+    margin-top: 10px;
+  }
+
+  .nav-right li {
+    margin-left: 0;
+    margin-right: 10px; /* 減小按鈕之間的距離 */
+  }
+
+  .nav-right li a,
+  .nav-right li button {
+    font-size: 18px; /* 小螢幕縮小按鈕字體 */
+    padding: 8px 16px;
+  }
 }
 </style>

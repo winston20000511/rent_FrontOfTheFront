@@ -1,8 +1,5 @@
 <template>
   <div>
-    <!-- 加入 HomeNavbar -->
-    <HomeNavbar @signInClicked="handleSignInClick" />
-
     <div class="member-center">
       <div class="container mt-5">
         <!-- 新增會員資料區 -->
@@ -85,14 +82,10 @@
 </template>
 
 <script>
-import HomeNavbar from '../Home/HomeNavbar.vue';
 import api from '../../api/api'; // 假設 API 模組已設定 Authorization 標頭
 
 export default {
   name: 'MemberCenter',
-  components: {
-    HomeNavbar, // 註冊 HomeNavbar 組件
-  },
   data() {
     return {
       activeTab: '', // 初始值為空，會根據路由更新

@@ -293,7 +293,7 @@ onUnmounted(() => {
 </script>
 
 
-<style>
+<style scoped>
 @import './chat.css';
 
 /* popup model */

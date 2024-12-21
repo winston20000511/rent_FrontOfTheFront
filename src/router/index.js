@@ -33,6 +33,7 @@ const routes = [
     name: 'MemberCenter',
     component: MemberCenter, // 顯示 MemberCenter
     children: [ //我在 /member-center 路由下添加了一個 children 陣列，這樣當訪問 /member-center/edit-profile 時，會顯示 EditUserPage.vue。
+
       {
         path: 'edit-user', // 編輯用戶頁面路徑
         name: 'EditUser',
