@@ -11,12 +11,34 @@ import OrderConfirmView from '@/View/OrderConfirmView.vue';
 import AdtypeView from '@/View/AdtypeView.vue';
 import NoAdHouseList from '@/components/Ads/NoAdHouseList.vue';
 import OrderCompleteView from '@/View/OrderCompleteView.vue';
+import EditProfile from '@/components/User/EditProfile.vue';
 
 const routes = [
   {
     path: '/', // 主框架頁面
+    name: 'home',
     component: HomeView, // 主框架組件
-    children: [
+  },
+  {
+    path: '/login', // 登入頁面路徑
+    name: 'LoginPage',
+    component: LoginPage, // 顯示 LoginPage
+  },
+  {
+    path: '/forgot-password', // 忘記密碼頁面路徑
+    name: 'ForgotPassword',
+    component: ForgotPassword,
+  },
+  {
+    path: '/edit-user', // 編輯用戶頁面路徑
+    name: 'EditUser',
+    component: EditUserPage,
+  },
+  {
+    path: '/member-center', // 會員中心頁面路徑
+    name: 'MemberCenter',
+    component: MemberCenter, // 顯示 MemberCenter
+    children: [ //我在 /member-center 路由下添加了一個 children 陣列，這樣當訪問 /member-center/edit-profile 時，會顯示 EditUserPage.vue。
       {
         path: '', // 預設子路由，對應首頁內容
         name: 'home',
@@ -27,6 +49,12 @@ const routes = [
         name: 'EditUser',
         component: EditUserPage,
       },
+      {
+        path: 'edit-profile',  // 這是子路由，會在 MemberCenter 中顯示 EditProfile
+        name: 'EditProfile',
+        component: EditProfile
+      },
+      // 你可以在這裡添加更多子路由，根據需要加載其他頁面
     ],
   },
   {

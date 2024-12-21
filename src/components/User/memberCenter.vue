@@ -1,118 +1,209 @@
 <template>
-  <div class="container mt-3">
-    <!-- 將頁籤選項包在一個專用的容器中 -->
-    <div class="tabs-container">
-      <ul class="nav nav-tabs" id="memberCenterTabs" role="tablist">
-        <li class="nav-item" role="presentation">
-          <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#edit-profile" type="button" role="tab" aria-controls="edit-profile" aria-selected="true">
-            修改會員資料
-          </button>
-        </li>
-        <li class="nav-item" role="presentation">
-          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#favorite-houses" type="button" role="tab" aria-controls="favorite-houses" aria-selected="false">
-            房屋收藏
-          </button>
-        </li>
-        <li class="nav-item" role="presentation">
-          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#appointments-overview" type="button" role="tab" aria-controls="appointments-overview" aria-selected="false">
-            預約介面總覽
-          </button>
-        </li>
-        <li class="nav-item" role="presentation">
-          <button class="nav-link" data-bs-toggle="tab" data-bs-target="#my-ads" type="button" role="tab" aria-controls="my-ads" aria-selected="false">
-            我的廣告
-          </button>
-        </li>
-      </ul>
-    </div>
+  <div>
+    <!-- 加入 HomeNavbar -->
+    <HomeNavbar @signInClicked="handleSignInClick" />
 
-    <!-- 頁籤內容 -->
-    <div class="tab-content" id="memberCenterTabsContent">
-      <div class="tab-pane fade show active" id="edit-profile" role="tabpanel" aria-labelledby="edit-profile-tab">
-        <ProfileForm></ProfileForm>
-      </div>
-      <div class="tab-pane fade" id="favorite-houses" role="tabpanel" aria-labelledby="favorite-houses-tab">
-        <FavoriteHouses />
-      </div>
-      <div class="tab-pane fade" id="appointments-overview" role="tabpanel" aria-labelledby="appointments-overview-tab">
-        <AppointmentsOverview />
-      </div>
-      <div class="tab-pane fade" id="my-ads" role="tabpanel" aria-labelledby="my-ads-tab">
-        <MyAds></MyAds>
+    <div class="member-center">
+      <div class="container mt-5">
+        <!-- 新增會員資料區 -->
+        <div class="member-info card mb-4 shadow">
+          <div class="card-body d-flex align-items-center">
+            <img
+              :src="memberPicture"
+              alt="會員大頭貼"
+              class="member-avatar rounded-circle"
+            />
+            <div class="ml-3">
+              <h5 class="mb-0">你好，{{ memberName }}！</h5>
+              <p class="text-muted mb-0">歡迎來到會員中心</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-12">
+            <div class="card shadow">
+              <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">會員中心</h4>
+              </div>
+              <div class="card-body">
+                <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                  <!-- 使用 router-link 進行路由跳轉，並根據路由來設置 activeTab -->
+                  <li class="nav-item" role="presentation">
+                    <router-link
+                      to="/member-center/edit-profile"
+                      class="nav-link"
+                      :class="{ active: activeTab === 'profile' }"
+                      role="tab"
+                    >
+                      修改會員資料
+                    </router-link>
+                  </li>
+                  <li class="nav-item" role="presentation">
+                    <router-link
+                      to="/member-center/bookmarked"
+                      class="nav-link"
+                      :class="{ active: activeTab === 'bookmarked' }"
+                      role="tab"
+                    >
+                      房屋收藏
+                    </router-link>
+                  </li>
+                  <li class="nav-item" role="presentation">
+                    <router-link
+                      to="/member-center/reservation"
+                      class="nav-link"
+                      :class="{ active: activeTab === 'reservation' }"
+                      role="tab"
+                    >
+                      預約介面總覽
+                    </router-link>
+                  </li>
+                  <li class="nav-item" role="presentation">
+                    <router-link
+                      to="/member-center/ads"
+                      class="nav-link"
+                      :class="{ active: activeTab === 'ads' }"
+                      role="tab"
+                    >
+                      我的廣告
+                    </router-link>
+                  </li>
+                </ul>
+
+                <div class="tab-content" id="pills-tabContent">
+                  <!-- 使用 router-view 來顯示子路由內容 -->
+                  <router-view></router-view>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import MyAds from '../Ads/MyAds.vue';
-import AppointmentsOverview from '../Booking/AppointmentsOverview.vue';
-import CollectHouseList from '../houses/CollectHouseList.vue';
-import ProfileForm from './ProfileForm.vue';
-
-
-
+import HomeNavbar from '../Home/HomeNavbar.vue';
+import api from '../../api/api'; // 假設 API 模組已設定 Authorization 標頭
 
 export default {
   name: 'MemberCenter',
   components: {
-    ProfileForm,
-    CollectHouseList,
-    AppointmentsOverview,
-    MyAds
-  }
+    HomeNavbar, // 註冊 HomeNavbar 組件
+  },
+  data() {
+    return {
+      activeTab: '', // 初始值為空，會根據路由更新
+      memberName: '', // 動態載入會員名稱
+      memberPicture: '', // 動態載入會員頭像
+    };
+  },
+  watch: {
+    // 監聽路由的變化，根據當前路由更新 activeTab
+    $route(to) {
+      if (to.path === '/member-center/edit-profile') {
+        this.activeTab = 'profile';
+      } else if (to.path === '/member-center/bookmarked') {
+        this.activeTab = 'bookmarked';
+      } else if (to.path === '/member-center/reservation') {
+        this.activeTab = 'reservation';
+      } else if (to.path === '/member-center/ads') {
+        this.activeTab = 'ads';
+      }
+    },
+  },
+  created() {
+    // 初始化時根據當前路由設置 activeTab
+    if (this.$route.path === '/member-center/edit-profile') {
+      this.activeTab = 'profile';
+    } else if (this.$route.path === '/member-center/bookmarked') {
+      this.activeTab = 'bookmarked';
+    } else if (this.$route.path === '/member-center/reservation') {
+      this.activeTab = 'reservation';
+    } else if (this.$route.path === '/member-center/ads') {
+      this.activeTab = 'ads';
+    }
+
+    // 動態載入會員資料
+    this.fetchMemberData();
+  },
+  methods: {
+    handleSignInClick() {
+      // 如果需要處理 HomeNavbar 傳來的事件，可以在這裡加入邏輯
+      console.log('Sign In 按鈕被點擊');
+    },
+    async fetchMemberData() {
+      try {
+        // 從後端 API 獲取會員資料
+        const response = await api.get("http://localhost:8080/api/user/userCenter"); // 待確認！後端 API 的路徑
+        const { name, picture } = response.data;
+
+        // 設定會員資料
+        this.memberName = name;
+        this.memberPicture = picture || 'https://via.placeholder.com/80'; // 預設圖片
+      } catch (error) {
+        console.error('無法取得會員資料', error);
+      }
+    },
+  },
 };
 </script>
 
 <style scoped>
-/* 清除任何不必要的間距，讓頁面緊貼上方 */
-body, html {
-  margin: 0;
-  padding: 0;
-  height: 100%;
+.member-center {
+  font-family: 'Arial', sans-serif;
+  background-color: #f8f9fa;
 }
 
-.container {
-  margin: 0 auto;
-  padding: 0; /* 去除預設 padding */
-  max-width: 1200px;
+.card {
+  border-radius: 15px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-/* 調整頁籤按鈕容器 */
-.tabs-container {
-  display: flex;
-  justify-content: space-between; /* 水平均勻分布 */
-  align-items: center;           /* 垂直置中 */
-  padding: 1rem 0;               /* 上下留空間 */
-  background-color: #f8f9fa;     /* 可選背景色 */
-  border-bottom: 1px solid #ddd; /* 加分隔線 */
+.card-header {
+  background-color: #007bff;
+  border-top-left-radius: 15px;
+  border-top-right-radius: 15px;
 }
 
-/* 頁籤按鈕 */
-.nav-tabs .nav-item {
-  margin: 0; /* 清除內外間距 */
+.card-header h4 {
+  font-size: 1.5rem;
+  font-weight: bold;
 }
 
-.nav-tabs .nav-link {
-  padding: 10px 20px; /* 調整按鈕大小 */
-  border-radius: 4px;
-  font-size: 16px;
-  text-align: center;
-  transition: background-color 0.3s ease;
+.nav-pills .nav-link {
+  border-radius: 30px;
 }
 
-/* 按鈕效果 */
-.nav-tabs .nav-link.active {
-  background-color: #0d6efd;
+.nav-pills .nav-link.active {
+  background-color: #007bff;
   color: #fff;
 }
 
-.nav-tabs .nav-link:hover {
-  background-color: #e0e0e0;
+.tab-content {
+  padding: 20px;
 }
 
-/* 頁籤內容間距 */
-.tab-content {
-  margin-top: 0; /* 取消額外的間距 */
+.member-info {
+  background-color: #fff;
+  border-radius: 15px;
+}
+
+.member-avatar {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+}
+
+.ml-3 {
+  margin-left: 1rem;
+}
+
+@media (max-width: 768px) {
+  .card-header h4 {
+    font-size: 1.2rem;
+  }
 }
 </style>
