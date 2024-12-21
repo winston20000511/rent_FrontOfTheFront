@@ -6,6 +6,7 @@ import router from "@/router";
 const emit = defineEmits(["toggle-cart"]);
 
 const selectedThirdParty = ref("linepay");
+const cartStore = useCart();
 
 // 優惠券
 const activeCouponIndex = ref(null);
@@ -34,21 +35,9 @@ function formatAddedDate(datetime) {
 // 將產品放入購物車 > 在ADLIST處理
 
 // 刪除購物車內容
-const cartStore = useCart();
 function removeFromCart(adId) {
+  activeCouponIndex.value = null;
   cartStore.removeFromCart(adId);
-
-  console.log("有進到刪除");
-  console.log("刪除的adId: ", adId);
-  console.log(cartStore.couponUsage);
-
-  if(cartStore.couponUsage.includes(adId)){
-    console.log("有進來");
-    cartStore.addCoupon(1);
-    cartStore.discountAmount = 0;
-  };
-
-  cartStore.loadCart();
 };
 
 
@@ -58,31 +47,27 @@ function checkOut() {
   router.push({ name: "orderConfirm" });
 }
 
-// 待修：刪除已使用優惠券的廣告，會因為index改變，讓其他廣告吃到渲染畫面
 function toggleCoupon(index) {
   const cartItem = cartStore.cartItems[index];
-  if(activeCouponIndex.value === null){
+
+  if (activeCouponIndex.value === null) {
     const isCouponLeft = cartStore.minusOneCoupon(1);
-    if(isCouponLeft){
+    if (isCouponLeft) {
       activeCouponIndex.value = index;
       cartStore.applyCouponToAd(cartItem.adId);
     }
-
-    cartStore.loadCart();
-    return;
-  };
-  
-  if (activeCouponIndex.value === index) {
-    activeCouponIndex.value = null;
-    cartStore.addCoupon(1);
-    cartStore.removeCoupon(cartItem.adId);
   } else {
-    activeCouponIndex.value = index;
-    cartStore.applyCouponToAd(cartItem.adId);
-  };
+    if (activeCouponIndex.value === index) {
+      activeCouponIndex.value = null;
+      cartStore.addCoupon(1);
+      cartStore.removeCoupon(cartItem.adId);
+    } else {
+      activeCouponIndex.value = index;
+      cartStore.applyCouponToAd(cartItem.adId);
+    }
+  }
 
   cartStore.loadCart();
-  
 };
 
 // 展開購物車中的物品詳細

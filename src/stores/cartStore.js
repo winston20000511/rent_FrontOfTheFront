@@ -102,7 +102,7 @@ export const useCart = defineStore("cart", {
 
     // 將商品加入購物車
     async addToCart(adId) {
-      console.log("cartStore add to cart: ", adId);
+      console.log("CartStore add to cart: ", adId);
 
       let existingItem;
       if(this.cartItems.length !== 0){
@@ -145,6 +145,12 @@ export const useCart = defineStore("cart", {
 
       if (existingItem) {
         try {
+
+          if (this.couponUsage.includes(adId)) {
+            this.addCoupon(1);
+            this.removeCoupon(adId);
+          }
+
           const url = "http://localhost:8080/api/cart/delete/item";
           const response = await fetch(url, {
             method: "DELETE",
@@ -155,8 +161,7 @@ export const useCart = defineStore("cart", {
 
           if (success) {
             this.cartItems = this.cartItems.filter(
-              (item) => item.adId !== adId
-            );
+              (item) => item.adId !== adId);
           } else {
             console.error("從購物車移除商品失敗");
           }

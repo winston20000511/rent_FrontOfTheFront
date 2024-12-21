@@ -43,6 +43,7 @@
 
   const cancel = async (merchantTradNo) => {
     const userConfirmed = window.confirm('確定要申請取消訂單嗎？');
+    
     if (userConfirmed) {
       try {
         const url = "http://localhost:8080/api/orders/merchantTradNo";
