@@ -1,178 +1,266 @@
 <script setup>
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, onUnmounted } from 'vue'
 import VueDatePicker from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
+import Accordion from 'primevue/accordion';
+import AccordionPanel from 'primevue/accordionpanel';
+import AccordionHeader from 'primevue/accordionheader';
+import AccordionContent from 'primevue/accordioncontent';
 
-const bookingSlotForm = ref({
-  fromDate: new Date().toISOString().split('T')[0],
-  toDate: new Date().toISOString().split('T')[0],
-  fromTime: '08:00',
-  toTime: '20:00',
-  weekDays: Array(7).fill(true), // 預設每週的天數為 false
-  duration: ''
-});
 
-const dateOption = ref('');
+// const props = defineProps(['modelValue']); // 來自父組件的數據
+const emit = defineEmits(['update:modelValue']); // 用於向父組件同步數據
 
+const bookingForm = ref({});
+const dateOption = ref('month');
+const timeOption = ref('default');
 const daysOfWeek = ["星期一", "星期二", "星期三", "星期四", "星期五", "星期六", "星期日"];
-const durationOptions = [30, 60]; // 預約間隔時間選項
+const durationOptions = [30, 60];
 
-
-const updateBooking =  () => {
-  const bookingRequest = {
-    houseId: window.location.pathname.split('/').pop(),
-    fromDate: bookingSlotForm.value.fromDate,
-    toDate: bookingSlotForm.value.toDate,
-    fromTime: `${bookingSlotForm.value.fromTime}:00`,
-    toTime: `${bookingSlotForm.value.toTime}:00`,
-    duration: bookingSlotForm.value.duration,
-    weekDay: bookingSlotForm.value.weekDays.map(day => (day ? '1' : '0')).join('')
-  };
-
+const datePickerProps = {
+    locale: "zh", //中文
+    autoApply: true, //
+    clearable: false
 };
 
-const onDateChange = (newDate)=>{
-    if(newDate > bookingSlotForm.value.toDate){
-        bookingSlotForm.value.toDate = newDate;
+// 設定 預約日曆 (初始預設)
+const form = ref({
+    minDate: new Date().toISOString().split('T')[0],
+    maxDate: new Date().toISOString().split('T')[0],
+    minTime: { hours: 8, minutes: 0 },
+    maxTime: { hours: 17, minutes: 0 },
+    week: Array(7).fill(true),
+    duration: '30'
+});
+
+// 初始化
+onMounted(() => {
+    // 
+    dateOption.value = 'three-months';
+    const current = new Date(form.value.minDate);
+    current.setMonth(current.getMonth() + 3);
+    form.value.maxDate = current.toISOString().split('T')[0];
+
+    updateBookingForm();
+
+    const bookingSetting = document.querySelector('#BookingSetting');
+    if (bookingSetting) {
+        const handleShow = () => console.log('展開中');
+        const handleHide = () => console.log('摺疊中');
+
+        bookingSetting.addEventListener('show.bs.collapse', handleShow);
+        bookingSetting.addEventListener('hide.bs.collapse', handleHide);
+
+        onUnmounted(() => {
+            bookingSetting.removeEventListener('show.bs.collapse', handleShow);
+            bookingSetting.removeEventListener('hide.bs.collapse', handleHide);
+        });
     }
+});
+
+const formatTime = (time) => `${time.hours.toString().padStart(2, '0')}:00:00`;
+const updateBookingForm = () => {
+    bookingForm.value = {
+        fromDate: form.value.minDate,
+        toDate: form.value.maxDate,
+        fromTime: formatTime(form.value.minTime),
+        toTime: formatTime(form.value.maxTime),
+        duration: form.value.duration,
+        weekDay: form.value.week.map(day => (day ? '1' : '0')).join(''),
+    };
+    emit('update:modelValue', bookingForm.value);
+};
+
+const onDateOption = (newDate) => {
+    dateOption.value = '';
 }
-const onTimeChange = (newTime)=>{
-    console.log(newTime);
-    console.log(":::"+bookingSlotForm.value.toTime);
-    if(newTime > bookingSlotForm.value.toTime){
-        bookingSlotForm.value.toTime = newTime;
+
+const onTimeOption = (newDate) => {
+    timeOption.value = '';
+}
+
+const onDateChangeAndOption = (newDate) => {
+    if (newDate > form.value.maxDate) {
+        form.value.maxDate = newDate;
     }
-    console.log(":::::::"+bookingSlotForm.value.toTime);
+    dateOption.value = '';
 
 }
+const onTimeChangeAndOption = (newTime) => {
+    if (newTime.hours >= form.value.maxTime.hours) {
+        form.value.maxTime.hours = newTime.hours + 1;
+    }
+    timeOption.value = '';
+}
 
+watch(form, updateBookingForm, { deep: true });
 
+watch(dateOption, (newValue) => {
+    const current = new Date(form.value.minDate);
+    if (newValue === 'month') current.setMonth(current.getMonth() + 1);
+    if (newValue === 'three-months') current.setMonth(current.getMonth() + 3);
+    if (newValue === 'six-months') current.setMonth(current.getMonth() + 6);
+    if (newValue === 'year') current.setFullYear(current.getFullYear() + 1);
+    form.value.maxDate = current.toISOString().split('T')[0];
+});
 
-
-watch(dateOption,(newValue)=>{
-    const today = new Date();
-    bookingSlotForm.value.fromDate = today.toISOString().split('T')[0];
-    if (newValue === 'month') {
-    const nextMonth = new Date(today.setMonth(today.getMonth() + 1));
-    bookingSlotForm.value.toDate = nextMonth.toISOString().split('T')[0]; 
-  } else if (newValue === 'three-months') {
-    const nextThreeMonths = new Date(today.setMonth(today.getMonth() + 3));
-    bookingSlotForm.value.toDate = nextThreeMonths.toISOString().split('T')[0];
-  } else if (newValue === 'year') {
-    const nextYear = new Date(today.setFullYear(today.getFullYear() + 1));
-    bookingSlotForm.value.toDate = nextYear.toISOString().split('T')[0];
-  } else if (newValue === 'six-months') {
-    const nextSixMonths = new Date(today.setMonth(today.getMonth() + 6));
-    bookingSlotForm.value.toDate = nextSixMonths.toISOString().split('T')[0];
-  }
+watch(timeOption, (newValue) => {
+    if (newValue === 'default') {
+        form.value.minTime = { hours: 8, minutes: 0 };
+        form.value.maxTime = { hours: 17, minutes: 0 };
+    } else if (newValue === 'all') {
+        form.value.minTime = { hours: 0, minutes: 0 };
+        form.value.maxTime = { hours: 23, minutes: 59 };
+    }
 })
-
 
 </script>
 
 <template>
 
-      <!-- 設定預約時段 -->
-        <h3>設定看房日曆</h3>
-        <div>
-            <div class="row">
-                <div class="col">
-            <h5>日期</h5>
-            <div class="shadow-sm">
-                    <div class="row mb-2" style="margin: 0;">
-                        <VueDatePicker class="p-1 col" v-model="bookingSlotForm.fromDate" 
-                        locale="zh"
-                        model-type="yyyy-MM-dd"
-                        min-date= 'new Date()'
-                        :enable-time-picker="false"     
-                        auto-apply
-                        @update:model-Value="onDateChange"
-                        />
-                        <VueDatePicker class="p-1 col" v-model="bookingSlotForm.toDate" 
-                        locale="zh"
-                        model-type="yyyy-MM-dd"
-                        :min-date= 'bookingSlotForm.fromDate'
-                        :enable-time-picker="false"     
-                        auto-apply
-                        />
-                    
-                    </div>
-                    <div class=" row mb-2" style="margin: 0;">
-                        <div class="p-1 col">
-                                <span>快速選擇</span>
-                            
-                                <label class=" p-1" for="date-option-month">
-                                    <input type="radio" id="date-option-month" value="month" v-model="dateOption"/>
-                                    一個月
-                                </label>
+    <div class="card">
+        <Accordion value="">
+            <AccordionPanel value="0">
+                <AccordionHeader>目前使用預設</AccordionHeader>
+                <AccordionContent>
+                    <div class=" m-1 ">
+                        <!-- 設定預約時段 -->
+                        <div class="booking-child align-items-center">
 
-                                <label class="p-1" for="date-option-three-months">
-                                    <input type="radio" id="date-option-three-months" value="three-months" v-model="dateOption"/>
-                                    三個月
-                                </label>
-                                
-                                <label class="p-1" for="date-option-six-months">
-                                    <input type="radio" id="date-option-six-months" value="six-months" v-model="dateOption"/>
-                                    半年
-                                </label> 
+                            <h5 class="p-1">日期</h5>
+                            <div class="p-1">
+                                <div class="row align-items-center" style="margin: 0;">
+                                    <div class="col">
+                                        <VueDatePicker class="p-1 " v-model="form.minDate" model-type="yyyy-MM-dd"
+                                            :min-date='new Date()' :enable-time-picker="false" v-bind="datePickerProps"
+                                            @update:model-value="onDateChangeAndOption" />
+                                    </div>
+                                    -
+                                    <div class="col ">
+                                        <VueDatePicker class="p-1 " v-model="form.maxDate" model-type="yyyy-MM-dd"
+                                            :min-date='form.minDate' :enable-time-picker="false"
+                                            v-bind="datePickerProps" @update:model-value="onDateOption" />
+                                    </div>
+                                </div>
 
-                                <label class="p-1" for="date-option-year">
-                                    <input type="radio" id="date-option-year" value="year" v-model="dateOption"/>
-                                    一年
-                                </label>
-                            
+                                <div class="d-flex justify-content-end">
+                                    <label class="btn  p-1" for="option-month-one">
+                                        <input type="radio" id="option-month-one" value="month" v-model="dateOption" />
+                                        一個月
+                                    </label>
+                                    <label class="btn p-1" for="option-month-three">
+                                        <input type="radio" id="option-month-three" value="three-months"
+                                            v-model="dateOption" />
+                                        三個月
+                                    </label>
+                                    <label class="btn p-1" for="option-month-six">
+                                        <input type="radio" id="option-month-six" value="six-months"
+                                            v-model="dateOption" />
+                                        半年
+                                    </label>
+                                    <label class="btn p-1" for="option-month-twelve">
+                                        <input type="radio" id="option-month-twelve" value="year"
+                                            v-model="dateOption" />
+                                        一年
+                                    </label>
+                                </div>
+
+                            </div>
+
                         </div>
-                        
+
+                        <!-- 設定可看房時段 -->
+                        <div class="booking-child align-items-center">
+
+                            <h5 class=" p-1">時段</h5>
+                            <div class=" p-1">
+                                <div class="row align-items-center " style="margin: 0;">
+                                    <div class="col">
+                                        <VueDatePicker class="p-1 col" v-model="form.minTime" :enable-minutes="false"
+                                            time-picker :max-time="{ hours: 22, minutes: 59 }" v-bind="datePickerProps"
+                                            @update:model-value="onTimeChangeAndOption" />
+                                    </div>
+                                    -
+                                    <div class="col">
+                                        <VueDatePicker class="p-1 col" v-model="form.maxTime" :enable-minutes="false"
+                                            time-picker
+                                            :min-time="{ hours: form.minTime?.hours ? form.minTime.hours + 1 : 8 }"
+                                            :max-time="{ hours: 24 }" v-bind="datePickerProps"
+                                            @update:model-value="onTimeOption" />
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-end">
+
+                                    <div class="p-1">
+                                        <label class="btn p-1" for="date-timeOption-default">
+                                            <input type="radio" id="date-timeOption-default" value="default"
+                                                v-model="timeOption" />
+                                            預設時段
+                                        </label>
+                                        <label class="btn p-1" for="date-timeOption-all">
+                                            <input type="radio" id="date-timeOption-all" value="all"
+                                                v-model="timeOption" />
+                                            全天
+                                        </label>
+                                        <!-- {{ form.minTime.hours }} - {{ form.maxTime.hours }} -->
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+                        </div>
+
+                        <!-- 設定可看房的星期 -->
+                        <div class="booking-child align-items-center">
+
+                            <h5 class=" p-1">星期</h5>
+                            <div class=" p-1">
+                                <fieldset class="btn-group p-2 d-flex justify-content-around" role="group">
+                                    <label v-for="(day, index) in daysOfWeek" :key="index" class="p-1">
+                                        <input type="checkbox" v-model="form.week[index]" />
+                                        {{ day }}
+                                    </label>
+                                </fieldset>
+                            </div>
+
+                        </div>
+
+                        <!-- 設定看房時間 -->
+                        <div class="booking-child align-items-center mb-2">
+                            <h5 class="p-1">間隔</h5>
+                            <div class="p-1">
+                                <select v-model="form.duration" class="form-select">
+                                    <option value="" disabled>選擇預約間隔</option>
+                                    <option v-for="duration in durationOptions" :key="duration" :value="duration">{{
+                                        duration }}分鐘
+                                    </option>
+                                </select>
+                            </div>
+
+                        </div>
                     </div>
-            </div>
-        </div>
-    <div class="col">
-        <!-- 設定可看房時段 -->
-            <h5>時段:</h5>
-            <div class="row shadow-sm" style="margin: 0;">
-                <VueDatePicker class="p-1 col" 
-                    locale="zh"
-                    v-model="bookingSlotForm.fromTime"
-                    :enable-minutes="false"
-                    time-picker
-                    auto-apply
-                    v-on:update:model-value="onTimeChange"
-                    />
-                    <VueDatePicker class="p-1 col" 
-                    locale="zh"
-                    v-model="bookingSlotForm.toTime"
-                    :enable-minutes="false"
-                    time-picker
-                    auto-apply
-                    />
-            </div>
-        </div>
-        </div>
+                </AccordionContent>
+            </AccordionPanel>
 
-        <!-- 設定可看房的星期 -->
-        <h5>星期</h5>
-        <div class="d-flex mb-2 shadow-sm">
-            <fieldset class="btn-group p-2" role="group">
-            <label v-for="(day, index) in daysOfWeek" :key="index" class="p-1">
-                <input type="checkbox" v-model="bookingSlotForm.weekDays[index]" />
-                {{ day }}
-            </label>
-            </fieldset>
-        </div>
-
-        <!-- 設定看房時間 -->
-        <h5>時間:</h5>
-        <div class="shadow-sm">
-            <select v-model="bookingSlotForm.duration" class="form-select">
-            <option value="" disabled>選擇預約間隔</option>
-            <option v-for="duration in durationOptions" :key="duration" :value="duration">{{ duration }}分鐘</option>
-            </select>
-        </div>
+        </Accordion>
     </div>
+
+
+
+
+
+
+
 </template>
 
 <style lang="css" scoped>
-    VueDatePicker{
-        margin: 0 ;
-    }
+.card {
+    --p-accordion-panel-border-color: green;
+    --p-accordion-panel-border-width: 0px;
+
+
+
+
+}
 </style>

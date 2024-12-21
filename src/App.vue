@@ -17,13 +17,9 @@ const toggleChatPopup = () => {
 // chat room end
 
 
-
 </script>
 
 <template>
-  <CollectHouseList></CollectHouseList>
-  <HouseList></HouseList>
-  <HouseCreate></HouseCreate>
   <RouterView></RouterView>
 
     <!-- chat popup start -->
@@ -78,5 +74,4 @@ body {
 
 <style scoped>
 /* 這裡可以添加你自定義的樣式 */
-
 </style>

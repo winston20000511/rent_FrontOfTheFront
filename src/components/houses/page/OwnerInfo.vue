@@ -1,11 +1,7 @@
 <template>
   <div class="owner-info-container">
     <div class="owner-info">
-      <img
-        :src="'data:image/jpeg;base64,' + ownerInfo.picture"
-        alt="屋主照片"
-        class="owner-avatar"
-      />
+      <img :src="'data:image/jpeg;base64,' + ownerInfo.picture" alt="屋主照片" class="owner-avatar" />
       <div class="owner-details">
         <p class="owner-name">{{ ownerInfo.name }}</p>
         <p class="owner-phone">{{ ownerInfo.phone }}</p>
@@ -13,7 +9,9 @@
     </div>
 
     <div class="appointment-time">
-      <button @click="appointmentTime" class="send-button">預約看房</button>
+      <button @click="loadBookingView" class="send-button btn btn-info">預約看房</button>
+      <BookingView v-if="showBookingView" :isVisible="showBookingView" @closeView="closeBookingView"
+        :houseId="houseId" />
     </div>
 
     <div class="message-section">
@@ -23,10 +21,15 @@
 </template>
 
 <script>
+import BookingView from '@/View/BookingView.vue';
+
 export default {
+  components: {
+    BookingView,
+  },
   props: {
     houseId: {
-      type: String,
+      type: Number,
       required: true,
     },
   },
@@ -38,6 +41,7 @@ export default {
         picture: "", // Base64 編碼的图片
       },
       appointmentTime: "",
+      showBookingView: false,
     };
   },
   methods: {
@@ -68,7 +72,23 @@ export default {
       } catch (error) {
         console.error("獲取屋主信息失敗:", error);
       }
+    }, loadBookingView() {
+      this.showBookingView = true;
     },
+    closeBookingView() {
+      this.showBookingView = false;
+    },
+  },
+  data() {
+    return {
+      ownerInfo: {
+        name: "",
+        phone: "",
+        picture: "", // Base64 編碼的圖片
+      },
+      appointmentTime: "",
+      showBookingView: false,
+    };
   },
   created() {
     this.fetchOwnerInfo(); // 獲取屋主信息
