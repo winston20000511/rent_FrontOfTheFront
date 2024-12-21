@@ -1,72 +1,84 @@
-import { createRouter, createWebHistory } from 'vue-router';
-import HomeView from '@/View/HomeView.vue';
-import MemberCenter from '@/components/User/memberCenter.vue';
-import EditUserPage from '@/components/User/EditUserPage.vue';
-import ForgotPassword from '@/components/User/ForgotPassword.vue';
-import LoginForm from '@/components/User/LoginForm.vue';
-import HouseView from '@/View/HouseView.vue';
-import MyOrders from '@/components/Orders/MyOrders.vue';
-import MyAds from '@/components/Ads/MyAds.vue';
-import OrderConfirmView from '@/View/OrderConfirmView.vue';
-import AdtypeView from '@/View/AdtypeView.vue';
+import { createRouter, createWebHistory } from "vue-router";
+import HomeView from "@/View/HomeView.vue";
+import MemberCenter from "@/components/User/memberCenter.vue";
+import EditUserPage from "@/components/User/EditUserPage.vue";
+import ForgotPassword from "@/components/User/ForgotPassword.vue";
+import LoginForm from "@/components/User/LoginForm.vue";
+import HouseView from "@/View/HouseView.vue";
+import MyOrders from "@/components/Orders/MyOrders.vue";
+import MyAds from "@/components/Ads/MyAds.vue";
+import OrderConfirmView from "@/View/OrderConfirmView.vue";
+import AdtypeView from "@/View/AdtypeView.vue";
+import BookingListByHost from "@/components/Booking/BookingListByHost.vue";
+import BookingListByGuest from "@/components/Booking/BookingListByGuest.vue";
 
 const routes = [
   {
-    path: '/', // 主框架頁面
+    path: "/", // 主框架頁面
     component: HomeView, // 主框架組件
     children: [
       {
-        path: '', // 預設子路由，對應首頁內容
-        name: 'home',
+        path: "", // 預設子路由，對應首頁內容
+        name: "home",
         component: HomeView, // 預設顯示 HomeView
       },
       {
-        path: 'edit-user', // 編輯用戶頁面路徑
-        name: 'EditUser',
+        path: "edit-user", // 編輯用戶頁面路徑
+        name: "EditUser",
         component: EditUserPage,
       },
     ],
   },
   {
-    path: '/login', // 登入頁面的路徑設定
-    name: 'LoginForm',
-    component: LoginForm}
-    ,
-  {
-    path: '/forgot-password', // 忘記密碼頁面的路徑設定
-    name: 'ForgotPassword',
-    component: ForgotPassword // 使用 ForgotPassword 組件
+    path: "/login", // 登入頁面的路徑設定
+    name: "LoginForm",
+    component: LoginForm,
   },
   {
-    path:"/MemberCenter",
-    name:"MemberCenter",
-    component: MemberCenter
+    path: "/forgot-password", // 忘記密碼頁面的路徑設定
+    name: "ForgotPassword",
+    component: ForgotPassword, // 使用 ForgotPassword 組件
   },
   {
-    path:"/HouseVue",
-    name:"HouseVue",
-    component:HouseView
+    path: "/MemberCenter",
+    name: "MemberCenter",
+    component: MemberCenter,
+  },
+  {
+    path: "/HouseVue",
+    name: "HouseVue",
+    component: HouseView,
   },
   // 其他路由可以在這裡添加
   {
-    path:"/orders", // 開發用，之後會刪掉
-    name:"orders",
+    path: "/orders", // 開發用，之後會刪掉
+    name: "orders",
     component: MyOrders,
   },
   {
-    path:"/adtype",
-    name:"adtypes",
+    path: "/adtype",
+    name: "adtypes",
     component: AdtypeView,
   },
   {
-    path:"/order-confirm",
-    name:"orderConfirm",
+    path: "/order-confirm",
+    name: "orderConfirm",
     component: OrderConfirmView,
   },
   {
-    path:"/ads", // 開發用，之後刪掉
-    name:"ads",
+    path: "/ads", // 開發用，之後刪掉
+    name: "ads",
     component: MyAds,
+  },
+  {
+    path: "/booking/host", // 開發用，不一定刪掉
+    name: "bookingbyhost",
+    component: BookingListByHost,
+  },
+  {
+    path: "/booking/guest", // 開發用，不一定刪掉
+    name: "bookingbyguest",
+    component: BookingListByGuest,
   },
 ];
 
