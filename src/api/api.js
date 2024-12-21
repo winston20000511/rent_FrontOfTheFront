@@ -13,3 +13,7 @@ api.interceptors.request.use((config) => {
 });
 
 export default api;
+
+// instance.defaults.headers.common["Content-Type"] = "application/json";
+
+// export default instance;

@@ -67,18 +67,21 @@ header {
   border-bottom: 1px solid lightgray;
 }
 main {
+  position: relative;
   width: 100%;
   height: 76vh;
   display: flex;
   background-color: rgb(235, 235, 235);
 }
 .main-left {
+  position: relative;
   width: 45%;
   z-index: 1;
 }
 .main-right {
   width: 55%;
-  overflow: auto;
+  overflow-y: auto;
+  overflow-x: hidden;
   z-index: 2;
 }
 </style>
