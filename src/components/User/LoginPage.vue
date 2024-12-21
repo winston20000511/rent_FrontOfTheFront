@@ -4,11 +4,11 @@
     <div class="row">
       <!-- 左側背景區域 -->
       <div class="col-md-6 left-side"></div>
-  
+
       <!-- 右側登入/註冊區域 -->
       <div class="col-md-6 form-container">
         <h3 class="text-center mb-4">Welcome to Rent189</h3>
-  
+
         <!-- 模式切換按鈕 -->
         <ul class="nav nav-tabs mb-3" id="formTab" role="tablist">
           <li class="nav-item" role="presentation">
@@ -38,7 +38,7 @@
             </button>
           </li>
         </ul>
-  
+
         <!-- 登入/註冊表單內容 -->
         <div class="tab-content" id="formTabContent">
           <div 
@@ -46,14 +46,14 @@
             id="login" 
             role="tabpanel" 
             aria-labelledby="login-tab">
-            <LoginForm></LoginForm>
+            <LoginForm />
           </div>
           <div 
             class="tab-pane fade" 
             id="register" 
             role="tabpanel" 
             aria-labelledby="register-tab">
-            <RegisterForm></RegisterForm>
+            <RegisterForm />
           </div>
         </div>
         
@@ -78,7 +78,7 @@ const emit = defineEmits(['closeLoginPage']);
 
 // 關閉登入頁面的方法
 const closeLoginPage = () => {
-  emit('closeLoginPage');
+  emit('closeLoginPage'); // 傳遞事件給 HomeView.vue
 };
 </script>
 
@@ -114,7 +114,7 @@ const closeLoginPage = () => {
   width: 50%; /* 變寬 */
   max-width: 700px;
   min-width: 500px;
-  height: 30%; /* 調整高度更短 */
+  height: auto; /* 根據內容調整高度 */
   display: flex;
   flex-direction: column;
   justify-content: flex-start;

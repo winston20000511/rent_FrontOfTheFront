@@ -6,18 +6,11 @@ import HomeCardList from '@/components/Home/HomeCardList.vue';
 import HomeFilter from '@/components/Home/HomeFilter.vue';
 import HomeMap from '@/components/Home/HomeMap.vue';
 import HomeNavbar from '@/components/Home/HomeNavbar.vue';
-import LoginPage from '@/components/User/LoginPage.vue';
+import LoginPage from '@/components/User/LoginPage.vue'; // 引入 LoginPage 組件
 
 // 從 auth Store 中提取狀態和方法
 const authStore = useAuthStore();
 const router = useRouter();
-
-const showLoginPage = ref(false); // 控制 LoginPage 顯示的狀態
-
-// 控制 LoginPage 的顯示狀態
-const toggleLoginPage = () => {
-  showLoginPage.value = !showLoginPage.value;
-};
 
 // 在組件掛載時檢查登入狀態
 onMounted(() => {
@@ -28,6 +21,19 @@ onMounted(() => {
 const isLoggedIn = computed(() => authStore.isLoggedIn);
 const userProfile = computed(() => authStore.userProfile);
 
+// 控制 LoginPage 顯示狀態
+const showLoginPage = ref(false);
+
+// 接收來自 HomeNavbar 的 signInClicked 事件
+const handleSignInClicked = () => {
+  showLoginPage.value = true; // 顯示 LoginPage
+};
+
+// 關閉 LoginPage 的方法
+const closeLoginPage = () => {
+  showLoginPage.value = false; // 隱藏 LoginPage
+};
+
 // 登出功能：清除狀態並重定向
 const signOut = () => {
   authStore.signOut();
@@ -37,16 +43,19 @@ const signOut = () => {
 
 <template>
   <header>
-    <HomeNavbar @signInClicked="toggleLoginPage"></HomeNavbar>
+    <HomeNavbar @signInClicked="handleSignInClicked"></HomeNavbar>
     <!-- 根據登入狀態顯示內容 -->
     <div v-if="isLoggedIn" class="user-info">
       <img v-if="userProfile" :src="userProfile" alt="User Profile" class="user-avatar" />
       <button @click="signOut">Sign Out</button>
     </div>
-    <div v-else>
-      <button @click="toggleLoginPage">Sign In</button>
-    </div>
   </header>
+
+  <!-- 如果 showLoginPage 為 true，顯示 LoginPage -->
+  <LoginPage 
+    v-if="showLoginPage" 
+    @closeLoginPage="closeLoginPage" 
+  />
 
   <div class="filter">
     <HomeFilter></HomeFilter>
@@ -61,14 +70,12 @@ const signOut = () => {
     </div>
   </main>
 
-  <!-- 控制 LoginPage 的顯示 -->
-  <LoginPage v-if="showLoginPage" @closeLoginPage="toggleLoginPage" />
-
   <!-- 子路由內容 -->
   <router-view></router-view>
 </template>
 
 <style scoped>
+/* 篩選區域樣式 */
 .filter {
   display: flex;
   width: 100%;
@@ -76,6 +83,7 @@ const signOut = () => {
   border-bottom: 1px solid lightgray;
 }
 
+/* 主容器樣式 */
 .main-container {
   display: flex;
   width: 100%;
@@ -99,6 +107,7 @@ const signOut = () => {
   z-index: 2;
 }
 
+/* 使用者資訊樣式 */
 .user-info {
   display: flex;
   align-items: center;

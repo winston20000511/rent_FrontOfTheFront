@@ -37,6 +37,7 @@
                     class="form-control"
                     id="email"
                     v-model="user.email"
+                    disabled 
                   />
                 </div>
 
