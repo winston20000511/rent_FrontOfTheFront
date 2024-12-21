@@ -1,7 +1,6 @@
 <script setup>
 import { ref } from 'vue';
 import { useAuthStore } from '@/stores/auth';
-import { defineEmits } from 'vue';
 
 const emit = defineEmits(['signInClicked']);
 const authStore = useAuthStore(); // 引入 auth Store

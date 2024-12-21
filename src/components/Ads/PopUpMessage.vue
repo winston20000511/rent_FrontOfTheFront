@@ -20,7 +20,7 @@
   });
 
   // 定義 Emits
-  const emit = defineEmits(["close-message"]);
+  const emit = (["close-message"]);
 
   // 關閉訊息
   function closeMessage() {

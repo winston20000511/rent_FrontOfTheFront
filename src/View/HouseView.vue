@@ -34,7 +34,6 @@
 
 <script setup>
 import { ref } from 'vue';
-import { defineProps, defineEmits } from 'vue';
 import HouseTitle from "@/components/houses/page/HouseTitle.vue";
 import HouseInfo from "@/components/houses/page/HouseInfo.vue";
 import OwnerInfo from "@/components/houses/page/OwnerInfo.vue";

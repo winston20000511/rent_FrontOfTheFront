@@ -45,7 +45,7 @@ const toggleLoginPage = () => {
     </main>
 
   <!-- 控制 LoginPage 的顯示 -->
-  <LoginPage v-if="showLoginPage" @closeLoginPage="toggleLoginPage" />
+  <!-- <LoginPage v-if="showLoginPage" @closeLoginPage="toggleLoginPage" /> -->
 
   <!-- 子路由內容 -->
   <!-- <router-view></router-view> -->

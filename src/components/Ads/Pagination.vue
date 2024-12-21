@@ -10,7 +10,7 @@
     },
   });
 
-  const emit = defineEmits(["pageChange"]);
+  const emit = (["pageChange"]);
 
   const changePage = (page) => {
     if (page >= 1 && page <= props.totalPages) {
