@@ -84,4 +84,16 @@ main {
   overflow-x: hidden;
   z-index: 2;
 }
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+}
 </style>
