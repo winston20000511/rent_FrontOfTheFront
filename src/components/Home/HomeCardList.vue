@@ -25,7 +25,7 @@ const openHouseView = (houseId) => {
   console.log('openHouseView triggered');
   console.log('House ID:', houseId);
   
-  selectedHouseId.value = houseId;
+  selectedHouseId.value = String(houseId);
   showView.value = true;
 };
 
@@ -37,8 +37,8 @@ const closeHouseView = () => {
 
 <template>
     <div class="container py-4 px-4 bg-body custom-shadow">
-        <div v-if="props.markers.searchList && props.markers.searchList.length">
-            <div v-for="list in props.markers.searchList" :key="list.houseid" class="col-12 col-md-6">
+        <div v-if="props.markers.searchList && props.markers.searchList.length" class="row">
+            <div v-for="list in props.markers.searchList" :key="list.houseid" class="col-12 col-md-6 py-4">
                 <div 
                     class="card card-shadow clickable-card" 
                     style="width: 100%;" 
@@ -51,15 +51,14 @@ const closeHouseView = () => {
                 </div>
             </div>
         </div>
-    
-        <!-- 房屋詳細頁面 (彈窗) -->
-        <HouseView
-          v-if="showView" 
-          :houseId="selectedHouseId"
-          :visible="showView" 
-          @close="closeHouseView"  
-        />
     </div>
+    <!-- 房屋詳細頁面 (彈窗) -->
+    <HouseView
+    v-if="showView" 
+    :houseId="selectedHouseId"
+    :visible="showView" 
+    @onClose="closeHouseView"  
+    />
 </template>
 
 <style scoped>

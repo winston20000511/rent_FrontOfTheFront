@@ -27,7 +27,7 @@
       <p v-if="errorMessage" class="error text-danger">{{ errorMessage }}</p>
       <button type="submit" class="btn btn-primary w-100">登入</button>
       
-      <!-- 修改「忘記密碼？」按鈕邏輯 -->
+      <!-- 忘記密碼按鈕 -->
       <button
         type="button"
         class="d-block mt-2 text-center forgot-password btn btn-link"
@@ -43,7 +43,8 @@
 </template>
 
 <script>
-import api from "../../api/api";
+// 引入自訂的 Axios API 模組
+import api from "../../api/api"; // Authorization 自動添加的功能見 api.js
 import ForgotPassword from "../../components/User/ForgotPassword.vue"; // 引入 ForgotPassword 組件
 
 export default {
@@ -55,7 +56,7 @@ export default {
       email: "",
       password: "",
       errorMessage: "",
-      showForgotPassword: false, // 用於控制 ForgotPassword.vue 顯示/隱藏
+      showForgotPassword: false, // 控制 ForgotPassword 組件顯示/隱藏
     };
   },
   methods: {
@@ -73,7 +74,7 @@ export default {
         // 儲存 token 到 localStorage
         localStorage.setItem("jwt", token);
 
-        // 跳轉到會員中心
+        // 登入成功提示並跳轉至會員中心
         alert("登入成功！");
         this.$router.push("/memberCenter");
       } catch (error) {
@@ -104,8 +105,6 @@ export default {
   margin-top: 10px;
   text-align: center;
 }
-
-/* 忘記密碼的按鈕樣式 */
 .forgot-password {
   color: #007bff;
   text-decoration: underline;
@@ -114,7 +113,6 @@ export default {
   background: none;
   border: none;
 }
-
 .forgot-password:hover {
   color: #0056b3;
 }

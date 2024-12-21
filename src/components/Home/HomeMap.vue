@@ -14,6 +14,10 @@ let context = null;
 let points = []; //儲存 Canvas 路徑點
 let polygon = null;
 
+
+let token = localStorage.getItem('jwt');
+
+const emits = defineEmits(['add-marker'])
 const props = defineProps({
   markers: Object
 })
@@ -110,7 +114,7 @@ onMounted(() => {
       });
 
       map.value.panTo(latlng);
-      map.value.setZoom(14);
+      // map.value.setZoom(14);
       mapMarkers.value.push(mapMark);
   });
 
@@ -269,7 +273,9 @@ onMounted(() => {
   async function drawLatLngFetch(latLngPoints){
     const response = await fetch(drawUrl,{
       method:"POST",
-      headers: {'Content-type': 'application/json'},
+      headers: {'Content-Type': 'application/json',
+                    'authorization': `${token}`
+            },
       body:JSON.stringify(latLngPoints)
     })
 
@@ -278,7 +284,8 @@ onMounted(() => {
     }
 
     const data = await response.json();
-    console.log(data);
+    emits('add-marker',data)
+
   }
 
   function forceRedrawMap(mapInstance) {

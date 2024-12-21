@@ -20,7 +20,8 @@
     methods: {
         addAd(){
             this.$emit("click-create-btn");
-            // window.location.href = "/advertisements/mylist?action=addAd";
+            this.$router.push({ path: '/ads'});
+            // 之後新增跳轉到子組件的畫面
         }
     }
   };

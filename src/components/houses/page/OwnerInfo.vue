@@ -17,7 +17,6 @@
     <div class="message-section">
       <button @click="sendMessage" class="send-message-button">发送信息</button>
     </div>
-
   </div>
 </template>
 

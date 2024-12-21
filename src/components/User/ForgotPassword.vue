@@ -53,11 +53,27 @@
 </template>
 
 <script setup>
+import api from "../../api/api"; // api.js的路徑存在於 src/api/ 目錄下，等同於"../../api/api"
+
 // 定義可觸發的事件
 defineEmits(['close']);
 
-function submitForm() {
-  alert("系統已發送重設密碼信件至您的電子信箱，請至信箱收信。");
+async function submitForm() {
+  const email = document.getElementById("email").value;
+  const verificationCode = document.getElementById("verificationCode").value;
+
+  try {
+    const response = await api.post("http://localhost:8080/api/user/forgotPassword", {
+      email,
+      verificationCode
+    });
+
+    // 假設成功後的回應處理
+    alert("系統已發送重設密碼信件至您的電子信箱，請至信箱收信。");
+  } catch (error) {
+    // 假設發生錯誤時顯示訊息
+    alert("發送請求時出現錯誤，請稍後再試。");
+  }
 }
 </script>
 

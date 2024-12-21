@@ -1,174 +1,149 @@
 <script setup>
-import { ref} from 'vue';
+import { ref } from 'vue';
+import { useAuthStore } from '@/stores/auth';
 
-// 定義父層傳遞的事件
 const emit = defineEmits(['signInClicked']);
-
-const navLeft = ref(null);
-const linkOne = ref(null);
-const linkListOne = ref(null);
-const linkListOnePos = ref({ top: 0, left: 0 });
-
-const linkMouseEnter = () => {
-  if (linkOne.value && linkListOne.value) {
-    const linkRect = navLeft.value.getBoundingClientRect();
-    linkListOnePos.value = {
-      top: linkRect.bottom + window.scrollY + 5,
-    };
-    linkListOne.value.style.display = 'block';
-  }
-};
-
-const linkMouseLeave = () => {
-  if (linkListOne.value) {
-    setTimeout(() => {
-      linkListOne.value.style.display = 'none';
-    }, 400);
-  }
-};
+const authStore = useAuthStore(); // 引入 auth Store
 
 const handleSignInClick = () => {
-  // 發送事件通知父組件顯示 LoginPage
-  emit('signInClicked');
+  // 如果未登入，發送事件通知父組件顯示 LoginPage
+  if (!authStore.isLoggedIn) {
+    emit('signInClicked');
+  } else {
+    // 如果已登入，則執行登出邏輯
+    authStore.logout();
+  }
 };
 </script>
 
 <template>
-  <!-- 左邊連結位置 -->
-  <ul class="nav-left" ref="navLeft">
-    <li>
-      <RouterLink to="#">
-        <span>Buy</span>
-      </RouterLink>
-    </li>
-    <li>
-      <RouterLink to="#" class="link" v-on:mouseenter="linkMouseEnter">
-        <span ref="linkOne">Rent</span>
-      </RouterLink>
-    </li>
-  </ul>
-
-  <ul
-    ref="linkListOne"
-    v-on:mouseleave="linkMouseLeave"
-    v-bind:style="{ top: `${linkListOnePos.top}px`, left: `${linkListOnePos.left}px` }"
-    class="link-list"
-  >
-    <li><RouterLink to="#">item 1</RouterLink></li>
-    <li><RouterLink to="#">item 2</RouterLink></li>
-    <li><RouterLink to="#">item 3</RouterLink></li>
-    <li><RouterLink to="#">item 4</RouterLink></li>
-  </ul>
-
-  <div class="nav-middle">
-    <img src="../../assets/Logo3.jpg" alt="" />
-
-    <div class="nav-title">
-      <h1>house</h1>
+  <div class="navbar">
+    <!-- 左側：Logo 和標題 -->
+    <div class="nav-left">
+      <img src="../../assets/Logo3.jpg" alt="Logo" class="nav-logo" />
+      <div class="nav-title">
+        <h1>house</h1>
+      </div>
     </div>
-  </div>
 
-  <!-- 右邊連結位置 -->
-  <div class="nav-right">
-    <!-- 修改 MemberCenter 的 RouterLink -->
-    <li><RouterLink to="/member-center">MemberCenter</RouterLink></li>
-    <li>
-      <!-- Sign In 按鈕，點擊觸發事件 -->
-      <button @click="handleSignInClick">Sign In</button>
-    </li>
+    <!-- 右側：MemberCenter 和 Sign In/Logout -->
+    <ul class="nav-right">
+      <li>
+        <RouterLink to="/member-center">MemberCenter</RouterLink>
+      </li>
+      <li>
+        <button @click="handleSignInClick">
+          {{ authStore.isLoggedIn ? 'Logout' : 'Sign In' }}
+        </button>
+      </li>
+    </ul>
   </div>
 </template>
 
 <style scoped>
-/* 保留你現有的 CSS */
+/* Navbar 容器 */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 40px; /* 添加內距 */
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  width: 100%; /* 填滿整個頁面寬度 */
+  box-sizing: border-box;
+}
+
+/* 左側：Logo 和標題 */
 .nav-left {
-  height: 100%;
   display: flex;
-  justify-content: left;
-  align-items: center;
-  list-style-type: none;
-  padding: 0px;
-  margin-left: 20px;
-}
-.nav-left li {
-  padding-left: 15px;
-}
-.nav-left li a {
-  font-size: 20px;
-  font-weight: bold;
-  color: black;
-  text-decoration: none;
-}
-.nav-left li a:hover {
-  color: blue;
-  border-bottom: 3px solid blue;
+  align-items: center; /* 垂直居中 Logo 和標題 */
+  gap: 20px; /* 增加 Logo 與標題的距離 */
 }
 
-.link-list {
-  display: none;
-  position: absolute;
-  z-index: 3;
-  background-color: white;
-  width: 98%;
-  height: 200px;
-  list-style-type: none;
-  padding-left: 20px;
-}
-.link-list li {
-  padding: 10px 5px;
-}
-.link-list li a {
-  font-size: 20px;
-  color: black;
-  text-decoration: none;
-}
-.link-list > li > a:hover {
-  padding: 0px 10px;
-  color: blue;
+.nav-logo {
+  max-width: 200px; /* 限制 Logo 寬度 */
+  max-height: 120px; /* 限制 Logo 高度 */
+  object-fit: contain; /* 確保圖片比例縮放 */
+  margin: 0; /* 移除外距，避免影響容器布局 */
 }
 
-.nav-middle {
-  display: flex;
-  flex-direction: row;
-  padding: 10px 0px 0px;
-  margin-left: 100px;
-}
-.nav-middle img {
-  object-fit: cover;
-}
-.nav-title {
-  display: grid;
-  align-items: center;
-}
 .nav-title h1 {
-  font-size: 60px;
+  font-size: 60px; /* 標題字體大小 */
   color: black;
   font-family: 'Pacifico', cursive;
   font-weight: 500;
   font-style: normal;
-  line-height: 30px;
+  line-height: 1;
+  margin: 0; /* 移除多餘外距 */
 }
 
+/* 右側：MemberCenter 和按鈕 */
 .nav-right {
-  height: 100%;
   display: flex;
-  justify-content: left;
   align-items: center;
   list-style-type: none;
-  padding: 0px;
-  margin-right: 20px;
+  padding: 0;
+  margin: 0;
 }
+
 .nav-right li {
-  padding-right: 15px;
+  margin-left: 20px;
 }
-.nav-right li a {
-  font-size: 20px;
-  font-weight: bold;
-  color: black;
+
+.nav-right li a,
+.nav-right li button {
+  font-size: 20px; /* 按鈕字體大小 */
+  padding: 10px 20px; /* 增加按鈕內距 */
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 8px; /* 圓角按鈕 */
   text-decoration: none;
+  cursor: pointer;
 }
-.nav-right li a:hover {
-  color: blue;
-  border-bottom: 3px solid blue;
+
+.nav-right li a:hover,
+.nav-right li button:hover {
+  background-color: #0056b3;
+}
+
+/* 響應式樣式 */
+@media (max-width: 768px) {
+  .navbar {
+    flex-direction: column; /* 導航欄內容垂直排列 */
+    align-items: flex-start;
+    padding: 20px;
+  }
+
+  .nav-left {
+    flex-direction: column; /* Logo 和標題換行 */
+    align-items: flex-start;
+    margin-bottom: 20px; /* 與右側按鈕區域分隔 */
+  }
+
+  .nav-title h1 {
+    font-size: 48px; /* 小螢幕縮小標題字體 */
+  }
+
+  .nav-logo {
+    max-width: 150px; /* 小螢幕縮小 Logo */
+    max-height: 100px;
+  }
+
+  .nav-right {
+    flex-wrap: wrap; /* 將導航按鈕換行 */
+    margin-top: 10px;
+  }
+
+  .nav-right li {
+    margin-left: 0;
+    margin-right: 10px; /* 減小按鈕之間的距離 */
+  }
+
+  .nav-right li a,
+  .nav-right li button {
+    font-size: 18px; /* 小螢幕縮小按鈕字體 */
+    padding: 8px 16px;
+  }
 }
 </style>

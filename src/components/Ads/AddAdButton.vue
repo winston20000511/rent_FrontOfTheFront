@@ -23,12 +23,13 @@
 
     // watch(source, callback, options?)
     watch(
-    () => props.showAdList,
-    (newValue) => {
-        buttonText.value = newValue ? "為物件新增VIP服務+" : "結束新增服務";
-    },
-    { immediate: true }
-    ); // 初始化時更按鈕文字
+      () => props.showAdList,
+      (newValue) => {
+          buttonText.value = newValue ? "為物件新增VIP服務+" : "結束新增服務";
+      },
+      { immediate: true }
+    ); 
+
 </script>
 
 <template>

@@ -1,6 +1,7 @@
 <script setup>
-import axios from "axios";
-import { ref, watch } from "vue";
+import { ref, watch, defineComponent } from "vue";
+
+defineComponent({ name: "noadhouselist" });
 
 const emit = defineEmits(["filter-no-ad-houses"]);
 
@@ -15,6 +16,8 @@ const props = defineProps({
   },
 });
 
+let token = localStorage.getItem("jwt");
+
 const isDataLoaded = ref(false);
 const selectedAdtypes = ref([]);
 
@@ -22,35 +25,30 @@ const selectedAdtypes = ref([]);
 const selectedHouseId = ref("");
 const selectedAdtype = ref("");
 
+// 初始化資料
 const initializeData = () => {
   if (props.noAdHouses.length > 0 && props.adtypes.length > 0) {
+    console.log("初始化載入");
     selectedAdtypes.value = props.noAdHouses.map(
       () => props.adtypes[0] || null
     );
-    isDataLoaded.value = true;
+  } else {
+    console.log("沒有符合資料");
   }
+  isDataLoaded.value = true;
 };
 
 watch(
   [() => props.noAdHouses, () => props.adtypes],
-  () => {
-    isDataLoaded.value = false;
-    initializeData();
-  },
-  { immediate: true }
+    () => {
+      initializeData(); 
+    },
+    { immediate: true }
 );
 
-// 取得用戶選擇的房屋和廣告方案資訊
 const getHouseAndAdtypeInfo = (index) => {
   selectedAdtype.value = selectedAdtypes.value[index];
   selectedHouseId.value = props.noAdHouses[index].houseId;
-
-  console.log(
-    "House ID: ", selectedHouseId.value,
-    "Adtype Price: ", selectedAdtype.value?.adPrice,
-    "Index: ", index,
-    "selectedAdtypeId: ", selectedAdtype.value?.adtypeId
-  );
 };
 
 // 插入廣告資料表
@@ -66,22 +64,33 @@ async function addAd(houseId, adtypeId) {
   };
 
   try {
-    const response = await axios.post("/advertisements", selectedInfo, {
-      headers: {
-        "Content-Type": "application/json",
-      },
+    const url = "http://localhost:8080/api/advertisements";
+    const response = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", authorization: `${token}` },
+      body: JSON.stringify(selectedInfo),
     });
-    console.log("Ad added successfully:", response.data);
+    const success = await response.json();
+
+    console.log("廣告新增結果: ", success);
+
+    if (success) {
+      alert("新增成功");
+      emit("filter-no-ad-houses");
+    } else {
+      alert("新增失敗");
+    }
   } catch (error) {
     console.error("Error adding ad:", error);
   }
 }
 </script>
 
+
 <template>
   <div>
     <div v-if="!isDataLoaded" class="text-center py-6 text-gray-500">
-      數據加載中...
+      資料載入中...
     </div>
 
     <div v-else>
@@ -103,8 +112,11 @@ async function addAd(houseId, adtypeId) {
             <th class="px-4 py-3 font-semibold">新增廣告</th>
           </tr>
         </thead>
-        <tbody>
-          <tr
+        <tbody >
+          <tr v-if="props.noAdHouses.length === 0" class="text-center py-6 text-gray-500">
+            <td class="px-4 py-3" colspan="5">沒有符合資料</td>
+          </tr>
+          <tr v-else
             v-for="(noAdHouse, index) in props.noAdHouses"
             :key="index"
             class="text-center"
@@ -146,3 +158,4 @@ async function addAd(houseId, adtypeId) {
     </div>
   </div>
 </template>
+
