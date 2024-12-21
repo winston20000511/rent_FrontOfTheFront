@@ -9,6 +9,8 @@ import MyOrders from '@/components/Orders/MyOrders.vue';
 import MyAds from '@/components/Ads/MyAds.vue';
 import OrderConfirmView from '@/View/OrderConfirmView.vue';
 import AdtypeView from '@/View/AdtypeView.vue';
+import NoAdHouseList from '@/components/Ads/NoAdHouseList.vue';
+import OrderCompleteView from '@/View/OrderCompleteView.vue';
 
 const routes = [
   {
@@ -64,7 +66,12 @@ const routes = [
     component: OrderConfirmView,
   },
   {
-    path:"/ads", // 開發用，之後刪掉
+    path:"/order-complete",
+    name:"orderComplete",
+    component: OrderCompleteView,
+  },
+  {
+    path:"/ads",
     name:"ads",
     component: MyAds,
   },

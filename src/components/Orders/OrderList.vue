@@ -1,7 +1,7 @@
 <script setup>
-  import {ref} from "vue";
-  import axios from "axios";
   
+  let token = localStorage.getItem('jwt');
+
   const props = defineProps({
     orders: {
       type: Array,
@@ -27,10 +27,15 @@
 
   const check = async (merchantTradNo) => {
     try {
-      const response = await axios.post('/api/orders/merchantTradNo', merchantTradNo, {
-        headers: { 'Content-Type': 'text/plain' },
-      });
-      emit('detail', response.data);
+      const url = "http://localhost:8080/api/orders/merchantTradNo"
+      const response = await fetch(url,{
+        method: "POST",
+        headers: { "Content-Type": "application/json", authorization: `${token}` },
+        body: merchantTradNo
+      })
+
+      const data = await response.json();
+      emit('detail', data);
     } catch (error) {
       console.error('系統錯誤: ', error);
     }
@@ -38,17 +43,25 @@
 
   const cancel = async (merchantTradNo) => {
     const userConfirmed = window.confirm('確定要申請取消訂單嗎？');
+    
     if (userConfirmed) {
       try {
-        const response = await axios.put('/api/orders/merchantTradNo', merchantTradNo, {
-          headers: { 'Content-Type': 'text/plain' },
+        const url = "http://localhost:8080/api/orders/merchantTradNo";
+        const response = await fetch(url,{
+          method: "PUT",
+          headers: { "Content-Type": "application/json", authorization: `${token}` },
+          body: merchantTradNo,
         });
+
+        const data = response.json();
+        
         emit('order-cancel-result', {
-          success: response.data,
+          success: data,
           merchantTradNo,
-          messageTitle: response.data ? '已提出取消申請' : '未成功訂單取消，請稍後再試',
-          message: response.data ? '請待服務人員確認，方能取消訂單' : '或請聯繫客服人員',
+          messageTitle: data ? '已提出取消申請' : '未成功訂單取消，請稍後再試',
+          message: data ? '請待服務人員確認，方能取消訂單' : '或請聯繫客服人員',
         });
+
       } catch (error) {
         console.error('伺服器錯誤: ', error);
         emit('order-cancel-result', {
