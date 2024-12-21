@@ -26,27 +26,43 @@
       </div>
       <p v-if="errorMessage" class="error text-danger">{{ errorMessage }}</p>
       <button type="submit" class="btn btn-primary w-100">登入</button>
-      <a href="/forgot-password" class="d-block mt-2 text-center forgot-password">忘記密碼？</a>
+      
+      <!-- 修改「忘記密碼？」按鈕邏輯 -->
+      <button
+        type="button"
+        class="d-block mt-2 text-center forgot-password btn btn-link"
+        @click="showForgotPassword = true"
+      >
+        忘記密碼？
+      </button>
     </form>
+
+    <!-- ForgotPassword.vue 組件，依據 showForgotPassword 控制顯示 -->
+    <ForgotPassword v-if="showForgotPassword" @close="closeForgotPassword" />
   </div>
 </template>
 
 <script>
 import api from "../../api/api";
+import ForgotPassword from "../../components/User/ForgotPassword.vue"; // 引入 ForgotPassword 組件
 
 export default {
+  components: {
+    ForgotPassword,
+  },
   data() {
     return {
       email: "",
       password: "",
       errorMessage: "",
+      showForgotPassword: false, // 用於控制 ForgotPassword.vue 顯示/隱藏
     };
   },
   methods: {
     async handleLogin() {
       try {
         // 發送登入請求到後端
-        const response = await api.post("http://localhost:8080/login", {
+        const response = await api.post("http://localhost:8080/api/user/login", {
           email: this.email,
           password: this.password,
         });
@@ -66,6 +82,10 @@ export default {
           error.response?.data?.message || "登入失敗，請檢查帳號或密碼。";
       }
     },
+    closeForgotPassword() {
+      // 關閉 ForgotPassword 組件
+      this.showForgotPassword = false;
+    },
   },
 };
 </script>
@@ -83,5 +103,19 @@ export default {
   color: red;
   margin-top: 10px;
   text-align: center;
+}
+
+/* 忘記密碼的按鈕樣式 */
+.forgot-password {
+  color: #007bff;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 14px;
+  background: none;
+  border: none;
+}
+
+.forgot-password:hover {
+  color: #0056b3;
 }
 </style>

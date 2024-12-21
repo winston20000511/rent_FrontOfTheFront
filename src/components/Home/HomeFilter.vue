@@ -1,10 +1,156 @@
 <script setup>
+    import { onMounted, onUnmounted, ref } from 'vue';
+    import { Offcanvas } from 'bootstrap';
 
+    const searchInputRef = ref(null);
+    const searchListRef = ref(null);
+    const searchListPosRef = ref({top:0 , left:0 , width: 0}) 
+    const searchListReuslt=ref([])   
+    const myOffcanvasRef = ref(null);
+    const offcanvasInstance= ref(null);
+    const iconBtnRef =ref(null);
+
+    const emits = defineEmits(['add-marker'])
+
+    let isComposing = false; //判斷是否正在打字
+    let keywordUrl='http://localhost:8080/api/keyword'
+    let mapUrl='http://localhost:8080/api/map'
+
+    let token = localStorage.getItem('jwt');
+
+    onMounted(() => {
+    document.addEventListener('click', closeSearchList);
+    if (myOffcanvasRef.value) {
+        offcanvasInstance.value = new Offcanvas(myOffcanvasRef.value);
+    }
+    });
+
+    onUnmounted(() => {
+    // 移除事件監聽器
+    document.removeEventListener('click', closeSearchList);
+    });
+
+    const compositionStart = ()=> {
+        isComposing = true;
+    }
+    const compostitionEnd = ()=> {
+        isComposing = false;
+        showKeyWordFetch();
+    }
+    
+    const showSearchList = ()=>{
+        if (searchInputRef.value){
+            const listRect = searchInputRef.value.getBoundingClientRect();
+            searchListPosRef.value={
+                top: listRect.bottom,
+                left: listRect.left,
+                width: listRect.width
+            };
+            searchListRef.value.style.display='block';
+        }
+    }
+    const closeSearchList = (event)=>{
+        if(searchListRef.value && !searchListRef.value.contains(event.target) &&
+            searchInputRef.value && !searchInputRef.value.contains(event.target) &&
+            myOffcanvasRef.value && !myOffcanvasRef.value.contains(event.target)){
+
+            searchListPosRef.value.innerHTML="";
+            searchListRef.value.style.display ='none';
+            offcanvasInstance.value.hide();
+        }
+    }
+    const clickSearchBtn = ()=>{
+        showMapFetch();
+    }
+    const enterSearchBtn = (event)=>{
+        if (event.key === 'Enter'){
+		    showMapFetch();
+        }
+    }
+    
+    const showKeyWordFetch = async () =>{
+        const response = await fetch(keywordUrl,{
+            method:'POST',
+            headers: {'Content-Type': 'text/plain',
+                    'authorization': `${token}`
+            },
+            body:searchInputRef.value.value
+        });
+
+        if (!response.ok){
+            throw new Error('Network response was not ok')
+        }
+
+        const data = await response.json();
+        console.log('Data received:' , data);
+        showLKeyWrodList(data);
+    }
+
+    const showLKeyWrodList = async (data)=>{
+        searchListReuslt.value = [];
+        data.forEach(k=>{
+
+            const dateSpec = '1999-01-01T00:00:00';
+
+            const sourceDate = new Date(k.paidDate);
+            const targetDate = new Date(dateSpec)
+
+            if (sourceDate > targetDate){
+                console.log(k.paidDate)
+            }
+
+            searchListReuslt.value.push({
+                id: Date.now() + Math.random(),
+                address: k.address,
+            });
+        })
+        
+    }
+
+    const showMapFetch = async (address)=>{
+        if (address){
+            searchInputRef.value.value = address;
+        }
+        
+        const inputData = {
+            origin: searchInputRef.value.value
+        }
+
+
+        const response = await fetch(mapUrl,{
+            method: 'POST',
+            headers:{'Content-Type': 'application/json',
+                'authorization': `${token}`
+            },
+            body: JSON.stringify(inputData)
+        });
+
+        if (!response.ok){
+            throw new Error('Network response was not ok')
+        }
+
+        const data = await response.json();
+        emits('add-marker',data)
+    }
+
+    const handleListClick = (item)=>{
+        searchInputRef.value.value=item.address;
+        searchInputRef.value.innerHTML='';
+        searchListRef.value.style.display ='none';
+        offcanvasInstance.value.hide();
+        showMapFetch();
+    }
 
 </script>
 <template>
     <!-- 選項位置 -->
-    <div class="offcanvas offcanvas-end" data-bs-scroll="true" data-bs-backdrop="false" tabindex="-1" id="offcanvasScrolling" aria-labelledby="offcanvasScrollingLabel">
+    <div class="offcanvas offcanvas-end" 
+    data-bs-scroll="true" 
+    data-bs-backdrop="false" 
+    tabindex="-1" 
+    id="offcanvasScrolling" 
+    aria-labelledby="offcanvasScrollingLabel" 
+    ref="myOffcanvasRef">
       <div class="offcanvas-header">
         <h5 class="offcanvas-title" id="offcanvasScrollingLabel">User Setting</h5>
         <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
@@ -86,9 +232,34 @@
 
 <div class="filter" id="filter">
     <div class="filter-left">
-        <input type="text" placeholder="Address, neighborhood, city, ZIP" id="search" class="form-control me-2" data-bs-toggle="offcanvas" data-bs-target="#offcanvasScrolling" aria-controls="offcanvasScrolling"> <i class="fa-solid fa-magnifying-glass"></i>
+        <input type="text" 
+                placeholder="Address, neighborhood, city, ZIP" 
+                id="search" 
+                class="form-control me-2" 
+                data-bs-toggle="offcanvas" 
+                data-bs-target="#offcanvasScrolling" 
+                aria-controls="offcanvasScrolling"
+                ref="searchInputRef"
+                v-on:input="showSearchList"
+                v-on:compositionstart="compositionStart"
+                v-on:compositionend="compostitionEnd"
+                v-on:click="showSearchList"
+                v-on:keyup="enterSearchBtn"> 
+        <i class="fa-solid fa-magnifying-glass" ref="iconBtnRef" v-on:click="clickSearchBtn"></i>
     </div>
-    <ul class="absolute left-0 w-full mt-1 bg-white border border-gray-300 rounded shadow-lg" id="searchList"></ul>
+    <ul class="searchList position-absolute mt-1 bg-white border rounded shadow"
+        ref="searchListRef"
+        v-bind:style="{top: `${searchListPosRef.top}px` , 
+                        left: `${searchListPosRef.left}px`,
+                        width: `${searchListPosRef.width}px`}"
+        >
+        <li v-for="item in searchListReuslt"
+            v-bind:key="item.id"
+            class="custom-list"
+            v-on:click="handleListClick(item)">
+
+        {{ item.address }}</li>
+    </ul>
     <!-- <div class="filter-right">
         <button
             class="filter-btn btn btn-primary"
@@ -163,7 +334,6 @@
 .filter-left input[type="text"]{
     width: 700px;
     height: 40px;
-    /* margin-left: 100px; */
     margin: 0px auto;
     font-size: 20px;
     padding-left: 20px;
@@ -178,20 +348,29 @@
     background-color: rgb(250, 250, 250)
 }
 
-/* .filter-left input[type="text"]:hover{
-    border: 1px solid blue;
-}
-.filter-left input[type="text"]:focus{
-    border: 5px solid blue;
-    border-radius: 10px;
-} */
-#searchList{
+.searchList{
+    background-color: red;
     display: none;
     z-index: 5;
+    list-style-type: none;
+    padding: 0;
 }
 
+.custom-list {
+    padding: 0.5rem 1rem; /* 等同於 Bootstrap 的 px-4 py-2 */
+    background-color: #f8f9fa; /* 等同於 bg-light */
+    color: #212529; /* 等同於 text-dark */
+    cursor: pointer;
+    border: none; /* 如果是按鈕，移除邊框 */
+    /* transition: all 0.3s ease; 添加平滑過渡效果 */
+}
 
-.filter-right{
+.custom-list:hover {
+    background-color: #0d6efd; /* 等同於 bg-primary */
+    color: #fff; /* 等同於 text-white */
+}
+
+/* .filter-right{
     position: relative;
     margin-left: 20px;
     width: 35%;
@@ -242,6 +421,6 @@
 
 .btn-list .checkHomeType{
     margin-top: 10px;
-}
+} */
 
 </style>

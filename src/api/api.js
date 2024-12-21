@@ -1,8 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8080/api',
-  withCredentials: true, 
+  baseURL: 'http://localhost:8080/api', // 後端伺服器地址
 });
 
 api.interceptors.request.use((config) => {
@@ -14,6 +13,7 @@ api.interceptors.request.use((config) => {
 });
 
 export default api;
+
 // instance.defaults.headers.common["Content-Type"] = "application/json";
 
 // export default instance;
