@@ -90,18 +90,10 @@
         searchListReuslt.value = [];
         data.forEach(k=>{
 
-            const dateSpec = '1999-01-01T00:00:00';
-
-            const sourceDate = new Date(k.paidDate);
-            const targetDate = new Date(dateSpec)
-
-            if (sourceDate > targetDate){
-                console.log(k.paidDate)
-            }
-
             searchListReuslt.value.push({
                 id: Date.now() + Math.random(),
                 address: k.address,
+                paidDate: k.paidDate,
             });
         })
         
@@ -139,6 +131,19 @@
         searchListRef.value.style.display ='none';
         offcanvasInstance.value.hide();
         showMapFetch();
+    }
+
+    const checkPaidDate = (item)=>{
+        const dateSpec = '1999-01-01T00:00:00';
+        
+        const sourceDate = new Date(item.paidDate);
+        const targetDate = new Date(dateSpec)
+        if (sourceDate>targetDate){
+            return "bi bi-hand-thumbs-up"
+        }else{
+            return ""
+        }
+        
     }
 
 </script>
@@ -256,57 +261,10 @@
         <li v-for="item in searchListReuslt"
             v-bind:key="item.id"
             class="custom-list"
-            v-on:click="handleListClick(item)">
-
-        {{ item.address }}</li>
+            v-on:click="handleListClick(item)"
+            >
+        {{ item.address }}<i :class="checkPaidDate(item)"></i></li>
     </ul>
-    <!-- <div class="filter-right">
-        <button
-            class="filter-btn btn btn-primary"
-            id="filter-btn-1">
-            Price <i class="fa-solid fa-angle-down"></i>
-        </button>
-        <button
-            class="filter-btn btn btn-primary"
-            id="filter-btn-2">
-            HomeType <i class="fa-solid fa-angle-down"></i>
-        </button>
-    </div>
-    <ul class="btn-list" id="btn-list-1">
-        <p>Price Range</p>
-        <div class="inputPrice">
-            <div class="left-minimum">
-                <p>Minimum</p>
-                <input
-                type="text"
-                id="btn-minimum"
-                placeholder="價錢..."
-                class="w-20 px-2 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-            </div>
-            <div class="right-maximum">
-                <p>Maximum</p>
-                <input
-                type="text"
-                id="btn-maximum"
-                placeholder="價錢..."
-                class="w-20 px-2 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                />
-            </div>
-        </div>
-
-    </ul>
-    <ul class="btn-list" id="btn-list-2">
-        <p>HomeType</p>
-        <div class="checkHomeType">
-            <input
-            type="checkbox"
-            id="option1"
-            class="h-5 w-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 focus:ring-2"
-            />
-            <label for="option1" class="text-sm font-medium text-gray-700">Option 1</label>
-        </div>
-    </ul> -->
 </div>
 </template>
 
@@ -369,58 +327,5 @@
     background-color: #0d6efd; /* 等同於 bg-primary */
     color: #fff; /* 等同於 text-white */
 }
-
-/* .filter-right{
-    position: relative;
-    margin-left: 20px;
-    width: 35%;
-    display: flex;
-    align-items: center;
-}
-.filter-btn{
-    margin-right: 10px;
-}
-.btn-list{
-    margin-top: 10px;
-    display: none;
-    position: absolute;
-    z-index: 3;
-    background-color: white;
-    width: 15%;
-    height: 200px;
-}
-.btn-list>p{
-    display: flex;
-    align-items: center;
-    padding-left: 20px;
-    background-color: #F0F0F0;
-    height: 30%;
-    font-weight: 700;
-}
-.btn-list .inputPrice{
-    display: flex;
-    padding: 20px 10px 0px;
-}
-.btn-list .left-minimum{
-    width: 50%;
-
-}
-.btn-list .left-minimum input{
-    font-weight: bold;
-    margin-top: 10px;
-}
-.btn-list .right-maximum{
-    width: 50%;
-
-}
-.btn-list .right-maximum input{
-    font-weight: bold;
-    margin-top: 10px;
-    
-}
-
-.btn-list .checkHomeType{
-    margin-top: 10px;
-} */
 
 </style>
