@@ -25,7 +25,7 @@ const openHouseView = (houseId) => {
   console.log('openHouseView triggered');
   console.log('House ID:', houseId);
   
-  selectedHouseId.value = houseId;
+  selectedHouseId.value = String(houseId);
   showView.value = true;
 };
 

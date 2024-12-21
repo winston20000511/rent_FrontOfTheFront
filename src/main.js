@@ -8,10 +8,18 @@ import LoginPage from './components/User/LoginPage.vue';
 import PrimeVue from 'primevue/config';
 import Aura from '@primevue/themes/aura';
 import axios from 'axios';
-
+import PrimeVue from 'primevue/config';
+import Aura from '@primevue/themes/aura'
+import Button from "primevue/button"
 const app = createApp(App)
 app.config.globalProperties.$axios = axios;
 app.use(LoginPage)
+app.use(PrimeVue, {
+    theme: {
+        preset: Aura
+    }
+});
+app.component('Button', Button);
 app.use(createPinia())
 app.use(router)
 app.mount('#app')

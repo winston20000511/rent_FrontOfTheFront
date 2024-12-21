@@ -4,6 +4,9 @@ import { ref } from 'vue';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import 'bootstrap-icons/font/bootstrap-icons.min.css';
+import HouseCreate from './components/houses/HouseCreate.vue';
+import CollectHouseList from './components/houses/CollectHouseList.vue';
+import HouseList from './components/houses/houselist.vue';
 
 // chat room start
 import ChatPopup from './components/ChatRoom/ChatRoom.vue';
@@ -18,6 +21,9 @@ const toggleChatPopup = () => {
 </script>
 
 <template>
+  <CollectHouseList></CollectHouseList>
+  <HouseList></HouseList>
+  <HouseCreate></HouseCreate>
   <RouterView></RouterView>
 
     <!-- chat popup start -->

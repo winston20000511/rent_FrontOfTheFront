@@ -21,7 +21,6 @@
             :src="`data:image/jpeg;base64,${photo}`"
             alt="房屋圖片"
             class="main-photo"
-            @click="openPhoto(photo)"
           />
         </SplideSlide>
       </Splide>
@@ -30,17 +29,6 @@
     <!-- 沒有照片的提示 -->
     <div v-if="!loading && !error && photos.length === 0" class="no-photos">
       <img src="../../assets/no-image.png" alt="暫時無照片展示" />
-    </div>
-
-    <!-- 模態框：放大顯示圖片 -->
-    <div v-if="showModal" class="modal" @click="closeModal">
-      <div class="modal-content">
-        <img
-          :src="`data:image/jpeg;base64,${selectedPhoto}`"
-          alt="放大圖片"
-          class="enlarged-photo"
-        />
-      </div>
     </div>
   </div>
 </template>
@@ -70,8 +58,6 @@ export default {
       photos: [], // 照片列表
       loading: true, // 是否加載中
       error: null, // 錯誤信息
-      showModal: false, // 是否顯示模態框
-      selectedPhoto: null, // 當前選擇的照片
       splideOptions: {
         type: "loop", // 啟用循環播放
         perPage: 1,
@@ -79,6 +65,8 @@ export default {
         gap: "1rem",
         padding: { left: "5rem", right: "5rem" },
         pagination: true,
+        arrowPath:
+          "M14 2L3 12L14 22",
       },
     };
   },
@@ -114,13 +102,8 @@ export default {
         this.loading = false;
       }
     },
-    openPhoto(photo) {
-      this.selectedPhoto = photo;
-      this.showModal = true;
-    },
-    closeModal() {
-      this.showModal = false;
-      this.selectedPhoto = null;
+    addLoopArrows(splide) {
+      splide.on('arrow:mounted')
     },
   },
   watch: {
@@ -169,10 +152,9 @@ export default {
   display: block;
   margin: 0 auto;
   width: auto;
-  height: 300px; /* 恢復圖片原高度 */
+  height: 400px; /* 調整圖片高度 */
   border: 1px solid #ddd;
   border-radius: 8px;
-  cursor: pointer;
 }
 
 .splide-container {
@@ -181,7 +163,7 @@ export default {
 }
 
 .splide__pagination {
-  bottom: -1.5rem;
+  bottom: -1.5rem; /* 調整原點位置 */
 }
 
 .splide__pagination__page {
@@ -192,31 +174,6 @@ export default {
 }
 
 .splide__pagination__page.is-active {
-  background-color: red;
-}
-
-.modal {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.9);
-  z-index: 1000;
-  cursor: pointer;
-}
-
-.modal-content {
-  max-width: 90%;
-  max-height: 90%;
-}
-
-.enlarged-photo {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+  background-color: red; /* 活躍狀態設為紅色 */
 }
 </style>
