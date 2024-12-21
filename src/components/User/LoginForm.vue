@@ -26,8 +26,8 @@
       </div>
       <p v-if="errorMessage" class="error text-danger">{{ errorMessage }}</p>
       <button type="submit" class="btn btn-primary w-100">登入</button>
-
-      <!-- 修改「忘記密碼？」按鈕邏輯 -->
+      
+      <!-- 忘記密碼按鈕 -->
       <button
         type="button"
         class="d-block mt-2 text-center forgot-password btn btn-link"
@@ -43,7 +43,8 @@
 </template>
 
 <script>
-import api from "../../api/api";
+// 引入自訂的 Axios API 模組
+import api from "../../api/api"; // Authorization 自動添加的功能見 api.js
 import ForgotPassword from "../../components/User/ForgotPassword.vue"; // 引入 ForgotPassword 組件
 
 export default {
@@ -55,7 +56,7 @@ export default {
       email: "",
       password: "",
       errorMessage: "",
-      showForgotPassword: false, // 用於控制 ForgotPassword.vue 顯示/隱藏
+      showForgotPassword: false, // 控制 ForgotPassword 組件顯示/隱藏
     };
   },
   methods: {
@@ -73,7 +74,7 @@ export default {
         // 儲存 token 到 localStorage
         localStorage.setItem("jwt", token);
 
-        // 跳轉到會員中心
+        // 登入成功提示並跳轉至會員中心
         alert("登入成功！");
         this.$router.push("/member-center");
       } catch (error) {
@@ -82,44 +83,10 @@ export default {
           error.response?.data?.message || "登入失敗，請檢查帳號或密碼。";
       }
     },
-    async validateJWT() {
-      try {
-        // 從 localStorage 取得 JWT
-        const token = localStorage.getItem("jwt");
-
-        if (!token) {
-          throw new Error("Token 不存在，請重新登入。");
-        }
-
-        // 使用 fetch 驗證 JWT
-        const response = await fetch("http://localhost:8080/api/user/validate", {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error("Token 驗證失敗，請重新登入。");
-        }
-
-        // 如果驗證成功
-        const data = await response.json();
-        console.log("Token 驗證成功：", data);
-      } catch (error) {
-        console.error(error.message);
-        alert(error.message);
-        localStorage.removeItem("jwt");
-        this.$router.push("/login");
-      }
-    },
     closeForgotPassword() {
       // 關閉 ForgotPassword 組件
       this.showForgotPassword = false;
     },
-  },
-  mounted() {
-    this.validateJWT(); // 組件加載時驗證 JWT
   },
 };
 </script>
@@ -138,8 +105,6 @@ export default {
   margin-top: 10px;
   text-align: center;
 }
-
-/* 忘記密碼的按鈕樣式 */
 .forgot-password {
   color: #007bff;
   text-decoration: underline;
@@ -148,7 +113,6 @@ export default {
   background: none;
   border: none;
 }
-
 .forgot-password:hover {
   color: #0056b3;
 }

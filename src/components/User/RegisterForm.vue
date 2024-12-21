@@ -90,7 +90,7 @@
 </template>
 
 <script>
-import api from "../../api/api"; // 引入 API 模組
+import api from "../../api/api"; // 引入包含請求攔截器的 Axios API 模組
 
 export default {
   data() {
@@ -108,24 +108,15 @@ export default {
     async submitRegister() {
       this.isLoading = true; // 開始載入
       this.errorMessage = ""; // 清空錯誤訊息
-      const token = localStorage.getItem("token"); // 從 localStorage 取得 token
       try {
-        // 發送註冊請求到後端，並加入 Authorization 標頭
-        await api.post(
-          "http://localhost:8080/api/user/register",
-          {
-            name: this.name,
-            email: this.email,
-            password: this.password,
-            phone: this.phone,
-            gender: this.gender,
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`, // JWT 驗證
-            },
-          }
-        );
+        // 發送註冊請求到後端，攔截器會自動加上 Authorization
+        await api.post("http://localhost:8080/api/user/register", {
+          name: this.name,
+          email: this.email,
+          password: this.password,
+          phone: this.phone,
+          gender: this.gender,
+        });
 
         // 註冊成功提示
         alert("註冊成功！");

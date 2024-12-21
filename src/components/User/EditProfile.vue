@@ -126,60 +126,47 @@
 </template>
 
 <script>
-import { ref } from "vue";
+import api from "../../api/api";  // 確保路徑正確
 
 export default {
   name: "EditProfile",
   data() {
     return {
       user: {
-        user_id: 1,
+        user_id: 1, // 假設的ID，您可以根據實際情況獲取
         name: "John Doe",
         email: "john@example.com",
         password: "",
         phone: "0912345678",
         picture: "",
         createtime: "2024-01-01",
-        gender: 0,
+        gender: 0, // 0代表男，1代表女
         coupon: 3,
-        status: 1,
+        status: 1, // 1代表啟用
       },
-      previewImage: null,
+      previewImage: null, // 預覽圖片
     };
   },
   methods: {
     handleFileUpload(event) {
       const file = event.target.files[0];
       if (file) {
-        this.previewImage = URL.createObjectURL(file);
-        this.user.picture = file;
+        this.previewImage = URL.createObjectURL(file); // 顯示預覽圖片
+        this.user.picture = file; // 可以將檔案傳送到後端
       }
     },
-    async submitForm() {
-      try {
-        const token = localStorage.getItem("jwt");
-        const response = await fetch("/api/update-profile", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            authorization: `${token}`,
-          },
-          body: JSON.stringify(this.user),
-        });
-
-        if (response.ok) {
-          const data = await response.json();
+    submitForm() {
+      // 使用 api 來發送 PUT 請求，並自動加入 Authorization 標頭
+      api
+        .put("http://localhost:8080/api/user/update", this.user)  // 待確認路徑！
+        .then((response) => {
+          console.log("資料已儲存", response);
           alert("資料已儲存！");
-          console.log("更新成功：", data);
-        } else {
-          const errorData = await response.json();
-          console.error("更新失敗：", errorData);
-          alert("更新失敗，請稍後再試！");
-        }
-      } catch (error) {
-        console.error("提交錯誤：", error);
-        alert("系統錯誤，請稍後再試！");
-      }
+        })
+        .catch((error) => {
+          console.error("儲存資料錯誤", error);
+          alert("儲存資料時發生錯誤！");
+        });
     },
   },
 };
