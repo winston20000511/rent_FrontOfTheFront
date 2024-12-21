@@ -10,7 +10,9 @@ import 'bootstrap-icons/font/bootstrap-icons.min.css';
 </script>
 
 <template>
-  <RouterView></RouterView>
+  <div class="container">
+    <RouterView></RouterView>
+  </div>
 </template>
 
 <style scoped>
