@@ -29,8 +29,13 @@ const handleSignInClick = () => {
 
     <!-- 右側：MemberCenter 和 Sign In/Logout -->
     <ul class="nav-right">
-      <li>
+      <!-- 只有登入後才顯示 MemberCenter -->
+      <li v-if="authStore.isLoggedIn">
         <RouterLink to="/member-center">MemberCenter</RouterLink>
+      </li>
+      <!-- 顯示會員頭像 -->
+      <li v-if="authStore.isLoggedIn && authStore.profilePicture">
+        <img :src="authStore.profilePicture" alt="Profile Picture" class="user-avatar" />
       </li>
       <li>
         <button @click="handleSignInClick">
@@ -103,5 +108,19 @@ const handleSignInClick = () => {
 .nav-right li a:hover,
 .nav-right li button:hover {
   background-color: #0056b3;
+}
+
+/* 會員頭像樣式 */
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%; /* 圓形顯示 */
+  object-fit: cover; /* 確保圖片不變形 */
+  border: 2px solid #007bff; /* 外框 */
+  cursor: pointer;
+}
+
+.user-avatar:hover {
+  border-color: #0056b3; /* 滑鼠懸停時變色 */
 }
 </style>
