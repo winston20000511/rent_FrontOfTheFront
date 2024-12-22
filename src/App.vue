@@ -7,6 +7,9 @@ import 'bootstrap-icons/font/bootstrap-icons.min.css';
 import HomeNavbar from '@/components/Home/HomeNavbar.vue'; // 引入 HomeNavbar
 import ChatPopup from './components/ChatRoom/ChatRoom.vue';
 import LoginPage from './components/User/LoginPage.vue';
+import CollectHouseList from './components/houses/CollectHouseList.vue';
+import HouseCreate from './components/houses/HouseCreate.vue';
+import HouseUpdate from './components/houses/HouseUpdate.vue';
 
 const showChatPopup = ref(false);
 const toggleChatPopup = () => {
@@ -28,6 +31,9 @@ const toggleLoginPage = () => {
 
     <!-- 主內容 -->
     <main class="app-main">
+    <HouseCreate></HouseCreate>
+    <HouseUpdate></HouseUpdate>
+
       <RouterView />
     </main>
 
