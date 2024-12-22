@@ -1,12 +1,16 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, toRef } from 'vue';
 import HomeCardList from '@/components/Home/HomeCardList.vue';
 import HomeFilter from '@/components/Home/HomeFilter.vue';
 import HomeMap from '@/components/Home/HomeMap.vue';
 import { useHouseCard } from '@/stores/CardHouseStore';
 
 const store = useHouseCard();
-const markers = ref({});
+const props = defineProps({
+  markers: Object
+});
+
+const markers = toRef(props,'markers')
 
 const addMarker = (locations) => {
   markers.value = locations;
@@ -15,9 +19,9 @@ const addMarker = (locations) => {
 </script>
 
 <template>
-  <div class="filter">
+  <!-- <div class="filter">
     <HomeFilter @add-marker="addMarker"></HomeFilter>
-  </div>
+  </div> -->
 
   <main>
     <div class="main-left">
@@ -30,17 +34,17 @@ const addMarker = (locations) => {
 </template>
 
 <style scoped>
-.filter {
+/* .filter {
   display: flex;
   width: 100%;
   height: 10vh;
   border-bottom: 1px solid lightgray;
-}
+} */
 
 main {
   position: relative;
   width: 100%;
-  height: 76vh;
+  /* height: 76vh; */
   display: flex;
   background-color: rgb(235, 235, 235);
 }
