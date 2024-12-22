@@ -5,7 +5,7 @@ import api from '@/api/api'; // 引入我們的 API 配置檔案
 export const useAuthStore = defineStore('auth', {
   state: () => ({
     isLoggedIn: false, // 是否登入
-    userProfile: null, // 用戶資料
+    userProfile: null, // 用戶資料，存儲所有的用戶資料
     profilePicture: null, // 會員頭像 URL
   }),
   actions: {
@@ -18,9 +18,14 @@ export const useAuthStore = defineStore('auth', {
     },
     async fetchUserProfile() {
       try {
-        const response = await api.get('/user/profile');
-        this.userProfile = response.data.profilePic; // 儲存用戶資料
-        this.profilePicture = response.data.profilePic; // 儲存頭像 URL
+        // 模擬後端返回的資料
+        // 假設您尚未完成後端，這裡直接用固定的資料來模擬
+        this.userProfile = {
+          name: 'Demo User',
+          email: 'demo@example.com',
+        }; 
+        // 設定模擬的頭像 URL
+        this.profilePicture = http://localhost:8080/api/user/profile-pic; // 假設的頭像圖片路徑
       } catch (error) {
         console.error('取得用戶資料失敗:', error);
       }
