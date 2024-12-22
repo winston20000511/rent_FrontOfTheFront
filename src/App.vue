@@ -67,7 +67,7 @@ const addMarker = (locations) => {
 
 .app-header {
   width: 100%;
-  height: 14vh;
+  height: 30vh;
   border-bottom: 1px solid lightgray;
   display: flex;
   justify-content: space-between;
