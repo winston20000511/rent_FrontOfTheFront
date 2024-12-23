@@ -5,7 +5,7 @@
 
 
         <Tabs :value="activeTab" @update:value="onTabChange">
-            <TabList class="custom-tabs">
+            <TabList>
                 <Tab :value="0">全部</Tab>
                 <Tab :value="1">待回應 ({{ pendingCount }})</Tab>
                 <Tab :value="2">預約中 ({{ bookingedCount }})</Tab>
@@ -17,7 +17,8 @@
 
 
         <DataTable :value="filteredBookingList" stripedRows paginator :rows="5" :rowsPerPageOptions="pageOptions"
-            selectionMode="single" sortField="ID" :sortOrder="1" tableStyle="min-width: 40rem" :emptyMessage="'沒有內容'">
+            selectionMode="single" sortField="ID" :sortOrder="1" tableStyle="min-width: 40rem"
+            emptyMessage="目前沒有任何資料可顯示">
 
             <template #header>
                 <div class="flex flex-wrap items-center justify-between gap-2">
@@ -28,17 +29,28 @@
 
             <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header"
                 class="text-center text-gray-500" :headerStyle="col.headerStyle" :sortable="col.sortable">
+                <!-- 自定義 'photos' 列的內容 -->
+                <template v-if="col.field === 'photos'" #body="slotProps">
+                    <img src="#" alt="沒圖片">
+                </template>
                 <!-- 自定義 'status' 列的內容 -->
                 <template v-if="col.field === 'status'" #body="slotProps">
                     <Tag :value="slotProps.data.Status" :severity=getSeverity(slotProps.data.status)>
                         {{ statusMap[slotProps.data.status] }}
                     </Tag>
                 </template>
+                <!-- 自定義 'operate' 列的內容 -->
                 <template v-if="col.field === 'operate'" #body="slotProps">
-                    <Button v-if="slotProps.data.status === 0" label="取消預約" severity="danger"
+                    <Button v-if="slotProps.data.status === 0 || 1" label="取消預約" severity="danger"
                         @click="confirmDeleteBooking(slotProps.data)" />
                 </template>
             </Column>
+
+            <template #empty>
+                <div class="flex justify-center">
+                    <p>查無資料</p>
+                </div>
+            </template>
 
             <template #footer>
                 共有 {{ filteredBookingList ? filteredBookingList.length : 0 }} 筆
@@ -96,10 +108,11 @@ const deleteBookingDialog = ref(false);
 
 // 設定 ( 對應屬性 欄位名稱 是否排列 )
 const columns = [
+    { field: 'photos', header: '', sortable: false, headerStyle: 'width: 10%;' },
     { field: 'houseTitle', header: '房屋名稱', sortable: false, headerStyle: 'width: 15%;' },
     { field: 'houseAddress', header: '房屋地址', sortable: false, headerStyle: 'width: 25%;' },
-    { field: 'housePrice', header: '房屋租金', sortable: false, headerStyle: 'width: 15%;' },
-    { field: 'bookingDate', header: '預約時間', sortable: true, headerStyle: 'width: 25%;' },
+    { field: 'housePrice', header: '房屋租金', sortable: false, headerStyle: 'width: 10%;' },
+    { field: 'bookingDate', header: '預約時間', sortable: true, headerStyle: 'width: 20%;' },
     { field: 'status', header: '狀態', sortable: false, headerStyle: 'width: 10%;' },
     { field: 'operate', header: '', sortable: false, headerStyle: 'width: 10%;' }
 ];
@@ -137,11 +150,11 @@ const load = async () => {
         bookingList.value = data;
         console.log('成功載入資料:', data);
 
-        for(const booking of bookingList.value ){
+        for (const booking of bookingList.value) {
             const houseId = booking.houseId;
 
             // 獲取圖片
-            const photosResponse = await fetch(`${BASE_URL}/getPhotos/${houseId}`, {
+            const photosResponse = await fetch(`${BASE_URL}/houses/getPhotos/${houseId}`, {
                 headers: {
                     'Content-Type': 'application/json',
                     'authorization': `${TOKEN}`,
@@ -150,17 +163,14 @@ const load = async () => {
 
             if (photosResponse.ok) {
                 const photos = await photosResponse.json();
-                
+
                 booking.photos = photos;
             } else {
                 console.warn(`無法獲得 houseId=${houseId} 的圖片，HTTP STATUS: ${photosResponse.status}`);
                 booking.photos = [];
             }
         }
-
         console.log('包含圖片的 bookingList:', bookingList.value);
-
-
 
         useFilter();
     } catch (error) {
@@ -214,6 +224,10 @@ const confirmDeleteBooking = (prod) => {
 const deleteBooking = () => {
     deleteBookingDialog.value = false;
     selectedBooking.value = {};
+
+
+
+
     load();
     toast.add({ severity: 'success', summary: 'Successful', detail: '預約已取消', life: 3000 });
 };
@@ -244,27 +258,17 @@ onMounted(() => {
     load();
 });
 
-
 watch(activeTab, (newValue) => {
     // console.log(newValue);
 })
 
-
 </script>
 
 <style scoped>
-.custom-tabs .p-tabs {
-    display: flex;
-    width: 100%;
-    /* 父容器寬度設定為 100% */
-}
-
-.custom-tabs .p-tab {
-    flex: none;
-    /* 固定寬度，不自動調整 */
+.p-tab {
     width: 20%;
     /* 5個 Tab 平均分配，每個佔 20% */
     text-align: center;
-    /* 文本居中 */
+    /* 文字置中 */
 }
 </style>
