@@ -55,9 +55,9 @@
 
                   <!-- 預約介面總覽 -->
                   <li class="nav-item" role="presentation">
-                    <router-link to="/memberCenter/booking-guest" class="nav-link"
+                    <router-link to="/member-center/my-booking" class="nav-link"
                       :class="{ active: activeTab === 'booking' }" role="tab">
-                      預約介面總覽
+                      我的預約
                     </router-link>
                   </li>
 
@@ -66,6 +66,14 @@
                     <router-link to="/member-center/ads" class="nav-link" :class="{ active: activeTab === 'ads' }"
                       role="tab">
                       我的廣告
+                    </router-link>
+                  </li>
+
+                  <!-- 屋主介面總覽 -->
+                  <li class="nav-item" role="presentation">
+                    <router-link to="/member-center/Homeowner" class="nav-link"
+                      :class="{ active: activeTab === 'Homeowner' }" role="tab">
+                      屋主系統
                     </router-link>
                   </li>
                 </ul>
@@ -104,10 +112,12 @@ export default {
         this.activeTab = "houses";
       } else if (to.path === "/member-center/my-collections") {
         this.activeTab = "collections";
-      } else if (to.path === "/member-center/reservation") {
-        this.activeTab = "reservation";
+      } else if (to.path === "/member-center/my-booking") {
+        this.activeTab = "booking";
       } else if (to.path === "/member-center/ads") {
         this.activeTab = "ads";
+      } else if (to.path === "/member-center/homeowner") {
+        this.activeTab = "homeowner";
       }
     },
   },
@@ -119,10 +129,12 @@ export default {
       this.activeTab = "houses";
     } else if (this.$route.path === "/member-center/my-collections") {
       this.activeTab = "collections";
-    } else if (this.$route.path === "/member-center/reservation") {
-      this.activeTab = "reservation";
+    } else if (this.$route.path === "/member-center/my-booking") {
+      this.activeTab = "booking";
     } else if (this.$route.path === "/member-center/ads") {
       this.activeTab = "ads";
+    } else if (this.$route.path === "/member-center/homeowner") {
+      this.activeTab = "homeowner";
     }
 
     // 動態載入會員資料

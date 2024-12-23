@@ -76,7 +76,7 @@ export default {
 
         // 登入成功提示並跳轉至會員中心
         alert("登入成功！");
-        this.$router.push("/memberCenter");
+        this.$router.push("/member-Center");
       } catch (error) {
         // 錯誤處理
         this.errorMessage =

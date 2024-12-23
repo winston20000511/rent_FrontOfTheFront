@@ -31,8 +31,8 @@ const toggleLoginPage = () => {
 
     <!-- 主內容 -->
     <main class="app-main">
-    <HouseCreate></HouseCreate>
-    <HouseUpdate></HouseUpdate>
+    <!-- <HouseCreate></HouseCreate>
+    <HouseUpdate></HouseUpdate> -->
 
       <RouterView />
     </main>

@@ -64,7 +64,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, computed } from 'vue';
+import { ref, onMounted, watch, computed, inject } from 'vue';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
 import 'primeicons/primeicons.css'
@@ -96,11 +96,12 @@ const deleteBookingDialog = ref(false);
 
 // 設定 ( 對應屬性 欄位名稱 是否排列 )
 const columns = [
-    { field: 'bookingId', header: 'ID', sortable: false, headerStyle: 'width: 10%;' },
-    { field: 'houseId', header: '房子ID', sortable: false, headerStyle: 'width: 20%;' },
-    { field: 'bookingDate', header: '預約時間', sortable: true, headerStyle: 'width: 40%;' },
-    { field: 'status', header: '狀態', sortable: false, headerStyle: 'width: 15%;' },
-    { field: 'operate', header: '', sortable: false, headerStyle: 'width: 15%;' }
+    { field: 'houseTitle', header: '房屋名稱', sortable: false, headerStyle: 'width: 15%;' },
+    { field: 'houseAddress', header: '房屋地址', sortable: false, headerStyle: 'width: 25%;' },
+    { field: 'housePrice', header: '房屋租金', sortable: false, headerStyle: 'width: 15%;' },
+    { field: 'bookingDate', header: '預約時間', sortable: true, headerStyle: 'width: 25%;' },
+    { field: 'status', header: '狀態', sortable: false, headerStyle: 'width: 10%;' },
+    { field: 'operate', header: '', sortable: false, headerStyle: 'width: 10%;' }
 ];
 
 // 設定 分頁選項
@@ -126,6 +127,7 @@ const load = async () => {
                 'authorization': `${TOKEN}`,
             },
         });
+
         if (!response.ok) {
             // 使用 Error 類型來拋出錯誤
             throw new Error(`HTTP 錯誤! 狀態碼: ${response.status} - ${response.statusText}`);
@@ -134,6 +136,31 @@ const load = async () => {
         const data = await response.json();
         bookingList.value = data;
         console.log('成功載入資料:', data);
+
+        for(const booking of bookingList.value ){
+            const houseId = booking.houseId;
+
+            // 獲取圖片
+            const photosResponse = await fetch(`${BASE_URL}/getPhotos/${houseId}`, {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'authorization': `${TOKEN}`,
+                },
+            });
+
+            if (photosResponse.ok) {
+                const photos = await photosResponse.json();
+                
+                booking.photos = photos;
+            } else {
+                console.warn(`無法獲得 houseId=${houseId} 的圖片，HTTP STATUS: ${photosResponse.status}`);
+                booking.photos = [];
+            }
+        }
+
+        console.log('包含圖片的 bookingList:', bookingList.value);
+
+
 
         useFilter();
     } catch (error) {
@@ -213,11 +240,10 @@ const getSeverity = (status) => {
     }
 }
 
-
-
 onMounted(() => {
     load();
 });
+
 
 watch(activeTab, (newValue) => {
     // console.log(newValue);

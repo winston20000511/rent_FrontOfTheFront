@@ -11,6 +11,8 @@ import OrderCompleteView from '@/View/OrderCompleteView.vue';
 import EditProfile from '@/components/User/EditProfile.vue';
 import Houselist from '@/components/houses/houselist.vue';
 import CollectHouseList from '@/components/houses/CollectHouseList.vue';
+import BookingListByGuest from '@/components/Booking/BookingListByGuest.vue';
+import BookingListByHost from '@/components/Booking/BookingListByHost.vue';
 
 const routes = [
   {
@@ -54,6 +56,16 @@ const routes = [
         name: 'EditUserChild',
         component: EditUserPage,
       },
+      {
+        path: 'my-booking', // 用戶預約
+        name: 'BookingGuest',
+        component: BookingListByGuest,
+      },
+      {
+        path: 'homeowner', // 房屋預約
+        name: 'BookingHost',
+        component: BookingListByHost,
+      },
     ],
   },
   {
@@ -80,6 +92,16 @@ const routes = [
     path: '/order-complete',
     name: 'OrderComplete',
     component: OrderCompleteView,
+  },
+  {
+    path: "/booking/host", // 開發用，不一定刪掉
+    name: "bookingbyhost",
+    component: BookingListByHost,
+  },
+  {
+    path: "/booking/guest", // 開發用，不一定刪掉
+    name: "bookingbyguest",
+    component: BookingListByGuest,
   },
 ];
 

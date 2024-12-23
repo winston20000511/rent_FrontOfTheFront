@@ -11,6 +11,7 @@ import Button from "primevue/button"
 import 'primeicons/primeicons.css';
 import ConfirmationService from 'primevue/confirmationservice';
 import ConfirmDialog from 'primevue/confirmdialog';
+import ToastService from "primevue/toastservice";
 
 const app = createApp(App)
 app.config.globalProperties.$axios = axios;
@@ -20,13 +21,15 @@ app.use(PrimeVue, {
         options: {
             prefix: 'p', 
             darkModeSelector: false, 
-            cssLayer: true, 
+            cssLayer: false, 
         }
     }
 });
+
 app.component('Button', Button);
 app.use(createPinia())
 app.use(ConfirmationService); // 註冊 ConfirmationService
+app.use(ToastService);
 app.component('ConfirmDialog', ConfirmDialog); 
 app.use(router)
 app.mount('#app')
