@@ -28,7 +28,7 @@
     <hr />
 
     <!-- 房屋描述 -->
-    <HouseDescription :houseId="houseId" />
+    <HouseDescription :houseId="String(houseId)" />
   </div>
 </template>
 
@@ -43,7 +43,7 @@ import HousePhotos from '@/components/houses/housePhotos.vue';
 // 定義接收的 props
 const props = defineProps({
   houseId: {
-    type: Number,
+    type:[String, Number],
     required: true, // 需傳入houseId，否則警告
   },
 });

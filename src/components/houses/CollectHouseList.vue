@@ -1,12 +1,12 @@
 <template>
   <div class="collect-list-container">
-    <!-- 重要：將 ConfirmDialog 放在最外層 -->
+    <!-- 确保 ConfirmDialog 位于页面顶层 -->
     <ConfirmDialog />
 
-    <!-- 標題 -->
+    <!-- 标题 -->
     <h2 class="title">我的收藏列表</h2>
 
-    <!-- 搜尋欄 -->
+    <!-- 搜索栏 -->
     <div class="action-bar">
       <div class="search-bar">
         <span class="p-input-icon-left">
@@ -29,8 +29,8 @@
       :sortOrder="sortOrder"
       @sort="onSort"
     >
-      <!-- 房屋圖片 -->
-      <Column header="圖片" style="width: 150px">
+      <!-- 房屋图片 -->
+      <Column header="图片" style="width: 150px">
         <template #body="slotProps">
           <div class="image-container">
             <img
@@ -44,13 +44,13 @@
         </template>
       </Column>
 
-      <!-- 房屋名稱 -->
+      <!-- 房屋名称 -->
       <Column field="title" header="房屋名稱" :sortable="true" style="width: 200px" />
 
       <!-- 地址 -->
       <Column field="address" header="地址" :sortable="true" style="width: 200px" />
 
-      <!-- 價格 -->
+      <!-- 价格 -->
       <Column field="price" header="價格" :sortable="true" style="width: 150px">
         <template #body="slotProps">
           {{ slotProps.data.price ? `$${slotProps.data.price}` : "未提供價格" }}
@@ -76,7 +76,7 @@
       </Column>
     </DataTable>
 
-    <!-- 查看房屋表單彈窗 -->
+    <!-- 查看房屋表单弹窗 -->
     <Dialog v-model:visible="showHouseView" :modal="true" header="查看房屋資訊" class="dialog-theme">
       <HouseView :houseId="selectedHouseId" @close="closeHouseView" />
     </Dialog>
@@ -105,7 +105,7 @@ export default {
   },
   data() {
     return {
-      houses: [], // 用來存放收藏的房屋資料 (含圖片)
+      houses: [], // 用来存放收藏的房屋数据 (含图片)
       filters: { global: { value: null, matchMode: "contains" } },
       sortField: null,
       sortOrder: null,
@@ -115,7 +115,7 @@ export default {
     };
   },
   computed: {
-    // 前端搜尋功能
+    // 前端搜索功能
     filteredHouses() {
       const searchTerm = this.filters["global"].value?.toLowerCase() || "";
       return this.houses.filter((house) => {
@@ -130,10 +130,9 @@ export default {
       return { Authorization: `${localStorage.getItem("jwt")}` };
     },
 
-    // 1) 載入收藏房屋
+    // 加载收藏房屋数据
     async loadHouses() {
       try {
-        // 向後端請求收藏房屋的 houseId 列表
         const response = await fetch(`${this.baseUrl}/collect`, {
           headers: this.getAuthHeaders(),
         });
@@ -143,14 +142,12 @@ export default {
           throw new Error("無效的房屋列表數據");
         }
 
-        // 逐一取得房屋詳細資料及圖片
         const housePromises = houseList.map(async (house) => {
           const houseId = typeof house === "object" ? house.houseId : house;
           if (!houseId || typeof houseId !== "number") {
             throw new Error(`無效的 houseId: ${JSON.stringify(house)}`);
           }
 
-          // 取得房屋詳細資料
           const detailsResponse = await fetch(
             `${this.baseUrl}/details/${houseId}`,
             {
@@ -159,7 +156,6 @@ export default {
           );
           const details = await detailsResponse.json();
 
-          // 取得房屋圖片
           const photosResponse = await fetch(
             `${this.baseUrl}/getPhotos/${houseId}`,
             {
@@ -176,11 +172,11 @@ export default {
 
         this.houses = await Promise.all(housePromises);
       } catch (error) {
-        console.error("加載收藏房屋失敗:", error);
+        console.error("加载收藏房屋失败:", error);
       }
     },
 
-    // 2) 查看房屋資訊
+    // 查看房屋信息
     openHouseView(houseId) {
       this.selectedHouseId = houseId;
       this.showHouseView = true;
@@ -189,21 +185,20 @@ export default {
       this.showHouseView = false;
     },
 
-    // 3) 刪除收藏 (DELETE /collect/remove/{houseId})
+    // 删除收藏
     async deleteHouse(houseId) {
       try {
         await fetch(`${this.baseUrl}/collect/remove/${houseId}`, {
           method: "DELETE",
           headers: this.getAuthHeaders(),
         });
-        // 前端移除
         this.houses = this.houses.filter((h) => h.houseId !== houseId);
       } catch (error) {
-        console.error("刪除收藏失敗:", error);
+        console.error("删除收藏失败:", error);
       }
     },
 
-    // 按下「刪除」按鈕時顯示 ConfirmDialog
+    // 显示确认框
     confirmDelete(houseId) {
       confirmDialog({
         message: "您確定要移除這個收藏嗎？",
@@ -211,16 +206,11 @@ export default {
         icon: "pi pi-exclamation-triangle",
         acceptLabel: "是",
         rejectLabel: "否",
-        accept: () => {
-          this.deleteHouse(houseId);
-        },
-        reject: () => {
-          // 使用者取消，不做任何事
-        },
+        accept: () => this.deleteHouse(houseId),
       });
     },
 
-    // 4) 排序事件
+    // 排序事件
     onSort(event) {
       this.sortField = event.sortField;
       this.sortOrder = event.sortOrder;
@@ -233,31 +223,21 @@ export default {
 </script>
 
 <style scoped>
-/* 
-  <<< TEAL 風格 >>>
-  主要使用 #008080, #20B2AA, #40E0D0 這些 Teal/Turquoise 相關色系
-*/
-
-/* 容器樣式 */
 .collect-list-container {
   padding: 20px;
   background-color: #e0f2f1;
-  /* 淡綠 + Teal 背景 */
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* 標題樣式 */
 .title {
   text-align: center;
   margin-bottom: 20px;
   color: #008080;
-  /* 深一點的 Teal */
   font-size: 1.8em;
   font-weight: bold;
 }
 
-/* 操作區樣式 */
 .action-bar {
   display: flex;
   justify-content: space-between;
@@ -265,7 +245,6 @@ export default {
   margin-bottom: 20px;
 }
 
-/* 搜尋欄樣式 */
 .search-bar {
   display: flex;
   align-items: center;
@@ -284,7 +263,6 @@ export default {
   color: #333;
 }
 
-/* 表格樣式 */
 .custom-table {
   margin-top: 10px;
   border: 1px solid #a7dcd6;
@@ -301,7 +279,6 @@ export default {
 
 .custom-table.teal-theme ::v-deep(.p-datatable-tbody > tr:hover) {
   background-color: #b2dfdb;
-  /* Teal 淡色 Hover */
 }
 
 .custom-table.teal-theme ::v-deep(.p-paginator) {
@@ -309,14 +286,12 @@ export default {
   border-top: 1px solid #a7dcd6;
 }
 
-/* 按鈕樣式 */
 .teal-theme-button {
   display: inline-flex;
   align-items: center;
   gap: 5px;
   border: none;
   background-color: #008080;
-  /* Teal */
   color: #ffffff;
   border-radius: 5px;
   padding: 6px 12px;
@@ -327,10 +302,8 @@ export default {
 
 .teal-theme-button:hover {
   background-color: #006666;
-  /* 深一點 */
 }
 
-/* 圖片預覽樣式 */
 .image-container {
   width: 100px;
   height: 100px;
@@ -345,7 +318,6 @@ export default {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
-/* 對話框樣式 */
 .dialog-theme {
   border-radius: 10px;
   background-color: #b2dfdb;

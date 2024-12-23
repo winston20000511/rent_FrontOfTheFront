@@ -143,7 +143,7 @@ export default {
         message: "您確定要下架這個房屋嗎？",
         header: "確認刪除",
         icon: "pi pi-exclamation-triangle",
-        accept: () => this.deleteHouse(houseId),
+        accept: () => this.deleteHouse(houseId)
       });
     },
     async deleteHouse(houseId) {
