@@ -15,6 +15,7 @@ const markers = toRef(props,'markers')
 const flipped = ref(false);
 const cardFrontRef = ref(null)
 const cardBackRef = ref(null)
+const options = ref({})
 
 const updateMarker = (locations) => {
   // markers.value = locations;
@@ -32,6 +33,9 @@ const updateFlipped = () =>{
     cardBackRef.value.style.backfaceVisibility='hidden'
   }
 }
+const updateOption = (userOptions)=>{
+  options.value = userOptions
+}
 
 </script>
 
@@ -48,7 +52,7 @@ const updateFlipped = () =>{
           <HomeMap @update-marker="updateMarker" @update-flipped="updateFlipped" :markers="markers"></HomeMap>
         </div>
         <div class="card-back" ref="cardBackRef">
-          <HomeOption @update-flipped="updateFlipped"></HomeOption>
+          <HomeOption @update-flipped="updateFlipped" @update-option="updateOption"></HomeOption>
         </div>
       </div>
     </div>

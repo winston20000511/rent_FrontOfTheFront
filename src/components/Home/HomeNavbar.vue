@@ -2,15 +2,18 @@
 import { onMounted, onUnmounted , ref } from 'vue';
 import { Offcanvas } from 'bootstrap';
 import { useAuthStore } from '@/stores/auth';
+import { useOption } from '@/stores/optionStore';
+
 
 
 const authStore = useAuthStore(); // 引入 auth Store
+const optionStore = useOption();
 const searchInputRef = ref(null);
 const searchListRef = ref(null);
 const searchListPosRef = ref({top:0 , left:0 , width: 0}) 
 const searchListReuslt=ref([])   
-const myOffcanvasRef = ref(null);
-const offcanvasInstance= ref(null);
+// const myOffcanvasRef = ref(null);
+// const offcanvasInstance= ref(null);
 const iconBtnRef =ref(null);
 
 let isComposing = false; //判斷是否正在打字
@@ -23,9 +26,9 @@ const emits = defineEmits(['add-marker','signInClicked'])
 
     onMounted(() => {
     document.addEventListener('click', closeSearchList);
-    if (myOffcanvasRef.value) {
-        offcanvasInstance.value = new Offcanvas(myOffcanvasRef.value);
-    }
+    // if (myOffcanvasRef.value) {
+    //     offcanvasInstance.value = new Offcanvas(myOffcanvasRef.value);
+    // }
     });
 
     onUnmounted(() => {
@@ -49,19 +52,23 @@ const emits = defineEmits(['add-marker','signInClicked'])
                 left: 0,
                 width: listRect.width
             };
-            console.log(searchInputRef.value)
             searchListRef.value.style.display='block';
         }
     }
     const closeSearchList = (event)=>{
-        if(searchListRef.value && !searchListRef.value.contains(event.target) &&
-            searchInputRef.value && !searchInputRef.value.contains(event.target) &&
-            myOffcanvasRef.value && !myOffcanvasRef.value.contains(event.target)){
+        // if(searchListRef.value && !searchListRef.value.contains(event.target) &&
+        //     searchInputRef.value && !searchInputRef.value.contains(event.target) &&
+        //     myOffcanvasRef.value && !myOffcanvasRef.value.contains(event.target)){
 
-            searchListPosRef.value.innerHTML="";
-            searchListRef.value.style.display ='none';
-            offcanvasInstance.value.hide();
+        //     searchListPosRef.value.innerHTML="";
+        //     searchListRef.value.style.display ='none';
+        //     offcanvasInstance.value.hide();
+        // }
+        if(searchListRef.value && !searchListRef.value.contains(event.target)){
+          searchListPosRef.value.innerHTML="";
+          searchListRef.value.style.display ='none';
         }
+
     }
     const clickSearchBtn = ()=>{
         showMapFetch();
@@ -73,13 +80,17 @@ const emits = defineEmits(['add-marker','signInClicked'])
     }
     
     const showKeyWordFetch = async () =>{
+        const input = {
+          origin: searchInputRef.value.value
+        }
+        const merge = Object.assign({},input,optionStore.shareOptions)
 
         const response = await fetch(keywordUrl,{
             method:'POST',
-            headers: {'Content-Type': 'text/plain',
+            headers: {'Content-Type': 'application/json',
                     'authorization': `${token}`
             },
-            body:searchInputRef.value.value
+            body:JSON.stringify(merge)
         });
 
         if (!response.ok){
@@ -134,7 +145,7 @@ const emits = defineEmits(['add-marker','signInClicked'])
         searchInputRef.value.value=item.address;
         searchInputRef.value.innerHTML='';
         searchListRef.value.style.display ='none';
-        offcanvasInstance.value.hide();
+        // offcanvasInstance.value.hide();
         showMapFetch();
     }
 
@@ -176,7 +187,7 @@ const handleSignInClick = () => {
       </div>
     </div>
 
-    <div class="offcanvas offcanvas-end" 
+    <!-- <div class="offcanvas offcanvas-end" 
     data-bs-scroll="true" 
     data-bs-backdrop="false" 
     tabindex="-1" 
@@ -260,16 +271,17 @@ const handleSignInClick = () => {
                 </div>
             </div>
         </div>
-    </div>
+    </div> -->
+
+    <!-- data-bs-toggle="offcanvas" 
+    data-bs-target="#offcanvasScrolling" 
+    aria-controls="offcanvasScrolling" -->
 
   <div class="filter" id="filter">
     <input type="text" 
             placeholder="Address, neighborhood, city, ZIP" 
             id="search" 
             class="form-control me-4" 
-            data-bs-toggle="offcanvas" 
-            data-bs-target="#offcanvasScrolling" 
-            aria-controls="offcanvasScrolling"
             ref="searchInputRef"
             v-on:input="showSearchList"
             v-on:compositionstart="compositionStart"
