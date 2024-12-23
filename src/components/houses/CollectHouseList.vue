@@ -1,94 +1,184 @@
+<template>
+  <div class="collect-list-container">
+    <!-- 標題 -->
+    <h2 class="title">我的收藏列表</h2>
+
+    <!-- 搜尋欄 -->
+    <div class="action-bar">
+      <div class="search-bar">
+        <span class="p-input-icon-left">
+          <i class="pi pi-search search-icon"></i>
+          <InputText v-model="filters['global'].value" placeholder="搜尋房屋..." class="search-input" />
+        </span>
+      </div>
+    </div>
+
+    <!-- 房屋列表 -->
+    <DataTable :value="filteredHouses" responsiveLayout="scroll" :paginator="true" :rows="5"
+      class="custom-table teal-theme" :filters="filters" filterDisplay="row" :sortField="sortField"
+      :sortOrder="sortOrder" @sort="onSort">
+      <!-- 房屋圖片 -->
+      <Column header="圖片" style="width: 150px">
+        <template #body="slotProps">
+          <img v-if="slotProps.data.images && slotProps.data.images.length > 0" :src="slotProps.data.images[0]"
+            alt="House Image" class="image-preview" width="100" height="70" />
+          <span v-else>無圖片</span>
+        </template>
+      </Column>
+
+      <!-- 房屋名稱 -->
+      <Column field="title" header="房屋名稱" :sortable="true" style="width: 200px" />
+
+      <!-- 地址 -->
+      <Column field="address" header="地址" :sortable="true" style="width: 200px" />
+
+      <!-- 價格 -->
+      <Column field="price" header="價格" :sortable="true" style="width: 150px">
+        <template #body="slotProps">
+          {{ slotProps.data.price ? `$${slotProps.data.price}` : "未提供價格" }}
+        </template>
+      </Column>
+
+      <!-- 操作 -->
+      <Column header="操作" style="width: 250px">
+        <template #body="slotProps">
+          <Button label="查看" icon="pi pi-eye" class="teal-theme-button"
+            @click="openHouseView(slotProps.data.houseId)" />
+          <Button label="刪除" icon="pi pi-trash" class="teal-theme-button"
+            @click="deleteHouse(slotProps.data.houseId)" />
+        </template>
+      </Column>
+    </DataTable>
+
+    <!-- 查看房屋表單彈窗 -->
+    <Dialog v-model:visible="showHouseView" :modal="true" header="查看房屋資訊" class="dialog-theme">
+      <HouseView :houseId="selectedHouseId" @close="closeHouseView" />
+    </Dialog>
+  </div>
+</template>
+
 <script>
-import ProgressSpinner from "primevue/progressspinner";
+import InputText from "primevue/inputtext";
+import Button from "primevue/button";
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
-import Button from "primevue/button";
-import InputText from "primevue/inputtext";
-import Message from "primevue/message";
+import Dialog from "primevue/dialog";
 import HouseView from "@/View/HouseView.vue";
 
 export default {
-  name: "CollectHouses",
+  name: "CollectList",
   components: {
-    ProgressSpinner,
+    InputText,
+    Button,
     DataTable,
     Column,
-    Button,
-    InputText,
-    Message,
+    Dialog,
     HouseView,
   },
   data() {
     return {
-      userId: null,
-      houseIds: [],
-      houses: [],
-      loading: false,
-      showView: false, // 控制彈窗顯示
-      selectedHouseId: null, // 選中的房屋 ID
-      filters: {
-        global: { value: null, matchMode: "contains" },
-      },
+      houses: [], // 用來存放收藏的房屋資料 (含圖片)
+      filters: { global: { value: null, matchMode: "contains" } },
+      sortField: null,
+      sortOrder: null,
       baseUrl: "http://localhost:8080/api/houses",
+      showHouseView: false,
+      selectedHouseId: null,
     };
+  },
+  computed: {
+    // 前端搜尋功能
+    filteredHouses() {
+      const searchTerm = this.filters["global"].value?.toLowerCase() || "";
+      return this.houses.filter((house) => {
+        const titleMatch = house.title?.toLowerCase().includes(searchTerm);
+        const addressMatch = house.address?.toLowerCase().includes(searchTerm);
+        return titleMatch || addressMatch;
+      });
+    },
   },
   methods: {
     getAuthHeaders() {
-      const token = localStorage.getItem("jwt");
-      return { Authorization: `${token}` };
+      return { Authorization: `${localStorage.getItem("jwt")}` };
     },
-    async fetchHouseIds() {
-      const response = await fetch(`${this.baseUrl}/collect`, {
-        method: "GET",
-        headers: this.getAuthHeaders(),
-      });
-      console.log("Authorization Header:", this.getAuthHeaders()); // 確認 Header
-  if (response.ok) {
-    const result = await response.json();
-    this.houseIds = Array.isArray(result) ? result : [];
-  } else {
-    console.error("Failed to fetch house IDs:", response.status, response.statusText);
-  }
-    },
-    async fetchHouseDetails(houseId) {
-      const response = await fetch(`${this.baseUrl}/details/${houseId}`, {
-        method: "GET",
-        headers: this.getAuthHeaders(),
-      });
-      return response.ok ? await response.json() : null;
-    },
-    async fetchHousePhotos(houseId) {
-      const response = await fetch(`${this.baseUrl}/getPhotos/${houseId}`, {
-        method: "GET",
-        headers: this.getAuthHeaders(),
-      });
-      const base64Images = response.ok ? await response.json() : [];
-      return base64Images.map((base64) => `data:image/jpeg;base64,${base64}`);
-    },
-    async deleteHouse(houseId) {
-      await fetch(`${this.baseUrl}/collect/delete/${houseId}`, {
-        method: "DELETE",
-        headers: this.getAuthHeaders(),
-      });
-      this.houses = this.houses.filter((house) => house.houseId !== houseId);
-    },
+    // 1) 載入收藏房屋
+    async loadHouses() {
+      try {
+        const response = await fetch(`${this.baseUrl}/collect`, {
+          headers: this.getAuthHeaders(),
+        });
+        const houseList = await response.json();
+
+        if (!Array.isArray(houseList)) {
+          throw new Error("無效的房屋列表數據");
+        }
+
+        const housePromises = houseList.map(async (house) => {
+          const houseId = typeof house === "object" ? house.houseId : house; // 確保獲取有效的 houseId
+          if (!houseId || typeof houseId !== "number") {
+            throw new Error(`無效的 houseId: ${JSON.stringify(house)}`);
+          }
+
+          const detailsResponse = await fetch(
+            `${this.baseUrl}/details/${houseId}`,
+            {
+              headers: this.getAuthHeaders(),
+            }
+          );
+          const details = await detailsResponse.json();
+
+          const photosResponse = await fetch(
+            `${this.baseUrl}/getPhotos/${houseId}`,
+            {
+              headers: this.getAuthHeaders(),
+            }
+          );
+          const images = await photosResponse.json();
+
+          return {
+            ...details,
+            images: images.map((img) => `data:image/jpeg;base64,${img}`),
+          };
+        });
+
+        this.houses = await Promise.all(housePromises);
+      } catch (error) {
+        console.error("加載房屋列表失敗:", error);
+      }
+    }
+    ,
+
+    // 2) 查看
     openHouseView(houseId) {
-      this.selectedHouseId = String(houseId);
-      this.showView = true;
+      this.selectedHouseId = houseId;
+      this.showHouseView = true;
     },
     closeHouseView() {
-      this.showView = false;
+      this.showHouseView = false;
     },
-    async loadHouses() {
-      this.loading = true;
-      await this.fetchHouseIds();
-      const housePromises = this.houseIds.map(async (id) => {
-        const details = await this.fetchHouseDetails(id);
-        const images = await this.fetchHousePhotos(id);
-        return { ...details, images, houseId: id };
-      });
-      this.houses = await Promise.all(housePromises);
-      this.loading = false;
+
+    // 3) 刪除收藏 (DELETE /collect/remove/{houseId}?houseId=xxx)
+    async deleteHouse(houseId) {
+      try {
+        // 發送刪除收藏請求
+        await fetch(
+          `${this.baseUrl}/collect/remove/${houseId}`,
+          {
+            method: "DELETE",
+            headers: this.getAuthHeaders(),
+          }
+        );
+        // 前端刪除
+        this.houses = this.houses.filter((h) => h.houseId !== houseId);
+      } catch (error) {
+        console.error("刪除房屋失敗:", error);
+      }
+    },
+
+    // 4) 排序事件
+    onSort(event) {
+      this.sortField = event.sortField;
+      this.sortOrder = event.sortOrder;
     },
   },
   mounted() {
@@ -97,119 +187,120 @@ export default {
 };
 </script>
 
-<template>
-  <div>
-    <!-- 標題 -->
-    <h2>我的收藏房屋</h2>
-
-    <!-- 搜尋欄 -->
-    <div class="search-bar">
-      <span class="p-input-icon-left">
-        <i class="pi pi-search" />
-        <InputText v-model="filters['global'].value" placeholder="搜尋房屋..." />
-      </span>
-    </div>
-
-    <!-- 加載中 -->
-    <div v-if="loading" class="loading">
-      <ProgressSpinner />
-    </div>
-
-    <!-- 收藏列表 -->
-    <div v-else>
-      <div v-if="houses.length > 0">
-        <DataTable :value="houses" responsiveLayout="scroll" :paginator="true" :rows="5"
-          :rowsPerPageOptions="[5, 10, 20]" v-model:filters="filters" filterDisplay="menu" class="custom-table">
-          <!-- 圖片 -->
-          <Column header="圖片" style="width: 150px;">
-            <template #body="slotProps">
-              <img v-if="slotProps.data.images.length > 0" :src="slotProps.data.images[0]" alt="House Image" width="100"
-                height="70" />
-              <span v-else>無圖片</span>
-            </template>
-          </Column>
-
-          <!-- 標題 -->
-          <Column field="title" header="房屋名稱" :sortable="true" style="width: 200px;" />
-
-          <!-- 地址 -->
-          <Column field="address" header="地址" :sortable="true" style="width: 200px;" />
-
-          <!-- 價格 -->
-          <Column field="price" header="價格" :sortable="true" style="width: 150px;">
-            <template #body="slotProps">
-              {{ slotProps.data.price ? `$${slotProps.data.price}` : "未提供價格" }}
-            </template>
-          </Column>
-
-          <!-- 操作 -->
-          <Column header="操作" style="width: 200px;">
-            <template #body="slotProps">
-              <!-- 刪除按鈕 -->
-              <Button icon="pi pi-trash" label="刪除" class="p-button-danger p-mr-2"
-                @click="deleteHouse(slotProps.data.houseId)" />
-              <!-- 查看房屋按鈕 -->
-              <Button icon="pi pi-eye" label="查看" class="p-button-secondary"
-                @click="openHouseView(slotProps.data.houseId)" />
-            </template>
-          </Column>
-        </DataTable>
-      </div>
-      <div v-else>
-        <Message severity="info" :closable="false">暫無收藏的房屋</Message>
-      </div>
-    </div>
-
-    <!-- 房屋詳細頁面 (彈窗) -->
-    <HouseView v-if="showView" :houseId="selectedHouseId" :visible="showView" @close="closeHouseView" />
-  </div>
-</template>
-
 <style scoped>
-h2 {
+/* 
+  <<< TEAL 風格 >>>
+  主要使用 #008080, #20B2AA, #40E0D0 這些 Teal/Turquoise 相關色系
+*/
+
+/* 容器樣式 */
+.collect-list-container {
+  padding: 20px;
+  background-color: #e0f2f1;
+  /* 淡綠 + Teal 背景 */
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* 標題樣式 */
+.title {
   text-align: center;
   margin-bottom: 20px;
-  color: #333;
-  /* 標題字體顏色 */
+  color: #008080;
+  /* 深一點的 Teal */
+  font-size: 1.8em;
+  font-weight: bold;
 }
 
-.loading {
+/* 操作區樣式 */
+.action-bar {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  height: 200px;
+  margin-bottom: 20px;
 }
 
-img {
+/* 搜尋欄樣式 */
+.search-bar {
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  margin-right: 8px;
+  color: #008080;
+}
+
+.search-input {
+  width: 300px;
+  border: 1px solid #a7dcd6;
   border-radius: 5px;
+  padding: 8px;
+  color: #333;
 }
 
-.custom-table ::v-deep(.p-datatable) {
-  background-color: #f9f9f9;
-  /* 表格背景顏色 */
-  color: #000;
-  /* 表格內文字顏色設為黑色 */
+/* 表格樣式 */
+.custom-table {
+  margin-top: 10px;
+  border: 1px solid #a7dcd6;
+  border-radius: 5px;
+  overflow: hidden;
 }
 
-.custom-table ::v-deep(.p-datatable-thead > tr > th) {
-  background-color: #f0f0f0;
-  /* 表頭背景顏色 */
-  color: #000;
-  /* 表頭文字顏色設為黑色 */
+.custom-table.teal-theme ::v-deep(.p-datatable-thead > tr > th) {
+  background-color: #008080;
+  color: #ffffff;
   text-align: center;
   font-weight: bold;
-  /* 表頭字體加粗 */
 }
 
-.custom-table ::v-deep(.p-datatable-tbody > tr) {
-  background-color: #ffffff;
-  /* 表格每列的背景顏色 */
-  color: #000;
-  /* 表格列中文字設為黑色 */
+.custom-table.teal-theme ::v-deep(.p-datatable-tbody > tr:hover) {
+  background-color: #b2dfdb;
+  /* Teal 淡色 Hover */
 }
 
-.custom-table ::v-deep(.p-datatable-tbody > tr:hover) {
-  background-color: #e6f7ff;
-  /* 滑鼠懸停時的背景顏色 */
+.custom-table.teal-theme ::v-deep(.p-paginator) {
+  background-color: #b2dfdb;
+  border-top: 1px solid #a7dcd6;
+}
+
+/* 按鈕樣式 */
+.teal-theme-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: none;
+  background-color: #008080;
+  /* Teal */
+  color: #ffffff;
+  border-radius: 5px;
+  padding: 6px 12px;
+  font-size: 0.9em;
+  cursor: pointer;
+  margin-right: 5px;
+}
+
+.teal-theme-button:hover {
+  background-color: #006666;
+  /* 深一點 */
+}
+
+/* 圖片預覽樣式 */
+.image-preview {
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  object-fit: cover;
+}
+
+/* 對話框樣式 */
+.dialog-theme {
+  border-radius: 10px;
+  background-color: #b2dfdb;
+  padding: 10px;
+}
+
+.dialog-theme ::v-deep(.p-dialog-header) {
+  background-color: #008080;
+  color: #ffffff;
 }
 </style>
