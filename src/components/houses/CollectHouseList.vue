@@ -1,21 +1,13 @@
 <template>
-  <div>
+  <div class="house-list-container">
     <!-- 標題 -->
-    <h2 class="title">我的房屋列表</h2>
+    <h2 class="title">我的收藏列表</h2>
 
-    <!-- 搜尋欄與新增房屋按鈕 -->
+    <!-- 搜尋欄 -->
     <div class="action-bar">
-      <!-- 新增房屋按鈕 -->
-      <Button
-        label="新增房屋"
-        icon="pi pi-plus"
-        class="add-house-button"
-        @click="openCreateForm"
-      />
-      <!-- 搜尋欄 -->
       <div class="search-bar">
         <span class="p-input-icon-left">
-          <i class="pi pi-search" />
+          <i class="pi pi-search search-icon" />
           <InputText
             v-model="filters['global'].value"
             placeholder="搜尋房屋..."
@@ -25,7 +17,7 @@
       </div>
     </div>
 
-    <!-- 房屋列表 -->
+    <!-- 房屋列表 (DataTable) -->
     <DataTable
       :value="filteredHouses"
       responsiveLayout="scroll"
@@ -41,15 +33,15 @@
       <!-- 房屋圖片 -->
       <Column header="圖片" style="width: 150px">
         <template #body="slotProps">
-          <img
-            v-if="slotProps.data.images && slotProps.data.images.length > 0"
-            :src="slotProps.data.images[0]"
-            alt="House Image"
-            width="100"
-            height="70"
-            class="image-preview"
-          />
-          <span v-else>無圖片</span>
+          <div class="image-container">
+            <img
+              v-if="slotProps.data.images && slotProps.data.images.length > 0"
+              :src="slotProps.data.images[0]"
+              alt="House Image"
+              class="image-preview"
+            />
+            <span v-else>無圖片</span>
+          </div>
         </template>
       </Column>
 
@@ -80,41 +72,38 @@
       <Column header="操作" style="width: 250px">
         <template #body="slotProps">
           <Button
-            label="查看"
             icon="pi pi-eye"
-            class="prime-theme-button"
+            class="p-button-rounded p-button-text p-button-info action-button large-button"
             @click="openHouseView(slotProps.data.houseId)"
           />
           <Button
-            label="編輯"
             icon="pi pi-pencil"
-            class="prime-theme-button"
+            class="p-button-rounded p-button-text p-button-warning action-button large-button"
             @click="openEditForm(slotProps.data.houseId)"
           />
           <Button
-            label="刪除"
             icon="pi pi-trash"
-            class="prime-theme-button"
+            class="p-button-rounded p-button-text p-button-danger action-button large-button"
             @click="deleteHouse(slotProps.data.houseId)"
           />
         </template>
       </Column>
     </DataTable>
 
-    <!-- 編輯房屋表單彈窗 -->
-    <Dialog v-model:visible="showEditForm" :modal="true" header="編輯房屋資訊" class="dialog-theme">
-      <HouseUpdate :houseId="selectedHouseId" @close="closeEditForm" />
-    </Dialog>
-
     <!-- 查看房屋表單彈窗 -->
-    <Dialog v-model:visible="showHouseView" :modal="true" header="查看房屋資訊" class="dialog-theme">
-      <HouseView :houseId="selectedHouseId" @close="closeHouseView" />
+    <Dialog
+      v-model:visible="showHouseView"
+      :modal="true"
+      header="查看房屋資訊"
+      class="dialog-theme"
+    >
+      <div class="dialog-container">
+        <HouseView :houseId="selectedHouseId" @close="closeHouseView" />
+      </div>
     </Dialog>
 
-    <!-- 新增房屋表單彈窗 -->
-    <Dialog v-model:visible="showCreateForm" :modal="true" header="新增房屋" class="dialog-theme">
-      <HouseCreate @close="closeCreateForm" />
-    </Dialog>
+    <!-- (若有需要，也可新增編輯或新增功能的 Dialog，
+         參考 HouseList.vue 的做法) -->
   </div>
 </template>
 
@@ -124,20 +113,20 @@ import Button from "primevue/button";
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
 import Dialog from "primevue/dialog";
-import HouseUpdate from "@/components/houses/HouseUpdate.vue";
-import HouseCreate from "@/components/houses/HouseCreate.vue";
 import HouseView from "@/View/HouseView.vue";
+// (若有需要編輯表單、新增表單，也可 import HouseUpdate, HouseCreate)
 
 export default {
+  name: "MyCollection",
   components: {
     InputText,
     Button,
     DataTable,
     Column,
     Dialog,
-    HouseUpdate,
     HouseView,
-    HouseCreate,
+    // HouseUpdate,
+    // HouseCreate,
   },
   data() {
     return {
@@ -145,19 +134,19 @@ export default {
       filters: { global: { value: null, matchMode: "contains" } },
       sortField: null,
       sortOrder: null,
-      baseUrl: "http://localhost:8080/api/houses",
-      showEditForm: false,
+      baseUrl: "http://localhost:8080/api/houses", // 根據實際情況
       showHouseView: false,
-      showCreateForm: false,
       selectedHouseId: null,
     };
   },
   computed: {
+    // 依照 global search 進行篩選
     filteredHouses() {
-      const searchTerm = this.filters['global'].value?.toLowerCase() || '';
-      return this.houses.filter(house =>
-        house.title.toLowerCase().includes(searchTerm) ||
-        house.address.toLowerCase().includes(searchTerm)
+      const searchTerm = this.filters["global"].value?.toLowerCase() || "";
+      return this.houses.filter(
+        (house) =>
+          house.title.toLowerCase().includes(searchTerm) ||
+          house.address.toLowerCase().includes(searchTerm)
       );
     },
   },
@@ -167,13 +156,17 @@ export default {
     },
     async loadHouses() {
       try {
-        const response = await fetch(`${this.baseUrl}/houses`, {
+        // 1) 向後端拿「收藏的房屋 ID 列表」
+        const response = await fetch(`${this.baseUrl}/collect`, {
           headers: this.getAuthHeaders(),
         });
         const houseIds = await response.json();
 
+        // 2) 逐一取詳細資料 + 圖片
         const housePromises = houseIds.map(async (id) => {
           const houseId = id.houseId || id;
+
+          // 2.1 細節
           const detailsResponse = await fetch(
             `${this.baseUrl}/details/${houseId}`,
             {
@@ -181,6 +174,8 @@ export default {
             }
           );
           const details = await detailsResponse.json();
+
+          // 2.2 圖片
           const photosResponse = await fetch(
             `${this.baseUrl}/getPhotos/${houseId}`,
             {
@@ -188,24 +183,21 @@ export default {
             }
           );
           const images = await photosResponse.json();
+
           return {
             ...details,
+            // 轉成 data URL
             images: images.map((img) => `data:image/jpeg;base64,${img}`),
           };
         });
 
+        // 等待所有 Promise 完成後更新列表
         this.houses = await Promise.all(housePromises);
       } catch (error) {
         console.error("加載房屋列表失敗:", error);
       }
     },
-    openEditForm(houseId) {
-      this.selectedHouseId = houseId;
-      this.showEditForm = true;
-    },
-    closeEditForm() {
-      this.showEditForm = false;
-    },
+    // 查看詳情
     openHouseView(houseId) {
       this.selectedHouseId = houseId;
       this.showHouseView = true;
@@ -213,18 +205,20 @@ export default {
     closeHouseView() {
       this.showHouseView = false;
     },
-    openCreateForm() {
-      this.showCreateForm = true;
+    // 編輯表單
+    openEditForm(houseId) {
+      console.log("TODO: open edit form, houseId=", houseId);
+      // this.showEditForm = true;
+      // this.selectedHouseId = houseId;
     },
-    closeCreateForm() {
-      this.showCreateForm = false;
-    },
+    // 刪除收藏
     async deleteHouse(houseId) {
       try {
-        await fetch(`${this.baseUrl}/delete/${houseId}`, {
+        await fetch(`${this.baseUrl}/collect/remove/${houseId}`, {
           method: "DELETE",
           headers: this.getAuthHeaders(),
         });
+        // 前端同步移除
         this.houses = this.houses.filter((house) => house.houseId !== houseId);
       } catch (error) {
         console.error("刪除房屋失敗:", error);
@@ -242,135 +236,131 @@ export default {
 </script>
 
 <style scoped>
+.house-list-container {
+  padding: 20px;
+  background-color: #f0f9ff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
 /* 標題樣式 */
 .title {
   text-align: center;
   margin-bottom: 20px;
-  color: #495057;
-  font-size: 1.75em;
+  color: #065f73;
+  font-size: 1.8em;
   font-weight: bold;
 }
 
-/* 搜尋欄與按鈕行樣式 */
+/* 操作區 (搜尋欄) */
 .action-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 10px;
 }
-
-/* 新增房屋按鈕樣式 */
-.add-house-button {
-  display: flex;
-  align-items: center;
-  background-color: #28a745;
-  color: #ffffff;
-  border: none;
-  border-radius: 5px;
-  padding: 8px 16px;
-  font-size: 0.9em;
-  cursor: pointer;
-}
-
-.add-house-button:hover {
-  background-color: #218838;
-}
-
-/* 搜尋欄樣式 */
 .search-bar {
   display: flex;
   align-items: center;
-  margin-left: auto;
 }
-
+.search-icon {
+  margin-right: 8px;
+}
 .search-input {
-  width: 100%;
-  max-width: 400px;
-  padding: 10px;
-  border: 1px solid #ced4da;
+  width: 300px;
+  border: 1px solid #bae6fd;
   border-radius: 5px;
+  padding: 8px;
 }
 
 /* 表格樣式 */
 .custom-table {
-  margin-top: 20px;
-  border-radius: 8px;
+  margin-top: 10px;
+  border: 1px solid #cbe7f3;
+  border-radius: 5px;
   overflow: hidden;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
-
-.custom-table.prime-theme ::v-deep(.p-datatable) {
-  background-color: #f8f9fa;
-  color: #495057;
-  border-radius: 8px;
-}
-
 .custom-table.prime-theme ::v-deep(.p-datatable-thead > tr > th) {
-  background-color: #6c757d;
+  background-color: #0891b2;
   color: #ffffff;
-  font-weight: bold;
   text-align: center;
-  border: none;
+  font-weight: bold;
 }
-
-.custom-table.prime-theme ::v-deep(.p-datatable-tbody > tr) {
-  background-color: #ffffff;
-  color: #495057;
-}
-
 .custom-table.prime-theme ::v-deep(.p-datatable-tbody > tr:hover) {
-  background-color: #e9ecef;
+  background-color: #e0f7fa;
 }
-
-/* 分頁器樣式 */
 .custom-table.prime-theme ::v-deep(.p-paginator) {
-  background-color: #f8f9fa;
-  border: 1px solid #ced4da;
+  background-color: #e0f7fa;
+  border-top: 1px solid #bae6fd;
 }
 
-.custom-table.prime-theme ::v-deep(.p-paginator .p-paginator-pages .p-highlight) {
-  background-color: #6c757d;
-  color: #ffffff;
+/* 圖片容器 */
+.image-container {
+  width: 100px;
+  height: 70px;
+  overflow: hidden;
 }
-
-.custom-table.prime-theme ::v-deep(.p-paginator .p-paginator-element) {
-  color: #495057;
-}
-
-.custom-table.prime-theme ::v-deep(.p-paginator .p-paginator-element:hover) {
-  background-color: #e9ecef;
-}
-
-/* 按鈕樣式 */
-.prime-theme-button {
-  display: flex;
-  align-items: center;
-  border: none;
-  background-color: #007bff;
-  color: #ffffff;
-  border-radius: 5px;
-  padding: 8px 16px;
-  font-size: 0.9em;
-  cursor: pointer;
-}
-
-.prime-theme-button i {
-  margin-right: 8px;
-}
-
-.prime-theme-button:hover {
-  background-color: #0056b3;
-}
-
-/* 圖片預覽樣式 */
 .image-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   border-radius: 5px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
-/* 對話框樣式 */
+/* 動作按鈕 */
+.action-button {
+  margin-right: 10px;
+  font-size: 1.2rem;
+  padding: 12px 20px;
+}
+.large-button {
+  font-size: 1.5rem;
+  padding: 15px 25px;
+}
+.p-button-info {
+  background-color: #60a5fa;
+  border-color: #60a5fa;
+}
+.p-button-info:hover {
+  background-color: #3b82f6;
+}
+.p-button-danger {
+  background-color: #f87171;
+  border-color: #f87171;
+}
+.p-button-danger:hover {
+  background-color: #dc2626;
+}
+.p-button-warning {
+  background-color: #fbbf24;
+  border-color: #fbbf24;
+}
+.p-button-warning:hover {
+  background-color: #d97706;
+}
+
+/* 對話框 */
 .dialog-theme {
   border-radius: 10px;
-  overflow: hidden;
+  background-color: #e3f2fd;
+  padding: 10px;
+}
+.dialog-container {
+  background-color: #ffffff;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+.dialog-theme ::v-deep(.p-dialog-header) {
+  background-color: #0891b2;
+  color: #ffffff;
+}
+.dialog-theme ::v-deep(.p-dialog-content) {
+  padding: 20px;
+}
+.dialog-theme ::v-deep(.p-dialog-footer) {
+  display: flex;
+  justify-content: flex-end;
 }
 </style>

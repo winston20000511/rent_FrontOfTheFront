@@ -6,11 +6,6 @@
       <button class="favorite-btn" @click="toggleFavorite">
         <i :class="isFavorited ? 'bi bi-heart-fill' : 'bi bi-heart'"></i>
       </button>
-
-      <!-- 關閉按鈕 -->
-      <button class="close-btn" @click="closeModal">
-        <i class="bi bi-x-circle"></i>
-      </button>
     </div>
 
     <hr />

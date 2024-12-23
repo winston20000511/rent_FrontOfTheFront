@@ -20,7 +20,7 @@ app.use(PrimeVue, {
         options: {
             prefix: 'p', 
             darkModeSelector: false, 
-            cssLayer: true, 
+            cssLayer: false, 
         }
     }
 });
