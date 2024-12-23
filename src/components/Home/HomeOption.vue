@@ -1,0 +1,294 @@
+<script setup>
+import { ref } from 'vue';
+
+    const emits = defineEmits(['update-flipped'])
+
+    const minprice = ref(0);
+    const maxprice = ref(0);
+    const washingmachin = ref(true);
+    const airconditioner = ref(true);
+    const network = ref(true);
+    const bedstead = ref(true);
+    const mattress = ref(true);
+    const refrigerator = ref(true);
+    const ewaterheater = ref(true);
+    const gwaterheater = ref(true);
+    const television = ref(true);
+    const channelfour = ref(true);
+    const sofaRef = ref(true);
+    const tablesRef = ref(true);
+    const petRef = ref(true);
+    const parkingspace = ref(true);
+    const elevatorRef = ref(true);
+    const balconyRef = ref(true);
+    const shortterm = ref(true);
+
+    const showMap = ()=>{
+        emits('update-flipped')
+    }
+    const saveConfig = ()=>{
+        const option = {
+            minPrice: minprice.value,
+            maxPrice: maxprice.value,
+            washingMachin: washingmachin.value,
+            airConditioner: airconditioner.value,
+            netWork: network.value,
+            bedStead: bedstead.value,
+            matTress: mattress.value,
+            refRigerator: refrigerator.value,
+            ewaterHeater: ewaterheater.value,
+            gwaterHeater: gwaterheater.value,
+            teleVision: television.value,
+            channelFour: channelfour.value,
+            sofa: sofaRef.value,
+            tables: tablesRef.value,
+            pet: petRef.value,
+            parkingSpace: parkingspace.value,
+            elevator: elevatorRef.value,
+            balcony: balconyRef.value,
+            shortTerm: shortterm.value,
+
+        }
+
+        console.log(JSON.stringify(option));
+    }
+    
+</script>
+<template>
+    <main>
+    <div class="container py-20 px-4 bg-body custom-shadow">
+    <div class="row gy-4">
+        <div class="col-12 col-md-12">
+            <div class="card border-secondary mb-3" style="max-width: 100%;">
+                <div class="card-header">租金範圍</div>
+                <div class="card-body text-secondary">
+                    <div class="row gy-4">
+                    <div class="col-12 col-md-6">
+                        <label for="price-minimum">Minimum</label>
+                        <input type="text" id="price-minimum" class="form-control" v-model="minprice">
+                    </div>
+                    <div class="col-12 col-md-6">
+                        <label for="price-maximum">Maximum</label>
+                        <input type="text" id="price-maximum" class="form-control" v-model="maxprice">
+                    </div>
+                </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6">
+            <div class="card border-secondary mb-3" style="max-width: 100%;">
+                <div class="card-header">房屋限制</div>
+                <div class="card-body text-secondary">
+                    <div class="row gy-4">
+                        <div class="col-12 col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" v-model="washingmachin" id="washingMachin" checked>
+                                <label class="form-check-label" for="washingMachin">
+                                    洗衣機
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" v-model="airconditioner" id="airConditioner" checked>
+                                <label class="form-check-label" for="airConditioner">
+                                    冷氣
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" v-model="network" id="netWork" checked>
+                                <label class="form-check-label" for="netWork">
+                                    網路
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" v-model="bedstead" id="bedStead" checked>
+                                <label class="form-check-label" for="bedStead">
+                                    床架
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" v-model="mattress" id="matTress" checked>
+                                <label class="form-check-label" for="matTress">
+                                    床墊
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" v-model="refrigerator" id="refRigerator" checked>
+                                <label class="form-check-label" for="refRigerator">
+                                    冰箱
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" v-model="ewaterheater" id="ewaterHeater" checked>
+                                <label class="form-check-label" for="ewaterHeater">
+                                    電熱水器
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" v-model="gwaterheater" id="gwaterHeater" checked>
+                                <label class="form-check-label" for="gwaterHeater">
+                                    瓦斯熱水器
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" v-model="television" id="teleVision" checked>
+                                <label class="form-check-label" for="teleVision">
+                                    電視
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" v-model="channelfour" id="channelFour" checked>
+                                <label class="form-check-label" for="channelFour">
+                                    第四台
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" v-model="sofaRef" id="sofa" checked>
+                                <label class="form-check-label" for="sofa">
+                                    沙發
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" v-model="tablesRef" id="tables" checked>
+                                <label class="form-check-label" for="tables">
+                                    桌椅
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" v-model="petRef" id="pet" checked>
+                                <label class="form-check-label" for="pet">
+                                    養寵物
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" v-model="parkingspace" id="parkingSpace" checked>
+                                <label class="form-check-label" for="parkingSpace">
+                                    停車位
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" v-model="elevatorRef" id="elevator" checked>
+                                <label class="form-check-label" for="elevator">
+                                    電梯
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" v-model="balconyRef" id="balcony" checked>
+                                <label class="form-check-label" for="balcony">
+                                    陽台
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" v-model="shortterm" id="shortTerm" checked>
+                                <label class="form-check-label" for="shortTerm">
+                                    短期租屋
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="house-typefour" checked>
+                                <label class="form-check-label" for="house-typefour">
+                                    開伙
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="house-typefour" checked>
+                                <label class="form-check-label" for="house-typefour">
+                                    飲水機
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="house-typefour" checked>
+                                <label class="form-check-label" for="house-typefour">
+                                    管理費
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="house-typefour" checked>
+                                <label class="form-check-label" for="house-typefour">
+                                    限男
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="house-typefour" checked>
+                                <label class="form-check-label" for="house-typefour">
+                                    限女
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="house-typeone" checked>
+                                <label class="form-check-label" for="house-typeone">
+                                    透天
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="house-typetwo" checked>
+                                <label class="form-check-label" for="house-typetwo">
+                                    獨立套房
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="house-typethree" checked>
+                                <label class="form-check-label" for="house-typethree">
+                                    分租套房
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="" id="house-typefour" checked>
+                                <label class="form-check-label" for="house-typefour">
+                                    雅房
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6">
+            <div class="card border-secondary mb-3" style="max-width: 100%;">
+                <div class="card-header">搜尋方式</div>
+                <div class="card-body text-secondary">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="priceRange" id="lowPrice" value="low" checked>
+                        <label class="form-check-label" for="lowPrice">
+                            廣告優先
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="priceRange" id="midPrice" value="mid">
+                        <label class="form-check-label" for="midPrice">
+                            價錢優先
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="priceRange" id="highPrice" value="high">
+                        <label class="form-check-label" for="highPrice">
+                            點擊優先
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-md-6">
+            <div class="card border-secondary mb-3" style="max-width: 100%;">
+                <button class="btn btn-primary" @click="saveConfig">SAVE</button>
+            </div>
+        </div>
+        <div class="col-12 col-md-6">
+            <div class="card border-secondary mb-3" style="max-width: 100%;">
+                <button class="btn btn-primary" @click="showMap">Cancel</button>
+            </div>
+        </div>
+    </div>
+    </div>
+    </main>
+
+</template>
+<style scoped>
+    header{
+    }
+    main{
+    }
+</style>

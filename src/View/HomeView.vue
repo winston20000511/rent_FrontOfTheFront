@@ -4,6 +4,7 @@ import HomeCardList from '@/components/Home/HomeCardList.vue';
 import HomeFilter from '@/components/Home/HomeFilter.vue';
 import HomeMap from '@/components/Home/HomeMap.vue';
 import { useHouseCard } from '@/stores/CardHouseStore';
+import HomeOption from '@/components/Home/HomeOption.vue';
 
 const store = useHouseCard();
 const props = defineProps({
@@ -12,7 +13,8 @@ const props = defineProps({
 const emits = defineEmits(['add-marker'])
 const markers = toRef(props,'markers')
 const flipped = ref(false);
-
+const cardFrontRef = ref(null)
+const cardBackRef = ref(null)
 
 const updateMarker = (locations) => {
   // markers.value = locations;
@@ -22,6 +24,13 @@ const updateMarker = (locations) => {
 
 const updateFlipped = () =>{
   flipped.value = !flipped.value;
+  if (flipped.value){
+    cardFrontRef.value.style.backfaceVisibility='hidden';
+    cardBackRef.value.style.backfaceVisibility='visible'
+  }else{
+    cardFrontRef.value.style.backfaceVisibility='visible';
+    cardBackRef.value.style.backfaceVisibility='hidden'
+  }
 }
 
 </script>
@@ -35,10 +44,12 @@ const updateFlipped = () =>{
     <!-- <button @click="flipped = !flipped">翻轉卡片</button> -->
     <div class="main-left" :class="{ flipped: flipped }">
       <div class="card">
-        <div class="card-front">
+        <div class="card-front" ref="cardFrontRef">
           <HomeMap @update-marker="updateMarker" @update-flipped="updateFlipped" :markers="markers"></HomeMap>
         </div>
-        <div class="card-back">背面</div>
+        <div class="card-back" ref="cardBackRef">
+          <HomeOption @update-flipped="updateFlipped"></HomeOption>
+        </div>
       </div>
     </div>
     <div class="main-right">
@@ -82,18 +93,17 @@ main {
   transform: rotateY(180deg);
 }
 
-.card-front,
-.card-back {
-  /* position: absolute;
+.card-front{
+  position: absolute;
   width: 100%;
   height: 100%;
   backface-visibility: hidden;
-  display: flex;
+  /* display: flex;
   justify-content: center;
-  align-items: center;
-  font-size: 20px;
-  color: #fff;
-  border-radius: 8px; */
+  align-items: center; */
+  /* font-size: 20px; */
+  /* color: #fff; */
+  border-radius: 8px;
 }
 
 .card-front {
@@ -105,13 +115,13 @@ main {
   width: 100%;
   height: 100%;
   backface-visibility: hidden;
-  display: flex;
+  /* display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 20px;
-  color: #fff;
+  font-size: 20px; */
+  /* color: #fff; */
   border-radius: 8px;
-  background-color: white;
+  /* background-color: white; */
   transform: rotateY(180deg);
 }
 

@@ -177,8 +177,8 @@ onMounted(() => {
 
   //地圖設定頁面
   function showConfig(){
-    refbtnDraw.value.style.display='none';
-    refbtnConfig.value.style.display='none';
+    // refbtnDraw.value.style.display='none';
+    // refbtnConfig.value.style.display='none';
     emits('update-flipped')
   }
 
