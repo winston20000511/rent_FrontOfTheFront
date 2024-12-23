@@ -42,6 +42,7 @@ export default {
   data() {
     return {
       ownerInfo: {
+        userId: "",
         name: "",
         phone: "",
         picture: "", // Base64 编码的图片
@@ -75,7 +76,7 @@ export default {
         const data = await response.json();
         this.ownerInfo.name = data.name;
         this.ownerInfo.phone = data.phone;
-
+        this.ownerInfo.userId = data.userId;
         // 将 byte[] 转换为 Base64 字符串
         if (data.picture) {
           const base64String = btoa(
