@@ -42,7 +42,7 @@ const addMarker = (locations) => {
 
     <!-- 主內容 -->
     <main class="app-main">
-      <RouterView :markers="markers"></RouterView>
+      <RouterView :markers="markers" @add-marker="addMarker"></RouterView>
     </main>
 
     <!-- 聊天彈窗和按鈕 -->

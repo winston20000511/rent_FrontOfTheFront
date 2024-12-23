@@ -9,13 +9,21 @@ const store = useHouseCard();
 const props = defineProps({
   markers: Object
 });
-
+const emits = defineEmits(['add-marker'])
 const markers = toRef(props,'markers')
+const flipped = ref(false);
 
-const addMarker = (locations) => {
-  markers.value = locations;
-  store.updateData(markers.value.searchList);
+
+const updateMarker = (locations) => {
+  // markers.value = locations;
+  // store.updateData(markers.value.searchList);
+  emits('add-marker',locations)
 };
+
+const updateFlipped = () =>{
+  flipped.value = !flipped.value;
+}
+
 </script>
 
 <template>
@@ -24,13 +32,21 @@ const addMarker = (locations) => {
   </div> -->
 
   <main>
-    <div class="main-left">
-      <HomeMap @add-marker="addMarker" :markers="markers"></HomeMap>
+    <!-- <button @click="flipped = !flipped">翻轉卡片</button> -->
+    <div class="main-left" :class="{ flipped: flipped }">
+      <div class="card">
+        <div class="card-front">
+          <HomeMap @update-marker="updateMarker" @update-flipped="updateFlipped" :markers="markers"></HomeMap>
+        </div>
+        <div class="card-back">背面</div>
+      </div>
     </div>
     <div class="main-right">
       <HomeCardList :markers="markers"></HomeCardList>
     </div>
   </main>
+
+
 </template>
 
 <style scoped>
@@ -44,7 +60,7 @@ const addMarker = (locations) => {
 main {
   position: relative;
   width: 100%;
-  /* height: 76vh; */
+  height: 76vh;
   display: flex;
   background-color: rgb(235, 235, 235);
 }
@@ -54,6 +70,51 @@ main {
   width: 45%;
   z-index: 1;
 }
+.card {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.6s;
+}
+
+.main-left.flipped .card {
+  transform: rotateY(180deg);
+}
+
+.card-front,
+.card-back {
+  /* position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
+  color: #fff;
+  border-radius: 8px; */
+}
+
+.card-front {
+  /* background-color: #007bff; */
+}
+
+.card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px;
+  color: #fff;
+  border-radius: 8px;
+  background-color: white;
+  transform: rotateY(180deg);
+}
+
 
 .main-right {
   width: 55%;
@@ -61,4 +122,5 @@ main {
   overflow-x: hidden;
   z-index: 2;
 }
+
 </style>

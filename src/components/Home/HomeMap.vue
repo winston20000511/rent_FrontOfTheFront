@@ -7,6 +7,7 @@ const map = shallowRef(null); // 地圖容器
 const mapMarkers = ref([]); //地圖標記
 const canvas = shallowRef(null); //繪筆
 const refbtnDraw = ref(null) //繪圖按鈕
+const refbtnConfig = ref(null) //地圖設定
 const isDrawingMode = ref(false); //按鈕切換繪圖模式
 
 let drawUrl='http://localhost:8080/api/draw';
@@ -19,7 +20,7 @@ let polygon = null;
 let token = localStorage.getItem('jwt');
 
 const store = useHouseCard()
-const emits = defineEmits(['add-marker'])
+const emits = defineEmits(['update-marker' , 'update-flipped'])
 const props = defineProps({
   markers: Object
 })
@@ -46,6 +47,7 @@ onMounted(() => {
       });
       //地圖按鈕在初始化完才顯示
       refbtnDraw.value.style.display = 'block'
+      refbtnConfig.value.style.display = 'block'
       // 初始化 Canvas  
       const canvasElement = canvas.value;
       context = canvasElement.getContext('2d');
@@ -173,6 +175,13 @@ onMounted(() => {
     context.clearRect(0, 0, canvasElement.width, canvasElement.height);
   } 
 
+  //地圖設定頁面
+  function showConfig(){
+    refbtnDraw.value.style.display='none';
+    refbtnConfig.value.style.display='none';
+    emits('update-flipped')
+  }
+
   //Draw模式切換
   function toggleDrawingMode(event){
     event.stopPropagation();
@@ -284,7 +293,7 @@ onMounted(() => {
     }
 
     const data = await response.json();
-    emits('add-marker',data)
+    emits('update-marker',data)
 
   }
 
@@ -306,6 +315,9 @@ onMounted(() => {
   <div>
     <button class="btn btn-outline-danger btnDraw" ref="refbtnDraw" @click="toggleDrawingMode">
       {{ isDrawingMode ? '關閉繪圖模式' : '啟動繪圖模式' }}
+    </button>
+    <button class="btn btn-outline-danger btnConfig" ref="refbtnConfig" @click="showConfig">
+      {{'設定'}}
     </button>
     <div ref="map" class="map-container" v-once></div>
     <canvas ref="canvas" class="drawing-canvas"></canvas>
@@ -338,6 +350,13 @@ onMounted(() => {
   position: absolute;
   top: 10px;
   left: 60%;
+  z-index: 2;
+}
+.btnConfig{
+  display: none;
+  position: absolute;
+  top: 10px;
+  left: 45%;
   z-index: 2;
 }
 .btn-purple {
