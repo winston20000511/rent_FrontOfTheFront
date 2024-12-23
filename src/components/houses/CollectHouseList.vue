@@ -1,5 +1,8 @@
 <template>
   <div class="collect-list-container">
+    <!-- 重要：將 ConfirmDialog 放在最外層 -->
+    <ConfirmDialog />
+
     <!-- 標題 -->
     <h2 class="title">我的收藏列表</h2>
 
@@ -14,15 +17,30 @@
     </div>
 
     <!-- 房屋列表 -->
-    <DataTable :value="filteredHouses" responsiveLayout="scroll" :paginator="true" :rows="5"
-      class="custom-table teal-theme" :filters="filters" filterDisplay="row" :sortField="sortField"
-      :sortOrder="sortOrder" @sort="onSort">
+    <DataTable
+      :value="filteredHouses"
+      responsiveLayout="scroll"
+      :paginator="true"
+      :rows="5"
+      class="custom-table teal-theme"
+      :filters="filters"
+      filterDisplay="row"
+      :sortField="sortField"
+      :sortOrder="sortOrder"
+      @sort="onSort"
+    >
       <!-- 房屋圖片 -->
       <Column header="圖片" style="width: 150px">
         <template #body="slotProps">
-          <img v-if="slotProps.data.images && slotProps.data.images.length > 0" :src="slotProps.data.images[0]"
-            alt="House Image" class="image-preview" width="100" height="70" />
-          <span v-else>無圖片</span>
+          <div class="image-container">
+            <img
+              v-if="slotProps.data.images && slotProps.data.images.length > 0"
+              :src="slotProps.data.images[0]"
+              alt="House Image"
+              class="image-preview"
+            />
+            <span v-else>無圖片</span>
+          </div>
         </template>
       </Column>
 
@@ -42,10 +60,18 @@
       <!-- 操作 -->
       <Column header="操作" style="width: 250px">
         <template #body="slotProps">
-          <Button label="查看" icon="pi pi-eye" class="teal-theme-button"
-            @click="openHouseView(slotProps.data.houseId)" />
-          <Button label="刪除" icon="pi pi-trash" class="teal-theme-button"
-            @click="deleteHouse(slotProps.data.houseId)" />
+          <Button
+            label="查看"
+            icon="pi pi-eye"
+            class="teal-theme-button"
+            @click="openHouseView(slotProps.data.houseId)"
+          />
+          <Button
+            label="刪除"
+            icon="pi pi-trash"
+            class="teal-theme-button"
+            @click="confirmDelete(slotProps.data.houseId)"
+          />
         </template>
       </Column>
     </DataTable>
@@ -63,6 +89,7 @@ import Button from "primevue/button";
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
 import Dialog from "primevue/dialog";
+import ConfirmDialog from "primevue/confirmdialog";
 import HouseView from "@/View/HouseView.vue";
 
 export default {
@@ -73,6 +100,7 @@ export default {
     DataTable,
     Column,
     Dialog,
+    ConfirmDialog,
     HouseView,
   },
   data() {
@@ -101,9 +129,11 @@ export default {
     getAuthHeaders() {
       return { Authorization: `${localStorage.getItem("jwt")}` };
     },
+
     // 1) 載入收藏房屋
     async loadHouses() {
       try {
+        // 向後端請求收藏房屋的 houseId 列表
         const response = await fetch(`${this.baseUrl}/collect`, {
           headers: this.getAuthHeaders(),
         });
@@ -113,12 +143,14 @@ export default {
           throw new Error("無效的房屋列表數據");
         }
 
+        // 逐一取得房屋詳細資料及圖片
         const housePromises = houseList.map(async (house) => {
-          const houseId = typeof house === "object" ? house.houseId : house; // 確保獲取有效的 houseId
+          const houseId = typeof house === "object" ? house.houseId : house;
           if (!houseId || typeof houseId !== "number") {
             throw new Error(`無效的 houseId: ${JSON.stringify(house)}`);
           }
 
+          // 取得房屋詳細資料
           const detailsResponse = await fetch(
             `${this.baseUrl}/details/${houseId}`,
             {
@@ -127,6 +159,7 @@ export default {
           );
           const details = await detailsResponse.json();
 
+          // 取得房屋圖片
           const photosResponse = await fetch(
             `${this.baseUrl}/getPhotos/${houseId}`,
             {
@@ -137,18 +170,17 @@ export default {
 
           return {
             ...details,
-            images: images.map((img) => `data:image/jpeg;base64,${img}`),
+            images: images.map((img) => `data:image/jpeg;base64,${img.base64}`),
           };
         });
 
         this.houses = await Promise.all(housePromises);
       } catch (error) {
-        console.error("加載房屋列表失敗:", error);
+        console.error("加載收藏房屋失敗:", error);
       }
-    }
-    ,
+    },
 
-    // 2) 查看
+    // 2) 查看房屋資訊
     openHouseView(houseId) {
       this.selectedHouseId = houseId;
       this.showHouseView = true;
@@ -157,22 +189,35 @@ export default {
       this.showHouseView = false;
     },
 
-    // 3) 刪除收藏 (DELETE /collect/remove/{houseId}?houseId=xxx)
+    // 3) 刪除收藏 (DELETE /collect/remove/{houseId})
     async deleteHouse(houseId) {
       try {
-        // 發送刪除收藏請求
-        await fetch(
-          `${this.baseUrl}/collect/remove/${houseId}`,
-          {
-            method: "DELETE",
-            headers: this.getAuthHeaders(),
-          }
-        );
-        // 前端刪除
+        await fetch(`${this.baseUrl}/collect/remove/${houseId}`, {
+          method: "DELETE",
+          headers: this.getAuthHeaders(),
+        });
+        // 前端移除
         this.houses = this.houses.filter((h) => h.houseId !== houseId);
       } catch (error) {
-        console.error("刪除房屋失敗:", error);
+        console.error("刪除收藏失敗:", error);
       }
+    },
+
+    // 按下「刪除」按鈕時顯示 ConfirmDialog
+    confirmDelete(houseId) {
+      confirmDialog({
+        message: "您確定要移除這個收藏嗎？",
+        header: "確認移除收藏",
+        icon: "pi pi-exclamation-triangle",
+        acceptLabel: "是",
+        rejectLabel: "否",
+        accept: () => {
+          this.deleteHouse(houseId);
+        },
+        reject: () => {
+          // 使用者取消，不做任何事
+        },
+      });
     },
 
     // 4) 排序事件
@@ -286,10 +331,18 @@ export default {
 }
 
 /* 圖片預覽樣式 */
+.image-container {
+  width: 100px;
+  height: 100px;
+  overflow: hidden;
+}
+
 .image-preview {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   border-radius: 4px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-  object-fit: cover;
 }
 
 /* 對話框樣式 */
