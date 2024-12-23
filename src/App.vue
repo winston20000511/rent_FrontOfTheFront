@@ -10,6 +10,7 @@ import LoginPage from './components/User/LoginPage.vue';
 import CollectHouseList from './components/houses/CollectHouseList.vue';
 import HouseCreate from './components/houses/HouseCreate.vue';
 import HouseUpdate from './components/houses/HouseUpdate.vue';
+import { useHouseCard } from './stores/CardHouseStore';
 
 const showChatPopup = ref(false);
 const toggleChatPopup = () => {

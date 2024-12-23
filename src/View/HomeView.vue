@@ -5,6 +5,7 @@ import HomeFilter from '@/components/Home/HomeFilter.vue';
 import HomeMap from '@/components/Home/HomeMap.vue';
 import { useHouseCard } from '@/stores/CardHouseStore';
 
+
 const store = useHouseCard();
 const props = defineProps({
   markers: Object
