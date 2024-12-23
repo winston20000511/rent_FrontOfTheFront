@@ -5,11 +5,7 @@
         <!-- 新增會員資料區 -->
         <div class="member-info card mb-4 shadow">
           <div class="card-body d-flex align-items-center">
-            <img
-              :src="memberPicture"
-              alt="會員大頭貼"
-              class="member-avatar rounded-circle"
-            />
+            <img :src="memberPicture" alt="會員大頭貼" class="member-avatar rounded-circle" />
             <div class="ml-3">
               <h5 class="mb-0">你好，{{ memberName }}！</h5>
               <p class="text-muted mb-0">歡迎來到會員中心</p>
@@ -27,42 +23,26 @@
                 <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
                   <!-- 使用 router-link 進行路由跳轉，並根據路由來設置 activeTab -->
                   <li class="nav-item" role="presentation">
-                    <router-link
-                      to="/member-center/edit-profile"
-                      class="nav-link"
-                      :class="{ active: activeTab === 'profile' }"
-                      role="tab"
-                    >
+                    <router-link to="/member-center/edit-profile" class="nav-link"
+                      :class="{ active: activeTab === 'profile' }" role="tab">
                       修改會員資料
                     </router-link>
                   </li>
                   <li class="nav-item" role="presentation">
-                    <router-link
-                      to="/member-center/bookmarked"
-                      class="nav-link"
-                      :class="{ active: activeTab === 'bookmarked' }"
-                      role="tab"
-                    >
+                    <router-link to="/member-center/bookmarked" class="nav-link"
+                      :class="{ active: activeTab === 'bookmarked' }" role="tab">
                       房屋收藏
                     </router-link>
                   </li>
                   <li class="nav-item" role="presentation">
-                    <router-link
-                      to="/member-center/reservation"
-                      class="nav-link"
-                      :class="{ active: activeTab === 'reservation' }"
-                      role="tab"
-                    >
+                    <router-link to="/memberCenter/booking-guest" class="nav-link"
+                      :class="{ active: activeTab === 'booking' }" role="tab">
                       預約介面總覽
                     </router-link>
                   </li>
                   <li class="nav-item" role="presentation">
-                    <router-link
-                      to="/member-center/ads"
-                      class="nav-link"
-                      :class="{ active: activeTab === 'ads' }"
-                      role="tab"
-                    >
+                    <router-link to="/member-center/ads" class="nav-link" :class="{ active: activeTab === 'ads' }"
+                      role="tab">
                       我的廣告
                     </router-link>
                   </li>
@@ -100,8 +80,8 @@ export default {
         this.activeTab = 'profile';
       } else if (to.path === '/member-center/bookmarked') {
         this.activeTab = 'bookmarked';
-      } else if (to.path === '/member-center/reservation') {
-        this.activeTab = 'reservation';
+      } else if (to.path === '/memberCenter/booking-guest') {
+        this.activeTab = 'booking';
       } else if (to.path === '/member-center/ads') {
         this.activeTab = 'ads';
       }
@@ -113,8 +93,8 @@ export default {
       this.activeTab = 'profile';
     } else if (this.$route.path === '/member-center/bookmarked') {
       this.activeTab = 'bookmarked';
-    } else if (this.$route.path === '/member-center/reservation') {
-      this.activeTab = 'reservation';
+    } else if (this.$route.path === '/memberCenter/booking-guest') {
+      this.activeTab = 'booking';
     } else if (this.$route.path === '/member-center/ads') {
       this.activeTab = 'ads';
     }

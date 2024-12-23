@@ -28,7 +28,7 @@ const toggleLoginPage = () => {
 
     <!-- 主內容 -->
     <main class="app-main">
-      <RouterView />
+      <RouterView :markers="markers"></RouterView>
     </main>
 
     <!-- 聊天彈窗和按鈕 -->
@@ -60,7 +60,8 @@ const toggleLoginPage = () => {
 }
 
 .app-main {
-  flex: 1; /* 填滿剩餘空間 */
+  flex: 1;
+  /* 填滿剩餘空間 */
   display: flex;
   flex-direction: column;
 }

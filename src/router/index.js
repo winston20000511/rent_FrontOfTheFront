@@ -11,12 +11,17 @@ import AdtypeView from "@/View/AdtypeView.vue";
 import NoAdHouseList from "@/components/Ads/NoAdHouseList.vue";
 import OrderCompleteView from "@/View/OrderCompleteView.vue";
 import EditProfile from "@/components/User/EditProfile.vue";
+import MyAdvertisements from "@/components/Ads/MyAdvertisements.vue";
+import BookingListByGuest from "@/components/Booking/BookingListByGuest.vue";
+import BookingListByHost from "@/components/Booking/BookingListByHost.vue";
+import CollectHouseList from "@/components/houses/CollectHouseList.vue";
 
 const routes = [
   {
     path: "/", // 主框架頁面
     name: "home",
     component: HomeView, // 主框架組件
+    props: (route) => ({ markers: route.params.markers || {} }),
   },
   {
     path: "/forgot-password", // 忘記密碼頁面路徑
@@ -44,6 +49,11 @@ const routes = [
         path: "edit-profile", // 這是子路由，會在 MemberCenter 中顯示 EditProfile
         name: "EditProfile",
         component: EditProfile,
+      },
+      {
+        path: "/booking-guest", // 編輯用戶頁面路徑
+        name: "guest",
+        component: BookingListByGuest,
       },
       // 你可以在這裡添加更多子路由，根據需要加載其他頁面
     ],
@@ -85,9 +95,9 @@ const routes = [
     component: OrderConfirmView,
   },
   {
-    path: "/ads", // 開發用，之後刪掉
-    name: "ads",
-    component: MyAds,
+    path: "/order-complete",
+    name: "orderComplete",
+    component: OrderCompleteView,
   },
   {
     path: "/booking/host", // 開發用，不一定刪掉
@@ -100,9 +110,9 @@ const routes = [
     component: BookingListByGuest,
   },
   {
-    path: "/order-complete",
-    name: "orderComplete",
-    component: OrderCompleteView,
+    path: "/test",
+    name: "test",
+    component: MyAdvertisements,
   },
 ];
 
