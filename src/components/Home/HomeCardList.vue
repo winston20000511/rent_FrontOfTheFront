@@ -1,7 +1,7 @@
 <script setup>
 import { ref, watch } from "vue";
-import Dialog from "primevue/dialog";         // 引入 PrimeVue 的 Dialog
-import HouseView from "@/View/HouseView.vue"; // 你的 HouseView 元件
+import Dialog from "primevue/dialog";
+import HouseView from "@/View/HouseView.vue";
 
 // 接收 props
 const props = defineProps({
@@ -11,31 +11,24 @@ const props = defineProps({
   },
 });
 
-// 控制彈窗顯示/隱藏
+// 狀態
 const showView = ref(false);
-// 儲存當前選擇的 houseId
 const selectedHouseId = ref(null);
 
-// 監聽 markers（可選）
+// 監聽 markers
 watch(
   () => props.markers,
-  (newMarkers) => {
-    console.log("Markers updated:", newMarkers);
+  (newVal) => {
+    console.log("Markers updated:", newVal);
   }
 );
 
-/**
- * 打開房屋詳細彈窗
- * @param houseId - 從卡片取得的 ID
- */
 function openHouseView(houseId) {
-  console.log("Opening HouseView for houseId:", houseId);
-  // 由於 HouseView 裡定義 houseId = Number，需要轉型為 Number
-  selectedHouseId.value = Number(houseId);
+  console.log("Open HouseView for houseId:", houseId);
+  selectedHouseId.value = Number(houseId); // HouseView 需要 Number
   showView.value = true;
 }
 
-/** 關閉房屋詳細彈窗 */
 function closeHouseView() {
   showView.value = false;
 }
@@ -49,12 +42,9 @@ function closeHouseView() {
         :key="list.houseid"
         class="col-12 col-md-6 py-4"
       >
-        <div
-          class="card card-shadow clickable-card"
-          style="width: 100%"
+        <div class="card card-shadow clickable-card" style="width: 100%"
           @click="openHouseView(list.houseid)"
         >
-          <!-- 若 list.image 有資料則用，否則預設 /src/assets/img/view1.jpg -->
           <img
             :src="list.image || '/src/assets/img/view1.jpg'"
             class="card-img-top"
@@ -69,20 +59,19 @@ function closeHouseView() {
     </div>
   </div>
 
-  <!-- 使用 PrimeVue 的 Dialog 來顯示 HouseView -->
+  <!-- Dialog 彈窗，appendTo="body" & breakpoints -->
   <Dialog
     v-model:visible="showView"
-    modal                             
-    appendTo="body"                  
-    :closable="true"                
-    header="房屋資訊"               
-    :style="{ width: '50vw' }"        
+    modal
+    appendTo="body"
+    :style="{ width: '80vw', maxWidth: '900px', height: '80vh', maxHeight: '90vh' }"
+    :breakpoints="{ '960px': '75vw', '640px': '90vw' }"
+    header="房屋資訊"
+    :closable="true"
+    @hide="showView = false"
   >
-    <!-- 在 Dialog 裡顯示 HouseView -->
-    <HouseView
-      :houseId="selectedHouseId"
-      @close="closeHouseView"        
-    />
+    <!-- 將 HouseView 放入 Dialog -->
+    <HouseView :houseId="selectedHouseId" @close="closeHouseView" />
   </Dialog>
 </template>
 
@@ -92,15 +81,15 @@ function closeHouseView() {
   padding: 0;
 }
 .custom-shadow {
-  margin: 0px 0px 0px 5px;
+  margin: 0 0 0 5px;
   box-shadow: -5px 0px 5px -3px rgba(0, 0, 0, 0.4);
 }
 .card-shadow {
   box-shadow: -5px 5px 5px -3px rgba(0, 0, 0, 0.4);
 }
-.card-body,
 .clickable-card,
-.card-img-top {
+.card-img-top,
+.card-body {
   cursor: pointer;
 }
 </style>

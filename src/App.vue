@@ -38,6 +38,7 @@ const addMarker = (locations) => {
 
 <template>
   <div class="app-container">
+  
     <!-- 全局導航欄 -->
     <header class="app-header">
       <HomeNavbar @signInClicked="toggleLoginPage" @add-marker="addMarker"/>
