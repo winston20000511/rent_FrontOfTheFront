@@ -1,7 +1,7 @@
 <template>
   <div class="owner-info-container">
     <div class="owner-info">
-      <img :src="'data:image/jpeg;base64,' + ownerInfo.picture" alt="屋主照片" class="owner-avatar" />
+      <img :src="ownerInfo.picture" alt="屋主照片" class="owner-avatar" />
       <div class="owner-details">
         <p class="owner-name">{{ ownerInfo.name }}</p>
         <p class="owner-phone">{{ ownerInfo.phone }}</p>
@@ -9,9 +9,15 @@
     </div>
 
     <div class="appointment-time">
-      <button @click="loadBookingView" class="send-button btn btn-info">預約看房</button>
-      <BookingView v-if="showBookingView" :isVisible="showBookingView" @closeView="closeBookingView"
-        :houseId="houseId" />
+      <button @click="loadBookingView" class="send-button btn btn-info">
+        預約看房
+      </button>
+      <BookingView
+        v-if="showBookingView"
+        :isVisible="showBookingView"
+        @closeView="closeBookingView"
+        :houseId="houseId"
+      />
     </div>
 
     <div class="message-section">
@@ -21,7 +27,7 @@
 </template>
 
 <script>
-import BookingView from '@/View/BookingView.vue';
+import BookingView from "@/View/BookingView.vue";
 
 export default {
   components: {
@@ -38,7 +44,7 @@ export default {
       ownerInfo: {
         name: "",
         phone: "",
-        picture: "", // Base64 編碼的图片
+        picture: "", // Base64 编码的图片
       },
       appointmentTime: "",
       showBookingView: false,
@@ -50,48 +56,51 @@ export default {
         `发送信息给 ${this.ownerInfo.name}，预约时间：${this.appointmentTime}`
       );
     },
-    // 使用 fetch 獲取屋主信息
+    // 使用 fetch 获取屋主信息
     async fetchOwnerInfo() {
       try {
-        const token = localStorage.getItem("jwt"); // 假設 token 存在 localStorage 中
+        const token = localStorage.getItem("jwt"); // 假设 token 存在 localStorage 中
         if (!token) {
           throw new Error("未找到 token");
         }
         const response = await fetch(
-          `http://localhost:8080/api/houses/owner/${this.houseId}`,
+          `http://localhost:8080/api/houses/ownerInfo/${this.houseId}`,
           {
             method: "GET",
-            headers: { Authorization: ` ${token}` },
+            headers: { Authorization: `${token}` },
           }
         );
-        if (!response.ok) {
-          throw new Error("網路請求失敗");
-        }
+        if (!response.ok) throw new Error("API 请求失败");
+
         const data = await response.json();
-        this.ownerInfo = data; // 将返回的数据赋值给 ownerInfo
+        this.ownerInfo.name = data.name;
+        this.ownerInfo.phone = data.phone;
+
+        // 将 byte[] 转换为 Base64 字符串
+        if (data.picture) {
+          const base64String = btoa(
+            new Uint8Array(data.picture).reduce(
+              (data, byte) => data + String.fromCharCode(byte),
+              ""
+            )
+          );
+          this.ownerInfo.picture = `data:image/jpeg;base64,${base64String}`;
+        } else {
+          this.ownerInfo.picture = "/path/to/default-avatar.jpg";
+        }
       } catch (error) {
-        console.error("獲取屋主信息失敗:", error);
+        console.error("获取屋主信息失败:", error);
       }
-    }, loadBookingView() {
+    },
+    loadBookingView() {
       this.showBookingView = true;
     },
     closeBookingView() {
       this.showBookingView = false;
     },
   },
-  data() {
-    return {
-      ownerInfo: {
-        name: "",
-        phone: "",
-        picture: "", // Base64 編碼的圖片
-      },
-      appointmentTime: "",
-      showBookingView: false,
-    };
-  },
   created() {
-    this.fetchOwnerInfo(); // 獲取屋主信息
+    this.fetchOwnerInfo(); // 获取屋主信息
   },
 };
 </script>
