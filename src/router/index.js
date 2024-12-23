@@ -11,6 +11,7 @@ import AdtypeView from '@/View/AdtypeView.vue';
 import NoAdHouseList from '@/components/Ads/NoAdHouseList.vue';
 import OrderCompleteView from '@/View/OrderCompleteView.vue';
 import EditProfile from '@/components/User/EditProfile.vue';
+import MyAdvertisements from '@/components/Ads/MyAdvertisements.vue';
 
 const routes = [
   {
@@ -45,6 +46,16 @@ const routes = [
         component: EditProfile
       },
       // 你可以在這裡添加更多子路由，根據需要加載其他頁面
+      {
+        path: "my-advertisements",
+        name: "MyAdvertisements",
+        component: MyAdvertisements
+      },
+      {
+        path: "my-orders",
+        name: "MyOrders",
+        component: MyOrders
+      },
     ],
   },
   {
@@ -68,11 +79,6 @@ const routes = [
     component:HouseView
   },
   // 其他路由可以在這裡添加
-  {
-    path:"/orders", // 開發用，之後會刪掉
-    name:"orders",
-    component: MyOrders,
-  },
   {
     path:"/adtype",
     name:"adtypes",

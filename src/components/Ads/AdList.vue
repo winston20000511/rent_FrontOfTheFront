@@ -2,7 +2,7 @@
 import { computed } from "vue";
 import { useCart } from "@/stores/cartStore";
 
-let token = localStorage.getItem('jwt');
+let token = localStorage.getItem("jwt");
 
 // 插入購物車資料表
 const cartStore = useCart();
@@ -11,7 +11,7 @@ cartStore.loadCart();
 function addAdToCart(adId) {
   cartStore.addToCart(adId);
   cartStore.loadCart();
-};
+}
 
 const props = defineProps({
   ads: {
@@ -29,10 +29,9 @@ const emit = defineEmits([
 
 // 處理過的廣告資料
 const processedAds = computed(() => {
-
-  if(!props.ads){
+  if (!props.ads) {
     return [];
-  };
+  }
 
   return props.ads.map((ad) => {
     const remainingDays = ad.remainingDays;
@@ -97,9 +96,12 @@ const deleteAd = async (adId) => {
   if (userConfirmed) {
     try {
       const url = "http://localhost:8080/api/advertisements";
-      const response = await fetch(url,{
+      const response = await fetch(url, {
         method: "DELETE",
-        headers: { "Content-Type": "application/json", authorization: `${token}` },
+        headers: {
+          "Content-Type": "application/json",
+          authorization: `${token}`,
+        },
         body: JSON.stringify(adId),
       });
       const sucess = await response.json();
@@ -144,65 +146,118 @@ const checkAd = async (adId) => {
     const url = `http://localhost:8080/api/advertisements/adId`;
     const response = await fetch(url, {
       method: "POST",
-      headers: { "Content-Type": "application/json", authorization: `${token}` },
-      body: adId
+      headers: {
+        "Content-Type": "application/json",
+        authorization: `${token}`,
+      },
+      body: adId,
     });
     const data = await response.json();
     emit("detail", data);
-
   } catch (error) {
     console.error("系統錯誤: ", error);
   }
 };
-
 </script>
 
 <template>
   <div>
-    <div class="px-4 py-2 text-sm font-bold text-yellow-600 bg-yellow-100 rounded m-3">
-      <div>．VIP申請僅保留三天。如逾期未付款，視為取消申請。</div>
-      <div>．加入訂單後，可前往查看選購清單，並進行付費。</div>
+    <div
+      class="px-4 py-2 text-sm font-bold text-yellow-600 bg-yellow-100 rounded m-3"
+    >
+      <div>．加入選購清單後，可前往查看並進行付費。</div>
+      <div>
+        ．選購清單之內容，於加入第一筆項目起算，保留三天。如逾期未結帳，將自動清除所有紀錄。
+      </div>
     </div>
 
     <!-- 資料表格 -->
-    <table class="table-auto w-full border-collapse border border-gray-300">
-      <thead class="bg-gray-100">
-        <tr>
-          <th class="px-4 py-2 text-left text-sm font-medium text-gray-600 text-center">房屋標題</th>
-          <th class="px-4 py-2 text-center text-sm font-medium text-gray-600">發布時間</th>
-          <th class="px-4 py-2 text-center text-sm font-medium text-gray-600">廣告狀態</th>
-          <th class="px-4 py-2 text-center text-sm font-medium text-gray-600">付款狀態</th>
-          <th class="px-4 py-2 text-center text-sm font-medium text-gray-600">剩餘時間</th>
-          <th class="px-4 py-2 text-center text-sm font-medium text-gray-600"></th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="ad in processedAds" :key="ad.adId" class="border-b hover:bg-gray-50">
-          <td class="px-4 py-3 text-sm text-gray-700 text-center">{{ ad.houseTitle }}</td>
-          <td class="px-4 py-3 text-sm text-center text-gray-700">{{ ad.paidDate }}</td>
-          <td class="px-4 py-3 text-sm text-center text-gray-700"><span :class="ad.statusClass">{{ ad.statusText }}</span></td>
-          <td class="px-4 py-3 text-sm text-center text-gray-700">{{ ad.isPaid }}</td>
-          <td class="px-4 py-3 text-sm text-center text-gray-700">{{ ad.remainingDaysText }}</td>
-          <td class="px-4 py-3 text-sm text-center text-gray-700">
-            <button class="px-3 py-1 text-sm mr-1 text-blue-600 bg-blue-100 rounded hover:bg-blue-200" @click="checkAd(ad.adId)">
-              <i class="fa-solid fa-pen-to-square"></i>
-            </button>
-            <button class="px-3 py-1 text-sm mr-1" :class="ad.cartButtonClass" :disabled="ad.remainingDays < 0 || ad.isPaid === '已付款'" @click="addAdToCart(ad.adId)">
-              <i class="fa-solid fa-cart-plus"></i>
-            </button>
-            <button class="px-3 py-1 text-sm" :class="ad.deleteButtonClass" @click="deleteAd(ad.adId)" :disabled="ad.isPaid === '已付款'">
-              <i class="fa-solid fa-trash-can"></i>
-            </button>
-          </td>
-        </tr>
-        <tr v-if="processedAds.length === 0">
-          <td colspan="6" class="px-4 py-3 text-center text-gray-500">目前沒有商品</td>
-        </tr>
-      </tbody>
-    </table>
+    <div class="table-container overflow-y-auto max-h-96">
+      <table class="table-auto w-full border-collapse border border-gray-300">
+        <thead class="bg-gray-100">
+          <tr>
+            <th
+              class="px-4 py-2 text-left text-sm font-medium text-gray-600 text-center"
+            >
+              房屋標題
+            </th>
+            <th class="px-4 py-2 text-center text-sm font-medium text-gray-600">
+              發布時間
+            </th>
+            <th class="px-4 py-2 text-center text-sm font-medium text-gray-600">
+              廣告狀態
+            </th>
+            <th class="px-4 py-2 text-center text-sm font-medium text-gray-600">
+              付款狀態
+            </th>
+            <th class="px-4 py-2 text-center text-sm font-medium text-gray-600">
+              剩餘時間
+            </th>
+            <th
+              class="px-4 py-2 text-center text-sm font-medium text-gray-600"
+            ></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="ad in processedAds"
+            :key="ad.adId"
+            class="border-b hover:bg-gray-50"
+          >
+            <td class="px-4 py-3 text-sm text-gray-700 text-center">
+              {{ ad.houseTitle }}
+            </td>
+            <td class="px-4 py-3 text-sm text-center text-gray-700">
+              {{ ad.paidDate }}
+            </td>
+            <td class="px-4 py-3 text-sm text-center text-gray-700">
+              <span :class="ad.statusClass">{{ ad.statusText }}</span>
+            </td>
+            <td class="px-4 py-3 text-sm text-center text-gray-700">
+              {{ ad.isPaid }}
+            </td>
+            <td class="px-4 py-3 text-sm text-center text-gray-700">
+              {{ ad.remainingDaysText }}
+            </td>
+            <td class="px-4 py-3 text-sm text-center text-gray-700">
+              <button
+                class="px-3 py-1 text-sm mr-1 text-blue-600 bg-blue-100 rounded hover:bg-blue-200"
+                @click="checkAd(ad.adId)"
+              >
+                <i class="fa-solid fa-pen-to-square"></i>
+              </button>
+              <button
+                class="px-3 py-1 text-sm mr-1"
+                :class="ad.cartButtonClass"
+                :disabled="ad.remainingDays < 0 || ad.isPaid === '已付款'"
+                @click="addAdToCart(ad.adId)"
+              >
+                <i class="fa-solid fa-cart-plus"></i>
+              </button>
+              <button
+                class="px-3 py-1 text-sm"
+                :class="ad.deleteButtonClass"
+                @click="deleteAd(ad.adId)"
+                :disabled="ad.isPaid === '已付款'"
+              >
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            </td>
+          </tr>
+          <tr v-if="processedAds.length === 0">
+            <td colspan="6" class="px-4 py-3 text-center text-gray-500">
+              目前沒有商品
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 
 <style scoped>
-
+.table-container {
+  max-height: 24rem;
+  overflow-y: auto;
+}
 </style>

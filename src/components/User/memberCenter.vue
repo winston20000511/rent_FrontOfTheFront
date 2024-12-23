@@ -58,12 +58,22 @@
                   </li>
                   <li class="nav-item" role="presentation">
                     <router-link
-                      to="/member-center/ads"
+                      to="{ name: 'MyAdvertisements' }"
                       class="nav-link"
-                      :class="{ active: activeTab === 'ads' }"
+                      :class="{ active: activeTab === 'my-advertisements' }"
                       role="tab"
                     >
-                      我的廣告
+                      我的VIP服務
+                    </router-link>
+                  </li>
+                  <li class="nav-item" role="presentation">
+                    <router-link
+                      to="{ name: 'MyOrders' }"
+                      class="nav-link"
+                      :class="{ active: activeTab === 'my-orders' }"
+                      role="tab"
+                    >
+                      我的VIP服務訂單
                     </router-link>
                   </li>
                 </ul>
@@ -130,7 +140,7 @@ export default {
     async fetchMemberData() {
       try {
         // 從後端 API 獲取會員資料
-        const response = await api.get("http://localhost:8080/api/user/userCenter"); // 待確認！後端 API 的路徑
+        const response = await api.post("http://localhost:8080/api/user/userCenter"); // 待確認！後端 API 的路徑
         const { name, picture } = response.data;
 
         // 設定會員資料

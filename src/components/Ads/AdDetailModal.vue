@@ -179,15 +179,17 @@ const closeDetail = () => {
 <template>
   <div
     class="fixed inset-0 z-20 bg-gray-500/75 flex items-center justify-center"
+    @click="closeDetail"
   >
-    <div class="bg-white rounded-lg shadow-lg w-4/5 h-4/5 p-8">
+    <div class="bg-white rounded-lg shadow-lg h-[80%] p-8" style="width:700px" @click.stop>
       <div class="text-right">
         <button
           class="m-1 px-3 py-1.5 rounded"
           @click="editDetail"
           :disabled="props.detail.isPaid === '已付款'"
           :class="EditButtonClass"
-          > 編輯
+        >
+          編輯
         </button>
         <button
           class="m-1 px-3 py-1.5 bg-red-500 text-white rounded hover:bg-red-600"
@@ -230,18 +232,14 @@ const closeDetail = () => {
                     </p>
 
                     <button
-                      v-if="
-                        editableDetails.isEditing && item.label === '廣告方案'
-                      "
+                      v-if="editableDetails.isEditing && item.label === '廣告方案'"
                       @click="saveAdPlan"
                       class="px-2 py-1 bg-green-500 text-white rounded ml-2"
                     >
                       儲存
                     </button>
                     <button
-                      v-if="
-                        editableDetails.isEditing && item.label === '廣告方案'
-                      "
+                      v-if="editableDetails.isEditing && item.label === '廣告方案'"
                       @click="cancelEdit"
                       class="px-2 py-1 bg-gray-500 text-white rounded ml-2"
                     >
