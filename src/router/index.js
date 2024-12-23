@@ -1,118 +1,85 @@
-import { createRouter, createWebHistory } from "vue-router";
-import HomeView from "@/View/HomeView.vue";
-import MemberCenter from "@/components/User/memberCenter.vue";
-import EditUserPage from "@/components/User/EditUserPage.vue";
-import ForgotPassword from "@/components/User/ForgotPassword.vue";
-import LoginForm from "@/components/User/LoginForm.vue";
-import HouseView from "@/View/HouseView.vue";
-import MyOrders from "@/components/Orders/MyOrders.vue";
-import OrderConfirmView from "@/View/OrderConfirmView.vue";
-import AdtypeView from "@/View/AdtypeView.vue";
-import NoAdHouseList from "@/components/Ads/NoAdHouseList.vue";
-import OrderCompleteView from "@/View/OrderCompleteView.vue";
-import EditProfile from "@/components/User/EditProfile.vue";
-import MyAdvertisements from "@/components/Ads/MyAdvertisements.vue";
-import BookingListByGuest from "@/components/Booking/BookingListByGuest.vue";
-import BookingListByHost from "@/components/Booking/BookingListByHost.vue";
-import CollectHouseList from "@/components/houses/CollectHouseList.vue";
+import { createRouter, createWebHistory } from 'vue-router';
+import HomeView from '@/View/HomeView.vue';
+import MemberCenter from '@/components/User/memberCenter.vue'; // 更新了相對路徑
+import EditUserPage from '@/components/User/EditUserPage.vue';
+import ForgotPassword from '@/components/User/ForgotPassword.vue';
+import LoginForm from '@/components/User/LoginForm.vue';
+import MyOrders from '@/components/Orders/MyOrders.vue';
+import OrderConfirmView from '@/View/OrderConfirmView.vue';
+import AdtypeView from '@/View/AdtypeView.vue';
+import OrderCompleteView from '@/View/OrderCompleteView.vue';
+import EditProfile from '@/components/User/EditProfile.vue';
+import Houselist from '@/components/houses/houselist.vue';
+import CollectHouseList from '@/components/houses/CollectHouseList.vue';
 
 const routes = [
   {
-    path: "/", // 主框架頁面
-    name: "home",
-    component: HomeView, // 主框架組件
-    props: (route) => ({ markers: route.params.markers || {} }),
+    path: '/', // 主框架頁面
+    name: 'home',
+    component: HomeView,
   },
   {
-    path: "/forgot-password", // 忘記密碼頁面路徑
-    name: "ForgotPassword",
+    path: '/forgot-password', // 忘記密碼頁面
+    name: 'ForgotPassword',
     component: ForgotPassword,
   },
   {
-    path: "/edit-user", // 編輯用戶頁面路徑
-    name: "EditUser",
+    path: '/edit-user', // 編輯用戶頁面
+    name: 'EditUser',
     component: EditUserPage,
   },
   {
-    path: "/member-center", // 會員中心頁面路徑
-    name: "MemberCenter",
-    component: MemberCenter, // 顯示 MemberCenter
+    path: '/member-center', // 會員中心
+    name: 'MemberCenter',
+    component: MemberCenter, // 對應你提供的路徑
+    redirect: '/member-center/my-houses', // 默認跳轉到我的房屋
     children: [
-      //我在 /member-center 路由下添加了一個 children 陣列，這樣當訪問 /member-center/edit-profile 時，會顯示 EditUserPage.vue。
-
       {
-        path: "edit-user", // 編輯用戶頁面路徑
-        name: "EditUser",
-        component: EditUserPage,
-      },
-      {
-        path: "edit-profile", // 這是子路由，會在 MemberCenter 中顯示 EditProfile
-        name: "EditProfile",
+        path: 'edit-profile', // 修改會員資料
+        name: 'EditProfile',
         component: EditProfile,
       },
       {
-        path: "/booking-guest", // 編輯用戶頁面路徑
-        name: "guest",
-        component: BookingListByGuest,
+        path: 'my-houses', // 我的房屋
+        name: 'MyHouses',
+        component: Houselist,
       },
-      // 你可以在這裡添加更多子路由，根據需要加載其他頁面
+      {
+        path: 'my-collections', // 我的收藏
+        name: 'MyCollections',
+        component: CollectHouseList,
+      },
+      {
+        path: 'edit-user', // 編輯用戶
+        name: 'EditUserChild',
+        component: EditUserPage,
+      },
     ],
   },
   {
-    path: "/login", // 登入頁面的路徑設定
-    name: "LoginForm",
+    path: '/login', // 登入頁面
+    name: 'LoginForm',
     component: LoginForm,
   },
   {
-    path: "/forgot-password", // 忘記密碼頁面的路徑設定
-    name: "ForgotPassword",
-    component: ForgotPassword, // 使用 ForgotPassword 組件
-  },
-  {
-    path: "/MemberCenter",
-    name: "MemberCenter",
-    component: MemberCenter,
-  },
-  {
-    path: "/HouseVue",
-    name: "HouseVue",
-    component: HouseView,
-  },
-  // 其他路由可以在這裡添加
-  {
-    path: "/orders", // 開發用，之後會刪掉
-    name: "orders",
+    path: '/orders', // 測試用
+    name: 'Orders',
     component: MyOrders,
   },
   {
-    path: "/adtype",
-    name: "adtypes",
+    path: '/adtype',
+    name: 'AdTypes',
     component: AdtypeView,
   },
   {
-    path: "/order-confirm",
-    name: "orderConfirm",
+    path: '/order-confirm',
+    name: 'OrderConfirm',
     component: OrderConfirmView,
   },
   {
-    path: "/order-complete",
-    name: "orderComplete",
+    path: '/order-complete',
+    name: 'OrderComplete',
     component: OrderCompleteView,
-  },
-  {
-    path: "/booking/host", // 開發用，不一定刪掉
-    name: "bookingbyhost",
-    component: BookingListByHost,
-  },
-  {
-    path: "/booking/guest", // 開發用，不一定刪掉
-    name: "bookingbyguest",
-    component: BookingListByGuest,
-  },
-  {
-    path: "/test",
-    name: "test",
-    component: MyAdvertisements,
   },
 ];
 

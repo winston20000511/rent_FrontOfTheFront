@@ -1,15 +1,10 @@
 <template>
   <div>
-    <!-- 加載狀態 -->
     <div v-if="loading" class="loading">加載中...</div>
-
-    <!-- 錯誤提示 -->
     <div v-if="error" class="error">
       {{ error.message }}
       <button @click="fetchHousePhotos" class="retry-button">重試</button>
     </div>
-
-    <!-- 照片輪播 -->
     <div v-if="!loading && !error && photos.length > 0">
       <Splide
         :options="splideOptions"
@@ -25,8 +20,6 @@
         </SplideSlide>
       </Splide>
     </div>
-
-    <!-- 沒有照片的提示 -->
     <div v-if="!loading && !error && photos.length === 0" class="no-photos">
       <img src="../../assets/no-image.png" alt="暫時無照片展示" />
     </div>
@@ -55,18 +48,17 @@ export default {
   },
   data() {
     return {
-      photos: [], // 照片列表
-      loading: true, // 是否加載中
-      error: null, // 錯誤信息
+      photos: [],
+      loading: true,
+      error: null,
       splideOptions: {
-        type: "loop", // 啟用循環播放
+        type: "loop",
         perPage: 1,
         focus: "center",
         gap: "1rem",
         padding: { left: "5rem", right: "5rem" },
         pagination: true,
-        arrowPath:
-          "M14 2L3 12L14 22",
+        arrowPath: "M14 2L3 12L14 22", // 客製箭頭路徑
       },
     };
   },
@@ -83,11 +75,9 @@ export default {
             Authorization: `${token}`,
           },
         });
-
         if (!response.ok) {
           throw new Error(`HTTP 錯誤！狀態碼：${response.status}`);
         }
-
         const responseBody = await response.text();
         if (responseBody) {
           this.photos = JSON.parse(responseBody) || [];
@@ -103,7 +93,7 @@ export default {
       }
     },
     addLoopArrows(splide) {
-      splide.on('arrow:mounted')
+      splide.on('arrow:mounted');
     },
   },
   watch: {
@@ -121,13 +111,11 @@ export default {
   font-size: 1.2rem;
   color: #555;
 }
-
 .error {
   text-align: center;
   color: red;
   font-size: 1.2rem;
 }
-
 .retry-button {
   background-color: #007bff;
   color: white;
@@ -137,22 +125,23 @@ export default {
   border-radius: 4px;
   margin-top: 10px;
 }
-
 .retry-button:hover {
   background-color: #0056b3;
 }
-
 .no-photos {
   text-align: center;
   color: #777;
   font-size: 1.2rem;
 }
 
+/* >>>> 使用 aspect-ratio 及 object-fit: cover */
 .main-photo {
   display: block;
   margin: 0 auto;
-  width: auto;
-  height: 400px; /* 調整圖片高度 */
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16/9;
+  object-fit: cover;
   border: 1px solid #ddd;
   border-radius: 8px;
 }
@@ -163,7 +152,7 @@ export default {
 }
 
 .splide__pagination {
-  bottom: -1.5rem; /* 調整原點位置 */
+  bottom: -1.5rem;
 }
 
 .splide__pagination__page {
@@ -174,6 +163,6 @@ export default {
 }
 
 .splide__pagination__page.is-active {
-  background-color: red; /* 活躍狀態設為紅色 */
+  background-color: red;
 }
 </style>

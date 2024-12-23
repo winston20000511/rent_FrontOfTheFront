@@ -312,9 +312,13 @@ export default {
       for (let [key, value] of formData.entries()) {
         console.log(key, value);
       }
-
+      const token = localStorage.getItem('jwt');
       fetch(import.meta.env.VITE_APIURL + '/houses/add', {
         method: 'POST',
+        headers: {
+              Authorization: token,
+              
+            },
         body: formData,
       })
         .then((response) => {
