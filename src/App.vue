@@ -10,6 +10,7 @@ import LoginPage from './components/User/LoginPage.vue';
 import CollectHouseList from './components/houses/CollectHouseList.vue';
 import HouseCreate from './components/houses/HouseCreate.vue';
 import HouseUpdate from './components/houses/HouseUpdate.vue';
+import { useHouseCard } from './stores/CardHouseStore';
 
 const showChatPopup = ref(false);
 const toggleChatPopup = () => {
@@ -20,21 +21,32 @@ const showLoginPage = ref(false); // 控制 LoginPage 的顯示
 const toggleLoginPage = () => {
   showLoginPage.value = !showLoginPage.value;
 };
+
+const store = useHouseCard();
+const markers = ref({});
+
+const addMarker = (locations) => {
+  markers.value = locations;
+  store.updateData(markers.value.searchList);
+  router.push({
+    name: 'Home',
+    params: { markers: markers.value }
+  });
+};
+
 </script>
 
 <template>
   <div class="app-container">
+  
     <!-- 全局導航欄 -->
     <header class="app-header">
-      <HomeNavbar @signInClicked="toggleLoginPage" />
+      <HomeNavbar @signInClicked="toggleLoginPage" @add-marker="addMarker"/>
     </header>
 
     <!-- 主內容 -->
     <main class="app-main">
-    <!-- <HouseCreate></HouseCreate>
-    <HouseUpdate></HouseUpdate> -->
-
-      <RouterView />
+      <RouterView :markers="markers"></RouterView>
     </main>
 
     <!-- 聊天彈窗和按鈕 -->
@@ -59,7 +71,7 @@ const toggleLoginPage = () => {
 
 .app-header {
   width: 100%;
-  height: 14vh;
+  height: 30vh;
   border-bottom: 1px solid lightgray;
   display: flex;
   justify-content: space-between;

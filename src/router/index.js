@@ -19,6 +19,7 @@ const routes = [
     path: '/', // 主框架頁面
     name: 'home',
     component: HomeView,
+    props: (route) => ({ markers: route.params.markers || {} }),
   },
   {
     path: '/forgot-password', // 忘記密碼頁面

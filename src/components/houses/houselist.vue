@@ -8,45 +8,26 @@
 
     <!-- 搜尋欄與新增房屋按鈕 -->
     <div class="action-bar">
-      <Button
-        label="新增房屋"
-        icon="pi pi-plus"
-        class="p-button-success action-button large-button"
-        @click="showCreateForm = true"
-      />
+      <Button label="新增房屋" icon="pi pi-plus" class="p-button-success action-button large-button"
+        @click="showCreateForm = true" />
       <div class="search-bar">
         <span class="p-input-icon-left">
           <i class="pi pi-search search-icon"></i>
-          <InputText
-            v-model="filters['global'].value"
-            placeholder="搜尋房屋..."
-            class="search-input"
-          />
+          <InputText v-model="filters['global'].value" placeholder="搜尋房屋..." class="search-input" />
         </span>
       </div>
     </div>
 
     <!-- 房屋列表 -->
-    <DataTable
-      :value="houses"
-      responsiveLayout="scroll"
-      :paginator="true"
-      :rows="5"
-      class="custom-table"
-      :filters="filters"
-      filterDisplay="row"
-      :sortField="sortField"
-      :sortOrder="sortOrder"
-    >
+    <DataTable :value="houses" responsiveLayout="scroll" :paginator="true" :rows="5" class="custom-table"
+      :filters="filters" filterDisplay="row" :sortField="sortField" :sortOrder="sortOrder">
       <!-- 房屋圖片 -->
       <Column header="圖片" style="width: 150px">
         <template #body="slotProps">
           <div class="image-container">
-            <img
-              v-if="slotProps.data.images && slotProps.data.images.length > 0"
-              :src="slotProps.data.images[0]"
-              alt="House Image"
-              class="image-preview"
+            <img v-if="slotProps.data.images && slotProps.data.images.length > 0" :src="slotProps.data.images[0]"
+            alt="House Image"
+            class="image-preview"
             />
             <span v-else>無圖片</span>
           </div>
@@ -54,20 +35,10 @@
       </Column>
 
       <!-- 房屋名稱 -->
-      <Column
-        field="title"
-        header="房屋名稱"
-        :sortable="true"
-        style="width: 200px"
-      />
+      <Column field="title" header="房屋名稱" :sortable="true" style="width: 200px" />
 
       <!-- 地址 -->
-      <Column
-        field="address"
-        header="地址"
-        :sortable="true"
-        style="width: 200px"
-      />
+      <Column field="address" header="地址" :sortable="true" style="width: 200px" />
 
       <!-- 價格 -->
       <Column field="price" header="價格" :sortable="true" style="width: 150px">
@@ -88,69 +59,39 @@
       <!-- 操作 -->
       <Column header="操作" style="width: 250px">
         <template #body="slotProps">
-          <Button
-            icon="pi pi-eye"
-            class="p-button-rounded p-button-text p-button-info action-button large-button"
+          <Button icon="pi pi-eye" class="p-button-rounded p-button-text p-button-info action-button large-button"
             @click="
               showHouseView = true;
-              selectedHouseId = slotProps.data.houseId;
-              console.log('Selected House ID:', selectedHouseId);
-            "
-          />
-          <Button
-            icon="pi pi-pencil"
-            class="p-button-rounded p-button-text p-button-warning action-button large-button"
+            selectedHouseId = slotProps.data.houseId;
+            console.log('Selected House ID:', selectedHouseId);
+            " />
+          <Button icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-warning action-button large-button"
             @click="
               showEditForm = true;
-              selectedHouseId = slotProps.data.houseId;
-            "
-          />
-          <Button
-            icon="pi pi-trash"
-            class="p-button-rounded p-button-text p-button-danger action-button large-button"
-            @click="confirmDelete(slotProps.data.houseId)"
-          />
+            selectedHouseId = slotProps.data.houseId;
+            " />
+          <Button icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger action-button large-button"
+            @click="confirmDelete(slotProps.data.houseId)" />
         </template>
       </Column>
     </DataTable>
 
     <!-- 編輯房屋表單彈窗 -->
-    <Dialog
-      v-model:visible="showEditForm"
-      :modal="true"
-      :dismissableMask="false"
-      header="編輯房屋資訊"
-      class="dialog-theme"
-    >
+    <Dialog v-model:visible="showEditForm" :modal="true" :dismissableMask="false" header="編輯房屋資訊" class="dialog-theme">
       <div class="dialog-container">
         <HouseUpdate :houseId="selectedHouseId" @close="showEditForm = false" />
       </div>
     </Dialog>
 
     <!-- 查看房屋表單彈窗 -->
-    <Dialog
-  v-model:visible="showHouseView"
-  :modal="true"
-  :dismissableMask="true"
-  header="查看房屋資訊"
-  class="dialog-theme"
->
-  <div class="dialog-container">
-    <HouseView
-      :houseId="selectedHouseId"
-      @close="showHouseView = false"
-    />
-  </div>
-</Dialog>
+    <Dialog v-model:visible="showHouseView" :modal="true" :dismissableMask="true" header="查看房屋資訊" class="dialog-theme">
+      <div class="dialog-container">
+        <HouseView :houseId="selectedHouseId" @close="showHouseView = false" />
+      </div>
+    </Dialog>
 
     <!-- 新增房屋表單彈窗 -->
-    <Dialog
-      v-model:visible="showCreateForm"
-      :modal="true"
-      :dismissableMask="false"
-      header="新增房屋"
-      class="dialog-theme"
-    >
+    <Dialog v-model:visible="showCreateForm" :modal="true" :dismissableMask="false" header="新增房屋" class="dialog-theme">
       <div class="dialog-container">
         <HouseCreate @close="showCreateForm = false" />
       </div>
@@ -164,10 +105,11 @@ import Button from "primevue/button";
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
 import Dialog from "primevue/dialog";
-import ConfirmDialog from "primevue/confirmdialog";
+
 import HouseCreate from "./HouseCreate.vue";
 import HouseUpdate from "./HouseUpdate.vue";
 import HouseView from "@/View/HouseView.vue";
+import { ConfirmDialog } from "primevue";
 
 
 export default {
@@ -197,11 +139,11 @@ export default {
   },
   methods: {
     confirmDelete(houseId) {
-      ConfirmDialog({
+      this.$confirm.require({
         message: "您確定要下架這個房屋嗎？",
         header: "確認刪除",
         icon: "pi pi-exclamation-triangle",
-        accept: () => this.deleteHouse(houseId),
+        accept: () => this.deleteHouse(houseId)
       });
     },
     async deleteHouse(houseId) {
@@ -223,16 +165,16 @@ export default {
     },
     async loadHouses() {
       try {
-        // 向後端請求房屋 ID 列表
         const response = await fetch(`${this.baseUrl}/houses`, {
           headers: this.getAuthHeaders(),
         });
         const houseIds = await response.json();
 
-        // 根據取得的 houseIds，逐一請求詳細資訊與圖片
+        // 獲取每個房屋的詳細資料和圖片
         const housePromises = houseIds.map(async (id) => {
           const houseId = id.houseId || id;
-          // 取得房屋詳細資訊
+
+          // 1. 取得房屋詳細資料
           const detailsResponse = await fetch(
             `${this.baseUrl}/details/${houseId}`,
             {
@@ -241,7 +183,7 @@ export default {
           );
           const details = await detailsResponse.json();
 
-          // 取得房屋照片
+          // 2. 取得房屋圖片
           const photosResponse = await fetch(
             `${this.baseUrl}/getPhotos/${houseId}`,
             {
@@ -250,18 +192,21 @@ export default {
           );
           const images = await photosResponse.json();
 
+          // 確保圖片正確綁定
           return {
             ...details,
-            images: images.map((img) => `data:image/jpeg;base64,${img}`),
+            images: images.map(
+              (img) => `data:image/jpeg;base64,${img.base64}` // 構建圖片 URL
+            ),
           };
         });
 
-        // 等待全部請求完成後，才更新 houses
-        this.houses = await Promise.all(housePromises);
+        this.houses = await Promise.all(housePromises); // 更新房屋列表
       } catch (error) {
         console.error("加載房屋列表失敗:", error);
       }
     },
+
     getAuthHeaders() {
       return { Authorization: `${localStorage.getItem("jwt")}` };
     },
@@ -354,15 +299,15 @@ export default {
 /* 圖片預覽樣式 */
 .image-container {
   width: 100px;
-  height: 70px;
+  height: 100px;
   overflow: hidden;
 }
+
 .image-preview {
   width: 100%;
-  height: auto;
-  object-fit: cover;
-  border-radius: 5px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  height: 100%;
+  object-fit: cover; /* 保持圖片比例，裁切超出部分 */
+  border-radius: 4px;
 }
 
 /* 對話框樣式 */
