@@ -11,6 +11,7 @@ import OrderCompleteView from '@/View/OrderCompleteView.vue';
 import EditProfile from '@/components/User/EditProfile.vue';
 import Houselist from '@/components/houses/houselist.vue';
 import CollectHouseList from '@/components/houses/CollectHouseList.vue';
+import MyAdvertisements from '@/components/Ads/MyAdvertisements.vue';
 
 const routes = [
   {
@@ -54,6 +55,16 @@ const routes = [
         path: 'edit-user', // 編輯用戶
         name: 'EditUserChild',
         component: EditUserPage,
+      },
+      {
+        path: 'my-advertisements', // 編輯用戶
+        name: 'MyAdvertisements',
+        component: MyAdvertisements,
+      },
+      {
+        path: 'my-orders', // 編輯用戶
+        name: 'MyOrders',
+        component: MyOrders,
       },
     ],
   },

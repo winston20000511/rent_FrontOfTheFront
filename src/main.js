@@ -28,6 +28,7 @@ app.component('Button', Button);
 app.use(createPinia())
 app.use(ConfirmationService); // 註冊 ConfirmationService
 app.component('ConfirmDialog', ConfirmDialog); 
+// app.use(VueReCaptcha, { siteKey: import.meta.env.VITE_RECAPTCHA_SITE_KEY });
 app.use(router)
 app.mount('#app')
 
