@@ -21,14 +21,12 @@
             filterDisplay="row" emptyMessage="目前沒有任何資料可顯示">
 
             <template #header>
-                <div class="flex flex-wrap items-center justify-end gap-2">
+                <div class="flex flex-wrap items-center justify-between gap-2">
                     <div>
-                        <span>
-                            <i class="pi pi-search search-icon"></i>
-                            <InputText v-model="filters['global'].value" placeholder="搜尋房屋..." class="search-input" />
-                        </span>
+                        <i class="pi pi-search search-icon"></i>
+                        <InputText v-model="filters['global'].value" placeholder="搜尋" class="search-input" />
                     </div>
-                    <Button icon="pi pi-refresh" @click="refresh" rounded raised />
+                    <Button icon="pi pi-refresh" @click="refresh" rounded raised :loading="loading" />
                 </div>
             </template>
 
@@ -69,19 +67,24 @@
         </DataTable>
 
         <Dialog v-model:visible="cancelBookingDialog" :style="{ width: '450px' }" header="確認" :modal="true"
-            :contentStyle="{ fontSize: '18px' }"
-            >
-            
+            :contentStyle="{ fontSize: '18px' }">
+
             <div class="flex items-center gap-4 ">
                 <i class="pi pi-exclamation-triangle !text-3xl" />
                 <span v-if="selectedBooking">您確定要取消 <b class="text-danger">編號: {{ selectedBooking.bookingId }}</b>
                     的預約嗎?</span>
             </div>
-            
+
+            <div class="booking-time-container">
+                <b>預約時間：</b>
+                <span>{{ selectedBooking.bookingDate }}</span>
+            </div>
+
             <template #footer>
-                <Button label="Yes" icon="pi pi-check" severity="secondary" text
-                    @click="cancelBooking(selectedBooking)" />
-                <Button label="No" icon="pi pi-times" severity="contrast" @click="cancelBookingDialog = false" />
+                <Button label="是" icon="pi pi-check" severity="secondary" @click="cancelBooking(selectedBooking)"
+                    :loading="loading" />
+                <Button label="否" icon="pi pi-times" severity="contrast" @click="cancelBookingDialog = false"
+                    :loading="loading" />
             </template>
         </Dialog>
 
@@ -116,6 +119,7 @@ const activeTab = ref(0); // 默認 0:顯示全部
 const toast = useToast();
 const selectedBooking = ref({});
 const cancelBookingDialog = ref(false);
+const loading = ref(false); // 轉圈圈
 
 // 搜尋功能
 const filters = ref({
@@ -127,10 +131,10 @@ const columns = [
     { field: 'photos', header: '', sortable: false, headerStyle: 'width: 10%;' },
     { field: 'houseTitle', header: '房屋名稱', sortable: false, headerStyle: 'width: 15%;' },
     { field: 'houseAddress', header: '房屋地址', sortable: false, headerStyle: 'width: 25%;' },
-    { field: 'housePrice', header: '房屋租金', sortable: false, headerStyle: 'width: 10%;' },
+    { field: 'housePrice', header: '房屋租金', sortable: true, headerStyle: 'width: 10%;' },
     { field: 'bookingDate', header: '預約時間', sortable: true, headerStyle: 'width: 20%;' },
     { field: 'status', header: '狀態', sortable: false, headerStyle: 'width: 10%;' },
-    { field: 'operate', header: '', sortable: false, headerStyle: 'width: 10%;' }
+    { field: 'operate', header: '操作', sortable: false, headerStyle: 'width: 10%;' }
 ];
 
 // 設定 分頁選項
@@ -149,6 +153,7 @@ const statusMap = {
 
 // 載入數據
 const load = async () => {
+    loading.value = true;
     try {
         const response = await fetch(`${BASE_URL}/booking/guest`, {
             headers: {
@@ -171,7 +176,7 @@ const load = async () => {
             // 獲取圖片
             const photosResponse = await fetch(`${BASE_URL}/houses/getPhotos/${houseId}`, {
                 headers: {
-                    'Content-Type': 'application/json',
+
                     'authorization': `${TOKEN}`,
                 },
             });
@@ -189,6 +194,9 @@ const load = async () => {
         useFilter(); // 過濾載入的資料
     } catch (error) {
         console.error('載入失敗，原因:', error.message);
+    } finally {
+        selectedBooking.value = {}; // 清空所選預約
+        loading.value = false;
     }
 };
 
@@ -236,10 +244,8 @@ const confirmcancelBooking = (prod) => {
 }
 
 const cancelBooking = async (selectedBooking) => {
+    loading.value = true;
     try {
-        cancelBookingDialog.value = false;  // 關閉 Dialog
-        selectedBooking.value = {};         // 清空所選預約
-
         const bookingDate = selectedBooking.bookingDate;  // 'yyyy-MM-dd HH:mm:ss'
         const [datePart, timePart] = bookingDate.split(' ');
         selectedBooking.bookingDate = datePart;  // 'yyyy-MM-dd'
@@ -264,11 +270,16 @@ const cancelBooking = async (selectedBooking) => {
     }
     catch (error) {
         console.error('載入失敗，原因:', error.message);
+    } finally {
+        selectedBooking.value = {}; // 清空所選預約
+        cancelBookingDialog.value = false;  // 關閉 Dialog
+        loading.value = false;
     }
 };
 
 const refresh = () => {
     load();
+    toast.add({ severity: 'success', summary: '資料更新', life: 2000 });
 }
 
 // 將預約狀態轉成文字
@@ -301,21 +312,40 @@ onMounted(() => {
 
 // 測試換頁
 // watch(activeTab, (newValue) => { 
-//      console.log("測試換頁: "+newValue);
+//      console.log("這是測試 換頁: "+newValue);
 // })
 
-watch(filters, () => {
-    console.log("測試搜尋: " + filters.value.global.value)
-}, { deep: true });
+// 測試搜尋
+// watch(filters, () => {
+//     console.log("這是測試 搜尋: " + filters.value.global.value)
+// }, { deep: true });
 
 </script>
 
 <style scoped>
+/** 欄位寬度 */
 .p-tab {
     width: 20%;
     /* 5個 Tab 平均分配，每個佔 20% */
     text-align: center;
     /* 文字置中 */
+}
+
+/**  預約時間 添加樣式*/
+.booking-time-container {
+    background-color: #f0f8ff;
+    /* 淺藍色背景 */
+    padding: 10px;
+    /* 內邊距 */
+    border-radius: 5px;
+    /* 圓角 */
+    margin-top: 10px;
+    /* 顯示距離上方有空隙 */
+    font-weight: bold;
+    color: #2a4d7b;
+    /* 深藍色字體 */
+    border: 1px solid #2a4d7b;
+    /* 添加邊框 */
 }
 
 /* 搜尋欄樣式 */

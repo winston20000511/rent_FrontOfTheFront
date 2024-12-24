@@ -73,7 +73,7 @@
                   <li class="nav-item" role="presentation">
                     <router-link to="/member-center/homeowner" class="nav-link"
                       :class="{ active: activeTab === 'homeowner' }" role="tab">
-                      屋主系統
+                      屋主預約管理
                     </router-link>
                   </li>
                 </ul>
