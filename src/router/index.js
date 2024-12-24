@@ -3,8 +3,10 @@ import HomeView from '@/views/HomeView.vue';
 import LoginPage from '@/components/User/LoginPage.vue';
 import EditUserPage from '@/components/User/EditUserPage.vue';
 import ForgotPassword from '@/components/User/ForgotPassword.vue';
+import ResetPassword from '@/components/User/ResetPassword.vue'; // 新增 ResetPassword 匯入
 import MemberCenter from '@/components/User/MemberCenter.vue';
 import EditProfile from '@/components/User/EditProfile.vue';
+import DeactivateAccount from '@/components/User/DeactivateAccount.vue';
 
 const routes = [
   {
@@ -23,6 +25,11 @@ const routes = [
     component: ForgotPassword,
   },
   {
+    path: '/reset-password', // 重設密碼頁面路徑
+    name: 'ResetPassword',
+    component: ResetPassword, // 顯示 ResetPassword
+  },
+  {
     path: '/edit-user', // 編輯用戶頁面路徑
     name: 'EditUser',
     component: EditUserPage,
@@ -31,13 +38,17 @@ const routes = [
     path: '/member-center', // 會員中心頁面路徑
     name: 'MemberCenter',
     component: MemberCenter, // 顯示 MemberCenter
-    children: [ //我在 /member-center 路由下添加了一個 children 陣列，這樣當訪問 /member-center/edit-profile 時，會顯示 EditUserPage.vue。
+    children: [
       {
-        path: 'edit-profile',  // 這是子路由，會在 MemberCenter 中顯示 EditProfile
+        path: 'edit-profile', // 子路由，顯示 EditProfile
         name: 'EditProfile',
-        component: EditProfile
+        component: EditProfile,
       },
-      // 你可以在這裡添加更多子路由，根據需要加載其他頁面
+      {
+        path: '/deactivate-account',
+        name: 'DeactivateAccount',
+        component: DeactivateAccount,
+      },
     ],
   },
 ];

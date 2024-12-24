@@ -1,18 +1,21 @@
 <script setup>
 import { ref } from 'vue';
+import { useRouter } from 'vue-router'; // 引入 useRouter
 import { useAuthStore } from '@/stores/auth';
 import { defineEmits } from 'vue';
 
 const emit = defineEmits(['signInClicked']);
 const authStore = useAuthStore(); // 引入 auth Store
+const router = useRouter(); // 初始化 router
 
 const handleSignInClick = () => {
   // 如果未登入，發送事件通知父組件顯示 LoginPage
   if (!authStore.isLoggedIn) {
     emit('signInClicked');
   } else {
-    // 如果已登入，則執行登出邏輯
+    // 如果已登入，執行登出邏輯
     authStore.logout();
+    router.push('/'); // 跳轉至首頁 HomeView.vue
   }
 };
 </script>

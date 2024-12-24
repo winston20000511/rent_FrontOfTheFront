@@ -18,14 +18,11 @@ export const useAuthStore = defineStore('auth', {
     },
     async fetchUserProfile() {
       try {
-        // 模擬後端返回的資料
-        // 假設您尚未完成後端，這裡直接用固定的資料來模擬
-        this.userProfile = {
-          name: 'Demo User',
-          email: 'demo@example.com',
-        }; 
-        // 設定模擬的頭像 URL
-        this.profilePicture = http://localhost:8080/api/user/profile-pic; // 假設的頭像圖片路徑
+        const response = await api.get('/user/profile');
+        // 假設後端返回的資料包含完整的用戶資訊，我們儲存整個用戶資料
+        this.userProfile = response.data; 
+        // 將 profilePic 儲存到 profilePicture 屬性
+        this.profilePicture = response.data.profilePic;
       } catch (error) {
         console.error('取得用戶資料失敗:', error);
       }
