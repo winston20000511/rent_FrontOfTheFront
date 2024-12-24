@@ -26,6 +26,7 @@ const emits = defineEmits(['add-marker','signInClicked'])
 
     onMounted(() => {
     document.addEventListener('click', closeSearchList);
+    optionStore.initializeData();
     // if (myOffcanvasRef.value) {
     //     offcanvasInstance.value = new Offcanvas(myOffcanvasRef.value);
     // }
@@ -83,14 +84,14 @@ const emits = defineEmits(['add-marker','signInClicked'])
         const input = {
           origin: searchInputRef.value.value
         }
-        const merge = Object.assign({},input,optionStore.shareOptions)
+        // const merge = Object.assign({},input,optionStore.shareOptions)
 
         const response = await fetch(keywordUrl,{
             method:'POST',
             headers: {'Content-Type': 'application/json',
                     'authorization': `${token}`
             },
-            body:JSON.stringify(merge)
+            body:JSON.stringify(input)
         });
 
         if (!response.ok){
@@ -121,15 +122,16 @@ const emits = defineEmits(['add-marker','signInClicked'])
         }
         
         const inputData = {
-            origin: searchInputRef.value.value
+            address: searchInputRef.value.value
         }
+        const merge = Object.assign({},inputData,optionStore.shareOptions)
 
         const response = await fetch(mapUrl,{
             method: 'POST',
             headers:{'Content-Type': 'application/json',
                 'authorization': `${token}`
             },
-            body: JSON.stringify(inputData)
+            body: JSON.stringify(merge)
         });
 
         if (!response.ok){

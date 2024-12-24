@@ -1,6 +1,6 @@
 <script setup>
 import { useOption } from '@/stores/optionStore';
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 
     const emits = defineEmits(['update-flipped','update-option'])
     const optionStore = useOption();
@@ -8,18 +8,6 @@ import { ref } from 'vue';
     const errRef = ref('');
     const minprice = ref(0);
     const maxprice = ref(0);
-    const washingmachine = ref(true);
-    const airconditioner = ref(true);
-    const network = ref(true);
-    const bedstead = ref(true);
-    const mattress = ref(true);
-    const refrigerator = ref(true);
-    const ewaterheater = ref(true);
-    const gwaterheater = ref(true);
-    const television = ref(true);
-    const channelfour = ref(true);
-    const sofaRef = ref(true);
-    const tablesRef = ref(true);
     const petRef = ref(true);
     const parkingspace = ref(true);
     const elevatorRef = ref(true);
@@ -28,14 +16,15 @@ import { ref } from 'vue';
     const cookingRef = ref(true);
     const waterdispenser = ref(true);
     const feeRef = ref(true);
-    const genderRef = ref(0);
+    const genderRef = ref(2);
     const genderboy = ref(true);
     const gendergirl = ref(true);
     const houseRef = ref(true);
     const independenthouse = ref(true);
     const renthouse = ref(true);
     const sharehouse = ref(true);
-    const priority = ref('a');
+    const housetype = ref('');
+    const priorityRef = ref('a');
 
     const showMap = ()=>{
         emits('update-flipped')
@@ -55,36 +44,24 @@ import { ref } from 'vue';
             genderRef.value = 0
         }
 
-        let houseType='';
+        housetype.value='';
         if (houseRef.value){
-            houseType = houseType + '透天,'
+            housetype.value = housetype.value + '透天,'
         }
         if(independenthouse.value){
-            houseType = houseType + '獨立套房,'
+            housetype.value = housetype.value + '獨立套房,'
         }
         if(renthouse.value){
-            houseType = houseType + '分租套房,'
+            housetype.value = housetype.value + '分租套房,'
         }
         if(sharehouse.value){
-            houseType = houseType + '雅房,'
+            housetype.value = housetype.value + '雅房,'
         }
-        houseType = houseType.substring(0,houseType.length-1)
+        housetype.value = housetype.value.substring(0,housetype.value.length-1)
 
         const options = {
             minPrice: minprice.value,
             maxPrice: maxprice.value,
-            washingMachine: washingmachine.value,
-            airConditioner: airconditioner.value,
-            netWork: network.value,
-            bedStead: bedstead.value,
-            matTress: mattress.value,
-            refRigerator: refrigerator.value,
-            ewaterHeater: ewaterheater.value,
-            gwaterHeater: gwaterheater.value,
-            teleVision: television.value,
-            channelFour: channelfour.value,
-            sofa: sofaRef.value,
-            tables: tablesRef.value,
             pet: petRef.value,
             parkingSpace: parkingspace.value,
             elevator: elevatorRef.value,
@@ -94,12 +71,8 @@ import { ref } from 'vue';
             waterDispenser: waterdispenser.value,
             fee: feeRef.value,
             gender: genderRef.value,
-            houseType: houseType,
-            // house: houseRef.value,
-            // independentHouse: independenthouse.value,
-            // rentHouse: renthouse.value,
-            // shareHouse: sharehouse.value,
-            priority: priority.value,
+            houseType: housetype.value,
+            priority: priorityRef.value,
         }
         errRef.value='';
         optionStore.updateData(options);
@@ -131,12 +104,12 @@ import { ref } from 'vue';
                 </div>
             </div>
         </div>
-        <div class="col-12 col-md-8">
+        <div class="col-12 col-md-6">
             <div class="card border-secondary mb-3" style="width: 100%;">
                 <div class="card-header">房屋篩選</div>
                 <div class="card-body text-secondary">
                     <div class="row gy-4">
-                        <div class="col-12 col-md-4">
+                        <!-- <div class="col-12 col-md-6">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" v-model="washingmachine" id="washingMachine" checked>
                                 <label class="form-check-label" for="washingMachine">
@@ -209,90 +182,90 @@ import { ref } from 'vue';
                                     桌椅
                                 </label>
                             </div>
-                        </div>
-                        <div class="col-12 col-md-4">
+                        </div> -->
+                        <div class="col-12 col-md-6">
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" v-model="petRef" id="pet" checked>
+                                <input class="form-check-input" type="checkbox" v-model="petRef" id="pet">
                                 <label class="form-check-label" for="pet">
                                     養寵物
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" v-model="parkingspace" id="parkingSpace" checked>
+                                <input class="form-check-input" type="checkbox" v-model="parkingspace" id="parkingSpace">
                                 <label class="form-check-label" for="parkingSpace">
                                     停車位
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" v-model="elevatorRef" id="elevator" checked>
+                                <input class="form-check-input" type="checkbox" v-model="elevatorRef" id="elevator">
                                 <label class="form-check-label" for="elevator">
                                     電梯
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" v-model="balconyRef" id="balcony" checked>
+                                <input class="form-check-input" type="checkbox" v-model="balconyRef" id="balcony">
                                 <label class="form-check-label" for="balcony">
                                     陽台
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" v-model="shortterm" id="shortTerm" checked>
+                                <input class="form-check-input" type="checkbox" v-model="shortterm" id="shortTerm">
                                 <label class="form-check-label" for="shortTerm">
                                     短期租屋
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" v-model="cookingRef" id="cooking" checked>
+                                <input class="form-check-input" type="checkbox" v-model="cookingRef" id="cooking">
                                 <label class="form-check-label" for="cooking">
                                     開伙
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" v-model="waterdispenser" id="waterDispenser" checked>
+                                <input class="form-check-input" type="checkbox" v-model="waterdispenser" id="waterDispenser">
                                 <label class="form-check-label" for="waterDispenser">
                                     飲水機
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" v-model="feeRef" id="fee" checked>
+                                <input class="form-check-input" type="checkbox" v-model="feeRef" id="fee">
                                 <label class="form-check-label" for="fee">
                                     管理費
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" v-model="genderboy" id="genderBoy" checked>
+                                <input class="form-check-input" type="checkbox" v-model="genderboy" id="genderBoy">
                                 <label class="form-check-label" for="genderBoy">
                                     限男
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" v-model="gendergirl" id="genderGirl" checked>
+                                <input class="form-check-input" type="checkbox" v-model="gendergirl" id="genderGirl">
                                 <label class="form-check-label" for="genderGirl">
                                     限女
                                 </label>
                             </div>
                         </div>
-                        <div class="col-12 col-md-4">
+                        <div class="col-12 col-md-6">
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" v-model="houseRef" id="House" checked>
+                                <input class="form-check-input" type="checkbox" v-model="houseRef" id="House">
                                 <label class="form-check-label" for="House">
                                     透天
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" v-model="independenthouse" id="independentHouse" checked>
+                                <input class="form-check-input" type="checkbox" v-model="independenthouse" id="independentHouse">
                                 <label class="form-check-label" for="independentHuose">
                                     獨立套房
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" v-model="renthouse" id="rentHouse" checked>
+                                <input class="form-check-input" type="checkbox" v-model="renthouse" id="rentHouse">
                                 <label class="form-check-label" for="rentHouse">
                                     分租套房
                                 </label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="checkbox" v-model="sharehouse" id="shareHouse" checked>
+                                <input class="form-check-input" type="checkbox" v-model="sharehouse" id="shareHouse">
                                 <label class="form-check-label" for="shareHouse">
                                     雅房
                                 </label>
@@ -307,19 +280,19 @@ import { ref } from 'vue';
                 <div class="card-header">搜尋方式</div>
                 <div class="card-body text-secondary">
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="adsPriority" id="adsPriority" value="a" v-model="priority" checked>
+                        <input class="form-check-input" type="radio" name="adsPriority" id="adsPriority" value="a" v-model="priorityRef">
                         <label class="form-check-label" for="adsPriority">
                             廣告優先
                         </label>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="pricePriority" id="pricePriority" value="p" v-model="priority">
+                        <input class="form-check-input" type="radio" name="pricePriority" id="pricePriority" value="p" v-model="priorityRef">
                         <label class="form-check-label" for="pricePriority">
                             價錢優先
                         </label>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="clickPriority" id="clickPriority" value="c" v-model="priority">
+                        <input class="form-check-input" type="radio" name="clickPriority" id="clickPriority" value="c" v-model="priorityRef">
                         <label class="form-check-label" for="clickPriority">
                             點擊優先
                         </label>

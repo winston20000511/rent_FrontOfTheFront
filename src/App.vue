@@ -1,5 +1,6 @@
 <script setup>
 import { RouterView } from 'vue-router';
+import { useRouter } from 'vue-router';
 import { ref } from 'vue';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
@@ -9,6 +10,7 @@ import ChatPopup from './components/ChatRoom/ChatRoom.vue';
 import LoginPage from './components/User/LoginPage.vue';
 import { useHouseCard } from '@/stores/CardHouseStore';
 
+const router = useRouter();
 const showChatPopup = ref(false);
 const toggleChatPopup = () => {
   showChatPopup.value = !showChatPopup.value;

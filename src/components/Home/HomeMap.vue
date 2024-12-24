@@ -77,7 +77,6 @@ onMounted(() => {
 
   watch(markers, (newMarkers) => {
     
-    console.log("ok")
     const list = newMarkers.searchList;
     const origin = newMarkers.searchOrigin;
     const avgPrice = newMarkers.avgPrice;
