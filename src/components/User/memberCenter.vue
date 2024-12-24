@@ -58,7 +58,7 @@
                   </li>
                   <li class="nav-item" role="presentation">
                     <router-link
-                      to="{ name: 'MyAdvertisements' }"
+                      to="/member-center/my-advertisements"
                       class="nav-link"
                       :class="{ active: activeTab === 'my-advertisements' }"
                       role="tab"

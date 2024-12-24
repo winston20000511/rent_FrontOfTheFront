@@ -26,7 +26,7 @@
       </div>
       <p v-if="errorMessage" class="error text-danger">{{ errorMessage }}</p>
       <button type="submit" class="btn btn-primary w-100">登入</button>
-      
+
       <!-- 忘記密碼按鈕 -->
       <button
         type="button"
@@ -62,11 +62,26 @@ export default {
   methods: {
     async handleLogin() {
       try {
-        // 發送登入請求到後端
-        const response = await api.post("http://localhost:8080/api/user/login", {
-          email: this.email,
-          password: this.password,
-        });
+        // 獲取 reCAPTCHA token
+        // const recaptchaToken = await new Promise((resolve, reject) => {
+        //   grecaptcha.ready(() => {
+        //     grecaptcha
+        //       .execute(import.meta.env.VITE_RECAPTCHA_SITE_KEY, {
+        //         action: "login",
+        //       })
+        //       .then(resolve, reject);
+        //   });
+        // });
+
+        // 發送登入請求到後端 （新增一個 recaptchaToken）
+        const response = await api.post(
+          "http://localhost:8080/api/user/login",
+          {
+            email: this.email,
+            password: this.password,
+            // recaptchaToken,
+          }
+        );
 
         // 後端回傳 JWT token
         const token = response.data.token;

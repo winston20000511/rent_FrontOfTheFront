@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import HomeView from '@/View/HomeView.vue';
-import MemberCenter from '@/components/User/memberCenter.vue';
+
 import EditUserPage from '@/components/User/EditUserPage.vue';
 import ForgotPassword from '@/components/User/ForgotPassword.vue';
 import LoginForm from '@/components/User/LoginForm.vue';
@@ -12,6 +12,8 @@ import NoAdHouseList from '@/components/Ads/NoAdHouseList.vue';
 import OrderCompleteView from '@/View/OrderCompleteView.vue';
 import EditProfile from '@/components/User/EditProfile.vue';
 import MyAdvertisements from '@/components/Ads/MyAdvertisements.vue';
+import MemberCenter from '@/components/User/memberCenter.vue';
+// import TestReCaptcha from '@/components/User/TestReCaptcha.vue';
 
 const routes = [
   {
@@ -94,6 +96,11 @@ const routes = [
     name:"orderComplete",
     component: OrderCompleteView,
   },
+  // {
+  //   path:"/test-recaptcha",
+  //   name:"TestReCaptcha",
+  //   component: TestReCaptcha,
+  // },
 
 ];
 
