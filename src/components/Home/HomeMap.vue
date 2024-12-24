@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, onUnmounted, watch, toRef, shallowRef } from 'vue';
 import { Loader } from '@googlemaps/js-api-loader';
+import { useHouseCard } from '@/stores/CardHouseStore';
 
 const map = shallowRef(null); // 地圖容器
 const mapMarkers = ref([]); //地圖標記
@@ -17,6 +18,7 @@ let polygon = null;
 
 let token = localStorage.getItem('jwt');
 
+const store = useHouseCard()
 const emits = defineEmits(['add-marker'])
 const props = defineProps({
   markers: Object
@@ -70,12 +72,10 @@ onMounted(() => {
 
   // =========================================標記功能=================================================================
 
-  function forceRefresh() {
-    mapKey += 1;
-  }
 
   watch(markers, (newMarkers) => {
-
+    
+    console.log("ok")
     const list = newMarkers.searchList;
     const origin = newMarkers.searchOrigin;
     const avgPrice = newMarkers.avgPrice;

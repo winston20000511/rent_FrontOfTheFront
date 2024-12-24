@@ -1,132 +1,165 @@
-<template>
-  <div v-if="visible" class="modal-overlay" @click.self="handleOverlayClick">
-    <div class="modal-content">
-      <div class="header">
-        <button class="favorite-btn" @click="toggleFavorite">
-          <i :class="isFavorited ? 'bi bi-heart-fill' : 'bi bi-heart'"></i>
-        </button>
-        <button class="close-btn" @click="closeModal">
-          <i class="bi bi-x-circle"></i>
-        </button>
-      </div>
-      
-      <hr />
-
-      <!-- 房屋圖片 -->
-      <HousePhotos :houseId="houseId" />
-      <hr />
-      <HouseTitle :houseId="houseId" />
-      <hr />
-      <div class="info-container">
-        <!-- 房屋信息 -->
-        <HouseInfo :houseId="houseId" />
-        
-        <!-- 房東信息 -->
-        <OwnerInfo :houseId="houseId" />
-      </div>
-      <hr />
-
-      <!-- 房屋描述 -->
-      <HouseDescription :houseId="houseId" />
-    </div>
-  </div>
-</template>
-
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from "vue";
 import HouseTitle from "@/components/houses/page/HouseTitle.vue";
 import HouseInfo from "@/components/houses/page/HouseInfo.vue";
 import OwnerInfo from "@/components/houses/page/OwnerInfo.vue";
 import HouseDescription from "@/components/houses/page/HouseDescription.vue";
-import HousePhotos from '@/components/houses/housePhotos.vue';
+import HousePhotos from "@/components/houses/housePhotos.vue";
 
-// 定義接收的 props
+// 接收 props
 const props = defineProps({
   houseId: {
     type: Number,
-    required: true,
-  },
-  visible: {
-    type: Boolean,
-    required: true,
+    required: true, // 後端若要 Number
   },
 });
 
-// 定義 emits 事件
+// 定義 emits
 const emit = defineEmits(["close"]);
 
-// 關閉彈窗
-const closeModal = () => {
-  emit("close"); // 通知父組件關閉彈窗
-};
-
-const handleOverlayClick = (event) => {
-  if (event.target.classList.contains('modal-overlay')) {
-    closeModal();
-  }
-};
-
-// 定義收藏狀態
+// 收藏狀態
 const isFavorited = ref(false);
 
-const toggleFavorite = () => {
+// 生命週期 (onMounted) 時，向後端查詢是否已收藏
+onMounted(async () => {
+  try {
+    const response = await fetch(
+      `http://localhost:8080/api/houses/collect/exists/${props.houseId}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: localStorage.getItem("jwt"), 
+        },
+      }
+    );
+    const result = await response.json(); // 預期為 true/false
+    isFavorited.value = result;
+  } catch (error) {
+    console.error("檢查收藏狀態失敗:", error);
+  }
+});
+
+// 切換收藏
+async function toggleFavorite() {
+  if (isFavorited.value) {
+    // 目前是已收藏 → 移除收藏
+    await removeFavorite();
+  } else {
+    // 目前是未收藏 → 新增收藏
+    await addFavorite();
+  }
+  // 狀態翻轉
   isFavorited.value = !isFavorited.value;
-};
+}
+
+async function addFavorite() {
+  try {
+    await fetch(
+      `http://localhost:8080/api/houses/collect/add/${props.houseId}`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: localStorage.getItem("jwt"),
+        },
+      }
+    );
+    console.log("已加入收藏");
+  } catch (error) {
+    console.error("加入收藏失敗:", error);
+  }
+}
+
+async function removeFavorite() {
+  try {
+    // 假設你的後端路徑是 /collect/remove/{houseId}?houseId=xxx
+    // 也可能是 /collect/remove?houseId=xxx 要依後端實際路徑調整
+    await fetch(
+      `http://localhost:8080/api/houses/collect/remove/${props.houseId}`,
+      {
+        method: "DELETE",
+        headers: {
+          Authorization: localStorage.getItem("jwt"),
+        },
+      }
+    );
+    console.log("已移除收藏");
+  } catch (error) {
+    console.error("移除收藏失敗:", error);
+  }
+}
+
+
 </script>
 
+<template>
+  <div class="house-view-container">
+    <div class="header">
+      <!-- 收藏按鈕 -->
+      <button class="favorite-btn" @click="toggleFavorite">
+        <i :class="isFavorited ? 'bi bi-heart-fill' : 'bi bi-heart'"></i>
+      </button>
+    </div>
+
+    <hr />
+
+    <HouseTitle :houseId="houseId" />
+
+    <hr />
+    <HousePhotos :houseId="houseId" />
+
+    <hr />
+
+    <div class="info-container">
+      <!-- 房屋信息 -->
+      <HouseInfo :houseId="houseId" />
+      <!-- 房東信息 -->
+       <hr>
+
+      <OwnerInfo :houseId="houseId" />
+
+    </div>
+
+    <hr />
+
+    <!-- 房屋描述 -->
+    <HouseDescription :houseId="houseId" />
+  </div>
+</template>
+
 <style scoped>
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.7);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 999;
-  padding: 20px;
+.house-view-container {
+  /* 如果不用 dialog，可以用 position: fixed + 遮罩(overlay) */
+  background-color: #ffffff;
+  border-radius: 8px;
+  padding: 10px;
 }
 
-.modal-content {
-  background: white;
-  padding: 20px;
-  width: 100%;
-  max-width: 800px;
-  max-height: 80vh;
-  border-radius: 10px;
-  position: relative;
-  overflow: auto;
-}
-
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-.close-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-
-.close-btn .bi {
-  font-size: 24px;
-  color: blue; /* 設置成藍色 */
-}
-
+/* 收藏按鈕 */
 .favorite-btn {
   background: none;
   border: none;
   cursor: pointer;
 }
 
-.favorite-btn .bi {
-  font-size: 24px;
-  color: red;
+.favorite-btn .bi-heart-fill {
+  color: red; /* 已收藏 → 實心愛心 */
+}
+
+.favorite-btn .bi-heart {
+  color: gray; /* 未收藏 → 空心愛心 */
+}
+
+
+.close-btn .bi-x-lg {
+  font-size: 18px;
+  color: #333;
+}
+
+.header {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-bottom: 10px;
 }
 
 .info-container {
@@ -135,14 +168,8 @@ const toggleFavorite = () => {
   gap: 10px;
 }
 
-@media (max-width: 768px) {
-  .modal-content {
-    max-width: 90%;
-    padding: 10px;
-  }
-
-  .close-btn {
-    padding: 3px 8px;
-  }
+hr{
+  margin: 10px;
 }
+
 </style>

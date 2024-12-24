@@ -179,7 +179,7 @@ import BookingSlotSetting from '../Booking/BookingSlotSetting.vue';
 
 
 export default {
-  // name: 'AddHouseForm',
+  emits: ["close"],
   components: {
     BookingSlotSetting
   },
@@ -312,9 +312,13 @@ export default {
       for (let [key, value] of formData.entries()) {
         console.log(key, value);
       }
-
+      const token = localStorage.getItem('jwt');
       fetch(import.meta.env.VITE_APIURL + '/houses/add', {
         method: 'POST',
+        headers: {
+          Authorization: token,
+
+        },
         body: formData,
       })
         .then((response) => {
@@ -328,6 +332,7 @@ export default {
         .then((data) => {
           alert('房屋新增成功！');
           resetForm();
+          emit('close'); 
         })
         .catch((error) => {
           console.error('提交失敗:', error);

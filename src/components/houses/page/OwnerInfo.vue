@@ -1,31 +1,37 @@
+<!-- src/components/houses/page/OwnerInfo.vue -->
 <template>
   <div class="owner-info-container">
-    <div class="owner-info">
-      <img :src="'data:image/jpeg;base64,' + ownerInfo.picture" alt="屋主照片" class="owner-avatar" />
-      <div class="owner-details">
+    <div v-if="ownerInfo" class="owner-basic">
+      <Avatar :image="ownerInfo.picture || '/src/assets/no-photo.png'" size="large" shape="circle" class="owner-avatar"
+        @error="handleImageError" />
+      <div class="owner-text">
         <p class="owner-name">{{ ownerInfo.name }}</p>
         <p class="owner-phone">{{ ownerInfo.phone }}</p>
       </div>
     </div>
+    <div v-else class="loading-owner">正在加載屋主資訊...</div>
 
-    <div class="appointment-time">
-      <button @click="loadBookingView" class="send-button btn btn-info">預約看房</button>
-      <BookingView v-if="showBookingView" :isVisible="showBookingView" @closeView="closeBookingView"
-        :houseId="houseId" />
+    <div class="owner-actions flex gap-2">
+      <Button label="傳送訊息" icon="pi pi-comments" class="p-button-outlined p-button-warning" @click="sendMessage" />
+      <Button label="預約看房" icon="pi pi-calendar-plus" class="p-button-warning" @click="openBookingView" />
     </div>
 
-    <div class="message-section">
-      <button @click="sendMessage" class="send-message-button">发送信息</button>
-    </div>
+    <!-- BookingView 彈窗 -->
+    <BookingView v-if="showBookingView" :isVisible="showBookingView" @closeView="closeBookingView" :houseId="houseId" />
   </div>
 </template>
 
 <script>
-import BookingView from '@/View/BookingView.vue';
+
+import Button from "primevue/button";
+import Avatar from "primevue/avatar";
+import BookingView from "@/View/BookingView.vue";
 
 export default {
   components: {
     BookingView,
+    Button,
+    Avatar,
   },
   props: {
     houseId: {
@@ -35,119 +41,114 @@ export default {
   },
   data() {
     return {
-      ownerInfo: {
-        name: "",
-        phone: "",
-        picture: "", // Base64 編碼的图片
-      },
-      appointmentTime: "",
+      ownerInfo: null,
       showBookingView: false,
     };
   },
+  mounted() {
+    this.fetchOwnerInfo();
+  },
   methods: {
-    sendMessage() {
-      alert(
-        `发送信息给 ${this.ownerInfo.name}，预约时间：${this.appointmentTime}`
-      );
-    },
-    // 使用 fetch 獲取屋主信息
     async fetchOwnerInfo() {
       try {
-        const token = localStorage.getItem("jwt"); // 假設 token 存在 localStorage 中
+        const token = localStorage.getItem("jwt");
         if (!token) {
           throw new Error("未找到 token");
         }
-        const response = await fetch(
-          `http://localhost:8080/api/houses/owner/${this.houseId}`,
+        const resp = await fetch(
+          `http://localhost:8080/api/houses/ownerInfo/${this.houseId}`,
           {
             method: "GET",
-            headers: { Authorization: ` ${token}` },
+            headers: { Authorization: token },
           }
         );
-        if (!response.ok) {
-          throw new Error("網路請求失敗");
+        if (!resp.ok) {
+          const errorText = await resp.text();
+          console.error("API 請求失敗:", errorText);
+          throw new Error(errorText || "未知錯誤");
         }
-        const data = await response.json();
-        this.ownerInfo = data; // 将返回的数据赋值给 ownerInfo
+        const data = await resp.json();
+        this.ownerInfo = {
+          userId: data.userId || "",
+          name: data.name || "",
+          phone: data.phone || "",
+          picture: data.picture
+            ? `data:image/jpeg;base64,${btoa(
+              String.fromCharCode(...new Uint8Array(data.picture))
+            )}`
+            : "/src/assets/no-photo.png",
+        };
       } catch (error) {
-        console.error("獲取屋主信息失敗:", error);
+        console.error("取得屋主資訊失敗:", error);
       }
-    }, loadBookingView() {
+    },
+    openBookingView() {
       this.showBookingView = true;
     },
     closeBookingView() {
       this.showBookingView = false;
     },
-  },
-  data() {
-    return {
-      ownerInfo: {
-        name: "",
-        phone: "",
-        picture: "", // Base64 編碼的圖片
-      },
-      appointmentTime: "",
-      showBookingView: false,
-    };
-  },
-  created() {
-    this.fetchOwnerInfo(); // 獲取屋主信息
+    sendMessage() {
+      alert(`已發送訊息給 ${this.ownerInfo.name}`);
+    },
+    handleImageError(event) {
+      event.target.src = '/src/assets/no-photo.png';
+    }
   },
 };
 </script>
 
 <style scoped>
 .owner-info-container {
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 20px;
+  gap: 1rem;
+  text-align: center;
 }
 
-.owner-info {
+.owner-basic {
   display: flex;
   align-items: center;
-  gap: 20px;
-  margin-bottom: 20px;
+  justify-content: center;
+  gap: 1rem;
 }
 
 .owner-avatar {
   width: 80px;
   height: 80px;
-  border-radius: 50%;
-  object-fit: cover;
+  border: 2px solid #ff9800;
 }
 
-.owner-details {
+.owner-text {
   display: flex;
   flex-direction: column;
+  align-items: center; /* 确保文字也居中 */
 }
 
+.owner-actions {
+  display: flex;
+  justify-content: center; /* 按钮组居中 */
+  gap: 1rem;
+}
+
+
 .owner-name {
-  font-size: 18px;
   font-weight: bold;
+  font-size: 1.2rem;
+  color: #4e342e;
+  /* 深咖啡色 */
+  margin: 0;
 }
 
 .owner-phone {
-  font-size: 14px;
-  color: #555;
+  color: #616161;
+  margin: 0;
 }
 
-.appointment-section {
-  margin-bottom: 20px;
-}
-
-.send-message-button {
-  background-color: #3579c0;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
-}
-
-.send-message-button:hover {
-  background-color: #0056b3;
+.loading-owner {
+  text-align: center;
+  color: #757575;
 }
 </style>
