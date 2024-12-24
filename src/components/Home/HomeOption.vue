@@ -28,6 +28,7 @@ import { ref } from 'vue';
     const cookingRef = ref(true);
     const waterdispenser = ref(true);
     const feeRef = ref(true);
+    const genderRef = ref(0);
     const genderboy = ref(true);
     const gendergirl = ref(true);
     const houseRef = ref(true);
@@ -45,6 +46,29 @@ import { ref } from 'vue';
             errRef.value="租金範圍有誤 , 最小值不能大於最大值";
             return
         }
+
+        if (genderboy.value && gendergirl.value){
+            genderRef.value = 2
+        }else if(gendergirl.value){
+            genderRef.value = 1
+        }else{
+            genderRef.value = 0
+        }
+
+        let houseType='';
+        if (houseRef.value){
+            houseType = houseType + '透天,'
+        }
+        if(independenthouse.value){
+            houseType = houseType + '獨立套房,'
+        }
+        if(renthouse.value){
+            houseType = houseType + '分租套房,'
+        }
+        if(sharehouse.value){
+            houseType = houseType + '雅房,'
+        }
+        houseType = houseType.substring(0,houseType.length-1)
 
         const options = {
             minPrice: minprice.value,
@@ -69,26 +93,26 @@ import { ref } from 'vue';
             cooking: cookingRef.value,
             waterDispenser: waterdispenser.value,
             fee: feeRef.value,
-            genderBoy: genderboy.value,
-            genderGirl: gendergirl.value,
-            house: houseRef.value,
-            independentHouse: independenthouse.value,
-            rentHouse: renthouse.value,
-            shareHouse: sharehouse.value,
+            gender: genderRef.value,
+            houseType: houseType,
+            // house: houseRef.value,
+            // independentHouse: independenthouse.value,
+            // rentHouse: renthouse.value,
+            // shareHouse: sharehouse.value,
             priority: priority.value,
         }
         errRef.value='';
         optionStore.updateData(options);
         emits('update-flipped');
-        // console.log(JSON.stringify(option));
+        console.log(JSON.stringify(options));
     }
     
 </script>
 <template>
     <main>
         
-    <div class="container py-2 px-4 bg-body custom-shadow">
-    <div class="row gy-4">
+    <div class="container py-2 px-2 bg-body custom-shadow">
+    <div class="row">
         <p class="err" v-text="errRef"></p>
         <div class="col-12 col-md-12">
             <div class="card border-secondary mb-3" style="max-width: 100%;">
@@ -107,8 +131,8 @@ import { ref } from 'vue';
                 </div>
             </div>
         </div>
-        <div class="col-12 col-md-6">
-            <div class="card border-secondary mb-3" style="max-width: 100%;">
+        <div class="col-12 col-md-8">
+            <div class="card border-secondary mb-3" style="width: 100%;">
                 <div class="card-header">房屋篩選</div>
                 <div class="card-body text-secondary">
                     <div class="row gy-4">
@@ -278,7 +302,7 @@ import { ref } from 'vue';
                 </div>
             </div>
         </div>
-        <div class="col-12 col-md-6">
+        <div class="col-12 col-md-4">
             <div class="card border-secondary mb-3" style="max-width: 100%;">
                 <div class="card-header">搜尋方式</div>
                 <div class="card-body text-secondary">
@@ -319,6 +343,10 @@ import { ref } from 'vue';
 
 </template>
 <style scoped>
+    main{
+        width: 100%;
+        height: 200px;
+    }
     .err{
         font-size: 16px;
         color: red;
