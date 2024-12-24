@@ -25,7 +25,9 @@
         />
       </div>
       <p v-if="errorMessage" class="error text-danger">{{ errorMessage }}</p>
-      <button type="submit" class="btn btn-primary w-100">登入</button>
+      <button type="submit" class="btn btn-primary w-100 g-recaptcha">
+        登入
+      </button>
 
       <!-- 忘記密碼按鈕 -->
       <button
@@ -62,24 +64,14 @@ export default {
   methods: {
     async handleLogin() {
       try {
-        // 獲取 reCAPTCHA token
-        // const recaptchaToken = await new Promise((resolve, reject) => {
-        //   grecaptcha.ready(() => {
-        //     grecaptcha
-        //       .execute(import.meta.env.VITE_RECAPTCHA_SITE_KEY, {
-        //         action: "login",
-        //       })
-        //       .then(resolve, reject);
-        //   });
-        // });
+        const recaptchaToken = await this.executeRecaptcha();
 
-        // 發送登入請求到後端 （新增一個 recaptchaToken）
         const response = await api.post(
-          "http://localhost:8080/api/user/login",
+          `http://localhost:8080/api/user/login`,
           {
             email: this.email,
             password: this.password,
-            // recaptchaToken,
+            recaptchaToken,
           }
         );
 
@@ -95,13 +87,40 @@ export default {
       } catch (error) {
         // 錯誤處理
         this.errorMessage =
-          error.response?.data?.message || "登入失敗，請檢查帳號或密碼。";
+          error.response?.data?.message ||
+          `登入失敗，請檢查帳號或密碼。（錯誤：${error.message}）`;
+        console.error("登入錯誤詳情：", error.response || error);
       }
     },
+    executeRecaptcha() {
+      return new Promise((resolve, reject) => {
+        if (!window.grecaptcha) {
+          reject(new Error("reCAPTCHA 尚未載入，請稍後再試"));
+          return;
+        }
+        window.grecaptcha
+          .execute(import.meta.env.VITE_RECAPTCHA_SITE_KEY, { action: "login" })
+          .then(resolve)
+          .catch((error) => {
+            reject(new Error("reCAPTCHA 執行失敗：" + error.message));
+          });
+      });
+    },
+
     closeForgotPassword() {
       // 關閉 ForgotPassword 組件
       this.showForgotPassword = false;
     },
+  },
+  mounted() {
+    // 載入 Google reCAPTCHA v3
+    const script = document.createElement("script");
+    script.src = `https://www.google.com/recaptcha/api.js?render=${
+      import.meta.env.VITE_RECAPTCHA_SITE_KEY
+    }`;
+    script.async = true;
+    script.defer = true;
+    document.head.appendChild(script);
   },
 };
 </script>
