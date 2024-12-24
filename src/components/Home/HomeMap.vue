@@ -89,7 +89,7 @@ onMounted(() => {
 
       const buttonElement = document.createElement("button");
       buttonElement.className="btn-purple"
-      buttonElement.innerHTML=`${Number(marker.price)/1000}K`
+      buttonElement.innerHTML=`${(Number(marker.price)/1000).toFixed(1)}K`
       buttonElement.style.pointerEvents = "auto";
 
       var latlng = new google.maps.LatLng(marker.lat, marker.lng);
@@ -104,7 +104,7 @@ onMounted(() => {
 
     const buttonOrigin = document.createElement("button");
     buttonOrigin.className="btn-yellow"
-    buttonOrigin.innerHTML=`${(Number(avgPrice)/1000).toFixed(1)}K`
+    buttonOrigin.innerHTML=`${(Number(origin.price)/1000).toFixed(1)}K`
     buttonOrigin.style.pointerEvents = "auto";
     var latlng = new google.maps.LatLng(origin.lat, origin.lng);
     var mapMark = new google.maps.marker.AdvancedMarkerElement({
@@ -312,11 +312,11 @@ onMounted(() => {
 
 <template>
   <div>
-    <button class="btn btn-outline-danger btnDraw" ref="refbtnDraw" @click="toggleDrawingMode">
-      {{ isDrawingMode ? '關閉繪圖模式' : '啟動繪圖模式' }}
+    <button class="btn btn-primary btnDraw" ref="refbtnDraw" @click="toggleDrawingMode">
+      <i class="bi bi-pencil-fill"></i>
     </button>
-    <button class="btn btn-outline-danger btnConfig" ref="refbtnConfig" @click="showConfig">
-      {{'設定'}}
+    <button class="btn btn-primary btnConfig" ref="refbtnConfig" @click="showConfig">
+      <i class="bi bi-exclamation-circle"></i>
     </button>
     <div ref="map" class="map-container" v-once></div>
     <canvas ref="canvas" class="drawing-canvas"></canvas>
@@ -346,16 +346,16 @@ onMounted(() => {
 }
 .btnDraw{
   display: none;
-  position: absolute;
-  top: 10px;
-  left: 60%;
+  position: fixed; /* 改為 fixed */
+  top: 60px; /* 距離視窗頂部 60px */
+  left: calc(100% - 50px); /* 從右側固定 */
   z-index: 2;
 }
 .btnConfig{
   display: none;
-  position: absolute;
-  top: 10px;
-  left: 45%;
+  position: fixed; /* 改為 fixed */
+  top: 110px; /* 距離視窗頂部 60px */
+  left: calc(100% - 50px); /* 從右側固定 */
   z-index: 2;
 }
 .btn-purple {
@@ -365,7 +365,7 @@ onMounted(() => {
     padding: 3px; /* 增加按鈕內邊距 */
     border: none; /* 去掉邊框 */
     transition: background-color 0.3s ease;
-    width: 30px;
+    width: 40px;
 }
 
 .btn-purple:hover {

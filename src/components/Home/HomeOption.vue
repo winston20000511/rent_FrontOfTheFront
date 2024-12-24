@@ -25,6 +25,7 @@ import { onMounted, ref } from 'vue';
     const sharehouse = ref(true);
     const housetype = ref('');
     const priorityRef = ref('a');
+    const sortRef = ref('desc');
 
     const showMap = ()=>{
         emits('update-flipped')
@@ -73,6 +74,7 @@ import { onMounted, ref } from 'vue';
             gender: genderRef.value,
             houseType: housetype.value,
             priority: priorityRef.value,
+            sort: sortRef.value
         }
         errRef.value='';
         optionStore.updateData(options);
@@ -109,80 +111,6 @@ import { onMounted, ref } from 'vue';
                 <div class="card-header">房屋篩選</div>
                 <div class="card-body text-secondary">
                     <div class="row gy-4">
-                        <!-- <div class="col-12 col-md-6">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" v-model="washingmachine" id="washingMachine" checked>
-                                <label class="form-check-label" for="washingMachine">
-                                    洗衣機
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" v-model="airconditioner" id="airConditioner" checked>
-                                <label class="form-check-label" for="airConditioner">
-                                    冷氣
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" v-model="network" id="netWork" checked>
-                                <label class="form-check-label" for="netWork">
-                                    網路
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" v-model="bedstead" id="bedStead" checked>
-                                <label class="form-check-label" for="bedStead">
-                                    床架
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" v-model="mattress" id="matTress" checked>
-                                <label class="form-check-label" for="matTress">
-                                    床墊
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" v-model="refrigerator" id="refRigerator" checked>
-                                <label class="form-check-label" for="refRigerator">
-                                    冰箱
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" v-model="ewaterheater" id="ewaterHeater" checked>
-                                <label class="form-check-label" for="ewaterHeater">
-                                    電熱水器
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" v-model="gwaterheater" id="gwaterHeater" checked>
-                                <label class="form-check-label" for="gwaterHeater">
-                                    瓦斯熱水器
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" v-model="television" id="teleVision" checked>
-                                <label class="form-check-label" for="teleVision">
-                                    電視
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" v-model="channelfour" id="channelFour" checked>
-                                <label class="form-check-label" for="channelFour">
-                                    第四台
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" v-model="sofaRef" id="sofa" checked>
-                                <label class="form-check-label" for="sofa">
-                                    沙發
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" v-model="tablesRef" id="tables" checked>
-                                <label class="form-check-label" for="tables">
-                                    桌椅
-                                </label>
-                            </div>
-                        </div> -->
                         <div class="col-12 col-md-6">
                             <div class="form-check">
                                 <input class="form-check-input" type="checkbox" v-model="petRef" id="pet">
@@ -275,27 +203,45 @@ import { onMounted, ref } from 'vue';
                 </div>
             </div>
         </div>
-        <div class="col-12 col-md-4">
+        <div class="col-12 col-md-6">
             <div class="card border-secondary mb-3" style="max-width: 100%;">
                 <div class="card-header">搜尋方式</div>
                 <div class="card-body text-secondary">
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="adsPriority" id="adsPriority" value="a" v-model="priorityRef">
-                        <label class="form-check-label" for="adsPriority">
-                            廣告優先
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="pricePriority" id="pricePriority" value="p" v-model="priorityRef">
-                        <label class="form-check-label" for="pricePriority">
-                            價錢優先
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="clickPriority" id="clickPriority" value="c" v-model="priorityRef">
-                        <label class="form-check-label" for="clickPriority">
-                            點擊優先
-                        </label>
+                    <div class="row gy-4">
+                        <div class="col-12 col-md-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="adsPriority" id="adsPriority" value="a" v-model="priorityRef">
+                                <label class="form-check-label" for="adsPriority">
+                                    廣告優先
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="pricePriority" id="pricePriority" value="p" v-model="priorityRef">
+                                <label class="form-check-label" for="pricePriority">
+                                    價錢優先
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="clickPriority" id="clickPriority" value="c" v-model="priorityRef">
+                                <label class="form-check-label" for="clickPriority">
+                                    點擊優先
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="sortDesc" id="sortDesc" value="desc" v-model="sortRef">
+                                <label class="form-check-label" for="sortDesc">
+                                    高到低
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="sortAsc" id="sortAsc" value="asc" v-model="sortRef">
+                                <label class="form-check-label" for="sortAsc">
+                                    低到高
+                                </label>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -29,6 +29,7 @@ export const useOption = defineStore('option', {
           shareHouse: true,
           houseType: '透天,獨立套房,分租套房,雅房',
           priority: 'a',
+          sort: 'desc'
         };
       },
     },

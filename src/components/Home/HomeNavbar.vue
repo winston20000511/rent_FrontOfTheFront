@@ -82,7 +82,9 @@ const emits = defineEmits(['add-marker','signInClicked'])
     
     const showKeyWordFetch = async () =>{
         const input = {
-          origin: searchInputRef.value.value
+          origin: searchInputRef.value.value,
+          priority: optionStore.shareOptions.priority,
+          sort: optionStore.shareOptions.sort
         }
         // const merge = Object.assign({},input,optionStore.shareOptions)
 
@@ -368,8 +370,10 @@ const handleSignInClick = () => {
     position: relative; /* 必須是相對定位 */
 }
 .fa-magnifying-glass{
-    position: absolute;
-    left: 90%;
+  position: fixed;
+  top: 12%; /* 固定於視窗頂部 60px */
+  left: 62%; /* 基本定位 */
+  transform: translate(-50%,-50%) /* 調整位置 */
 }
 .fa-magnifying-glass:hover{
 	font-size: 20px;
