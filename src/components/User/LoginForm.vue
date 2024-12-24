@@ -97,7 +97,8 @@ export default {
         if (!window.grecaptcha) {
           reject(new Error("reCAPTCHA 尚未載入，請稍後再試"));
           return;
-        }
+        };
+        
         window.grecaptcha
           .execute(import.meta.env.VITE_RECAPTCHA_SITE_KEY, { action: "login" })
           .then(resolve)

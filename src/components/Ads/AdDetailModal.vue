@@ -29,16 +29,12 @@ const EditButtonClass = computed(() => {
 
 watch(
   () => props.detail.adName,
-  (newAdName) => {
-    editableDetails.adName = newAdName;
-  }
+  (newAdName) => {editableDetails.adName = newAdName;}
 );
 
 watch(
   () => props.detail.adPrice,
-  (newAdPrice) => {
-    editableDetails.adPrice = newAdPrice;
-  }
+  (newAdPrice) => {editableDetails.adPrice = newAdPrice;}
 );
 
 // 計算廣告資料，會根據是否處於編輯狀態來決定是否可編輯
@@ -93,7 +89,7 @@ function getAdValidation(startDateStr, adtype) {
 }
 
 // 啟用編輯
-const editDetail = async () => {
+async function editDetail(){
   editableDetails.isEditing = true;
   try {
     const url = "http://localhost:8080/api/advertisements/adtypes";
@@ -125,14 +121,13 @@ watch(
 );
 
 // 儲存選擇的廣告方案
-const saveAdPlan = async () => {
+async function saveAdPlan(){
   const url = "http://localhost:8080/api/advertisements";
+  
   let request = {
     adId: props.detail.adId,
     newAdtypeId: editableDetails.adtypeId,
   };
-
-  console.log("request: ", request);
 
   try{
     const response = await fetch(url, {
@@ -144,7 +139,7 @@ const saveAdPlan = async () => {
     const updatedAd = await response.json();
 
     if(response.ok){
-      console.log("有收到通知")
+      console.log("有收到通知");
       console.log("updated ad: ", updatedAd);
       props.detail.adName = updatedAd.adName;
       props.detail.adPrice = updatedAd.adPrice;
@@ -155,25 +150,28 @@ const saveAdPlan = async () => {
       editableDetails.isEditing = false; // 儲存後關閉編輯
 
     }else{
+
       alert("尚未更新");
     }
 
   }catch(error){
-    console.error("更新方案時出現錯誤", error);
+    
+    console.error("系統更新方案時出現錯誤", error);
   }
   
 };
 
 // 取消編輯
-const cancelEdit = () => {
+function cancelEdit(){
   editableDetails.adName = props.detail.adName;
   editableDetails.isEditing = false;
 };
 
-const closeDetail = () => {
-  editableDetails.isEditing=false;
+function closeDetail(){
+  editableDetails.isEditing = false;
   emit("close-detail");
 };
+
 </script>
 
 <template>
