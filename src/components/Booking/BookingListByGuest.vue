@@ -1,6 +1,6 @@
 <template>
 
-    <div class="card">
+    <div class="booking-list-container">
 
 
 
@@ -10,43 +10,50 @@
                 <Tab :value="1">待回應 ({{ pendingCount }})</Tab>
                 <Tab :value="2">預約中 ({{ bookingedCount }})</Tab>
                 <Tab :value="3">已取消</Tab>
-                <Tab :value="4">歷史紀錄</Tab>
+                <Tab :value="4">已完成</Tab>
             </TabList>
         </Tabs>
 
 
 
-        <DataTable :value="filteredBookingList" stripedRows paginator :rows="5" :rowsPerPageOptions="pageOptions"
-            selectionMode="single" sortField="ID" :sortOrder="1" tableStyle="min-width: 40rem"
-            emptyMessage="目前沒有任何資料可顯示">
+        <DataTable :value="filteredBookingList" :rows="5" :rowsPerPageOptions="pageOptions" :sortOrder="1"
+            selectionMode="single" sortField="ID" tableStyle="min-width: 40rem" stripedRows paginator :filters="filters"
+            filterDisplay="row" emptyMessage="目前沒有任何資料可顯示">
 
             <template #header>
-                <div class="flex flex-wrap items-center justify-between gap-2">
-                    <span class="text-xl font-bold">我的預約</span>
+                <div class="flex flex-wrap items-center justify-end gap-2">
+                    <div>
+                        <span>
+                            <i class="pi pi-search search-icon"></i>
+                            <InputText v-model="filters['global'].value" placeholder="搜尋房屋..." class="search-input" />
+                        </span>
+                    </div>
                     <Button icon="pi pi-refresh" @click="refresh" rounded raised />
                 </div>
             </template>
 
             <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header"
                 class="text-center text-gray-500" :headerStyle="col.headerStyle" :sortable="col.sortable">
+
                 <!-- 自定義 'photos' 列的內容 -->
                 <template v-if="col.field === 'photos'" #body="slotProps">
-                    <div class="flex gap-2">
-                        <img v-for="(photo, index) in slotProps.data.photos" :key="index"
-                            :src="`data:image/jpeg;base64,${photo.base64}`" alt="房屋圖片"
-                            style="width: 50px; height: 50px; object-fit: cover;" />
+                    <div class="flex items-center justify-center gap-2" style="width: 100%; height: 80px;">
+                        <img :src="getPhoto(slotProps.data.photos)" alt="房屋圖片"
+                            style="width: 100%; height: 100%; object-fit: fill;" />
                     </div>
                 </template>
+
                 <!-- 自定義 'status' 列的內容 -->
                 <template v-if="col.field === 'status'" #body="slotProps">
                     <Tag :value="slotProps.data.Status" :severity=getSeverity(slotProps.data.status)>
                         {{ statusMap[slotProps.data.status] }}
                     </Tag>
                 </template>
+
                 <!-- 自定義 'operate' 列的內容 -->
                 <template v-if="col.field === 'operate'" #body="slotProps">
-                    <Button v-if="slotProps.data.status === 0 || 1" label="取消預約" severity="danger"
-                        @click="confirmDeleteBooking(slotProps.data)" />
+                    <Button v-if="slotProps.data.status === 0 || slotProps.data.status === 1" label="取消預約"
+                        severity="danger" @click="confirmcancelBooking(slotProps.data)" />
                 </template>
             </Column>
 
@@ -61,15 +68,20 @@
             </template>
         </DataTable>
 
-        <Dialog v-model:visible="deleteBookingDialog" :style="{ width: '450px' }" header="確認" :modal="true">
-            <div class="flex items-center gap-4">
+        <Dialog v-model:visible="cancelBookingDialog" :style="{ width: '450px' }" header="確認" :modal="true"
+            :contentStyle="{ fontSize: '18px' }"
+            >
+            
+            <div class="flex items-center gap-4 ">
                 <i class="pi pi-exclamation-triangle !text-3xl" />
                 <span v-if="selectedBooking">您確定要取消 <b class="text-danger">編號: {{ selectedBooking.bookingId }}</b>
                     的預約嗎?</span>
             </div>
+            
             <template #footer>
-                <Button label="Yes" icon="pi pi-check" severity="secondary" text @click="deleteBooking" />
-                <Button label="No" icon="pi pi-times" severity="contrast" @click="deleteBookingDialog = false" />
+                <Button label="Yes" icon="pi pi-check" severity="secondary" text
+                    @click="cancelBooking(selectedBooking)" />
+                <Button label="No" icon="pi pi-times" severity="contrast" @click="cancelBookingDialog = false" />
             </template>
         </Dialog>
 
@@ -83,34 +95,34 @@
 import { ref, onMounted, watch, computed, inject } from 'vue';
 import DataTable from 'primevue/datatable';
 import Column from 'primevue/column';
-import 'primeicons/primeicons.css'
-import ColumnGroup from 'primevue/columngroup';   // optional
-import Row from 'primevue/row';
-import { Tag } from 'primevue';
-import Tabs from 'primevue/tabs';
-import TabList from 'primevue/tablist';
-import Tab from 'primevue/tab';
-import OverlayBadge from 'primevue/overlaybadge';
-import ConfirmDialog from 'primevue/confirmdialog';
-import { useConfirm } from "primevue/useconfirm";
-import { useToast } from "primevue/usetoast";
+import InputText from "primevue/inputtext";
 import Toast from 'primevue/toast';
+import TabList from 'primevue/tablist';
+import Tabs from 'primevue/tabs';
+import Tab from 'primevue/tab';
 import Dialog from 'primevue/dialog';
-
+import placeholderImage from "@/assets/no-image.png";
+import 'primeicons/primeicons.css'
+import { Tag } from 'primevue';
+import { useToast } from "primevue/usetoast";
 
 
 const BASE_URL = import.meta.env.VITE_APIURL
 const TOKEN = localStorage.getItem('jwt');
 
-const bookingList = ref([]);
-const filteredBookingList = ref([]);
+const bookingList = ref([]);    // 載入的預約列表
+const filteredBookingList = ref([]); // 過濾後的預約列表
 const activeTab = ref(0); // 默認 0:顯示全部
-const confirm = useConfirm();
 const toast = useToast();
 const selectedBooking = ref({});
-const deleteBookingDialog = ref(false);
+const cancelBookingDialog = ref(false);
 
-// 設定 ( 對應屬性 欄位名稱 是否排列 )
+// 搜尋功能
+const filters = ref({
+    global: { value: null, matchMode: "contains" },
+});
+
+// 設定欄位 ( 對應屬性 欄位名稱 是否排列 欄位寬度 )
 const columns = [
     { field: 'photos', header: '', sortable: false, headerStyle: 'width: 10%;' },
     { field: 'houseTitle', header: '房屋名稱', sortable: false, headerStyle: 'width: 15%;' },
@@ -146,8 +158,7 @@ const load = async () => {
         });
 
         if (!response.ok) {
-            // 使用 Error 類型來拋出錯誤
-            throw new Error(`HTTP 錯誤! 狀態碼: ${response.status} - ${response.statusText}`);
+            throw new Error(`狀態碼: ${response.status} ; ${response.statusText}`);
         }
 
         const data = await response.json();
@@ -170,13 +181,12 @@ const load = async () => {
 
                 booking.photos = photos;
             } else {
-                console.warn(`無法獲得 houseId=${houseId} 的圖片，HTTP STATUS: ${photosResponse.status}`);
+                throw new Error(`狀態碼: ${photosResponse.status} ; 無法獲得 houseId=${houseId} 的圖片 ;`);
                 booking.photos = [];
             }
         }
-        console.log('包含圖片的 bookingList:', bookingList.value);
 
-        useFilter();
+        useFilter(); // 過濾載入的資料
     } catch (error) {
         console.error('載入失敗，原因:', error.message);
     }
@@ -220,20 +230,41 @@ const onTabChange = (tabValue) => {
     useFilter();
 };
 
-const confirmDeleteBooking = (prod) => {
+const confirmcancelBooking = (prod) => {
     selectedBooking.value = prod;
-    deleteBookingDialog.value = true;
+    cancelBookingDialog.value = true;
 }
 
-const deleteBooking = () => {
-    deleteBookingDialog.value = false;
-    selectedBooking.value = {};
+const cancelBooking = async (selectedBooking) => {
+    try {
+        cancelBookingDialog.value = false;  // 關閉 Dialog
+        selectedBooking.value = {};         // 清空所選預約
 
+        const bookingDate = selectedBooking.bookingDate;  // 'yyyy-MM-dd HH:mm:ss'
+        const [datePart, timePart] = bookingDate.split(' ');
+        selectedBooking.bookingDate = datePart;  // 'yyyy-MM-dd'
+        selectedBooking.bookingTime = timePart;  // 'HH:mm:ss'
 
+        const response = await fetch(`${BASE_URL}/booking/guest`, {
+            method: 'put',
+            headers: {
+                'Content-Type': 'application/json',
+                'authorization': `${TOKEN}`,
+            },
+            body: JSON.stringify(selectedBooking),
+        });
 
+        if (!response.ok) {
+            throw new Error(`狀態碼: ${response.status} ; ${response.statusText}`);
+        }
+        const data = await response.json();
 
-    load();
-    toast.add({ severity: 'success', summary: 'Successful', detail: '預約已取消', life: 3000 });
+        toast.add({ severity: data.status, summary: data.message, life: 4000 });
+        load();
+    }
+    catch (error) {
+        console.error('載入失敗，原因:', error.message);
+    }
 };
 
 const refresh = () => {
@@ -258,13 +289,24 @@ const getSeverity = (status) => {
     }
 }
 
+// 轉成圖片 (僅取得第一張, 沒資料時提供預設圖片)
+const getPhoto = (photos) => {
+    return (Array.isArray(photos) && photos.length > 0)
+        ? `data:image/jpeg;base64,${photos[0].base64}` : placeholderImage;
+};
+
 onMounted(() => {
     load();
 });
 
-watch(activeTab, (newValue) => {
-    // console.log(newValue);
-})
+// 測試換頁
+// watch(activeTab, (newValue) => { 
+//      console.log("測試換頁: "+newValue);
+// })
+
+watch(filters, () => {
+    console.log("測試搜尋: " + filters.value.global.value)
+}, { deep: true });
 
 </script>
 
@@ -276,4 +318,28 @@ watch(activeTab, (newValue) => {
     /* 文字置中 */
 }
 
+/* 搜尋欄樣式 */
+.search-bar {
+    display: flex;
+    align-items: center;
+}
+
+.search-icon {
+    margin-right: 12px;
+}
+
+.search-input {
+    width: 300px;
+    border: 1px solid #bae6fd;
+    border-radius: 5px;
+    padding: 8px;
+}
+
+
+.booking-list-container {
+    padding: 20px;
+    background-color: #f0f9ff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
 </style>
