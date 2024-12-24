@@ -1,4 +1,4 @@
-<template>
+span<template>
   <div class="house-list-container">
     <!-- 標題 -->
     <h2 class="title">房屋管理系統</h2>
@@ -20,15 +20,13 @@
 
     <!-- 房屋列表 -->
     <DataTable :value="houses" responsiveLayout="scroll" :paginator="true" :rows="5" class="custom-table"
-      :filters="filters" filterDisplay="row" :sortField="sortField" :sortOrder="sortOrder">
+    :filters="filters" filterDisplay="row" :sortField="sortField" :sortOrder="sortOrder">
       <!-- 房屋圖片 -->
       <Column header="圖片" style="width: 150px">
         <template #body="slotProps">
           <div class="image-container">
             <img v-if="slotProps.data.images && slotProps.data.images.length > 0" :src="slotProps.data.images[0]"
-            alt="House Image"
-            class="image-preview"
-            />
+              alt="House Image" class="image-preview" />
             <span v-else>無圖片</span>
           </div>
         </template>
@@ -306,7 +304,8 @@ export default {
 .image-preview {
   width: 100%;
   height: 100%;
-  object-fit: cover; /* 保持圖片比例，裁切超出部分 */
+  object-fit: cover;
+  /* 保持圖片比例，裁切超出部分 */
   border-radius: 4px;
 }
 

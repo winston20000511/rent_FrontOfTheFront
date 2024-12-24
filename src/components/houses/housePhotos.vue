@@ -8,12 +8,27 @@
     <div v-else>
       <!-- 如果有圖片 -->
       <div v-if="photos.length > 0">
-        <Splide :options="splideOptions" class="splide-container" @arrows-mounted="addLoopArrows">
+        <Splide :options="splideOptions" class="splide-container">
+          <template #arrows>
+            <button class="splide__arrow splide__arrow--prev">
+
+              <svg viewBox="0 0 24 24">
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
+            </button>
+            <button class="splide__arrow splide__arrow--next">
+
+              <svg viewBox="0 0 24 24">
+                <path d="M9 6l6 6-6 6" />
+              </svg>
+            </button>
+          </template>
           <SplideSlide v-for="(photo, index) in photos" :key="photo.id">
             <img
               :src="`data:image/jpeg;base64,${photo.base64}`"
               alt="房屋圖片"
               class="main-photo"
+              @click="openImageModal(photo)"
             />
           </SplideSlide>
         </Splide>
@@ -24,18 +39,25 @@
         <img src="../../assets/no-image.png" alt="暫時無照片展示" />
       </div>
     </div>
+
+    <!-- 圖片模態框 -->
+    <Dialog v-model:visible="isModalVisible" header="圖片查看" :modal="true" :style="{ width: '80vw' }">
+      <img :src="selectedPhotoSrc" alt="選中圖片" style="width: 100%;" />
+    </Dialog>
   </div>
 </template>
 
 <script>
 import { Splide, SplideSlide } from '@splidejs/vue-splide';
 import '@splidejs/splide/dist/css/splide.min.css';
+import Dialog from 'primevue/dialog'; // 引入 Dialog 组件
 
 export default {
   name: "HousePhotos",
   components: {
     Splide,
     SplideSlide,
+    Dialog,
   },
   props: {
     houseId: {
@@ -53,14 +75,17 @@ export default {
       loading: true,
       error: null,
       splideOptions: {
-        type: "loop",
+        type: "fade-loop",
         perPage: 1,
-        focus: "center",
-        gap: "1rem",
-        padding: { left: "5rem", right: "5rem" },
+        focus: "start", 
+        gap: "1em",
+        padding: { left: "50px", right: "50px" },
         pagination: true,
-        arrowPath: "M14 2L3 12L14 22", // 客製箭頭路徑
+        arrows: true,
+        start: 0, // 確保從第一張開始
       },
+      isModalVisible: false, 
+      selectedPhotoSrc: '', 
     };
   },
   methods: {
@@ -90,10 +115,9 @@ export default {
         this.loading = false;
       }
     },
-    addLoopArrows(splide) {
-      splide.on('arrow:mounted', () => {
-        // 如果需要在 mounted arrows 時再做一些操作
-      });
+    openImageModal(photo) {
+      this.selectedPhotoSrc = `data:image/jpeg;base64,${photo.base64}`;
+      this.isModalVisible = true;
     },
   },
   watch: {
@@ -136,43 +160,78 @@ export default {
 .main-photo {
   display: block;
   margin: 0 auto;
-  max-width: 90%; /* 保持圖片不超出容器寬度 */
-  height: 100%; /* 讓高度根據寬度自適應 */
-  object-fit: contain; /* 避免圖片被裁切，可根據需求改成 cover */
+  max-width: 100%; /* 調整為 100% 以適應容器 */
+  max-height: 500px;
+  object-fit: contain;
   border: 1px solid #ddd;
   border-radius: 8px;
-  transition: transform 0.3s ease; /* 滑鼠懸停效果 */
+  transition: transform 0.3s ease;
+  cursor: pointer;
 }
 .main-photo:hover {
   transform: scale(1.05);
 }
 
 .splide-container {
+  width: 100%; /* 確保容器佔滿父元素的寬度 */
   padding: 1rem;
 }
+
+.splide__arrow {
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+}
+
+.splide__arrow svg {
+  fill: #ff9800; /* 箭頭颜色 */
+  width: 100%;
+  height: 100%;
+}
+
+.splide__arrow--prev {
+  left: 10px;
+}
+
+.splide__arrow--next {
+  right: 10px;
+}
+
+.splide__arrow:hover svg {
+  fill: #e68900;
+}
+
 .splide__pagination {
   bottom: -1.5rem;
 }
+
 .splide__pagination__page {
   background-color: gray;
   width: 12px;
   height: 12px;
   border-radius: 50%;
 }
+
 .splide__pagination__page.is-active {
   background-color: red;
 }
 
-/* 響應式樣式 */
+/* 响应式样式 */
 @media (max-width: 1200px) {
   .main-photo {
-    max-width: 80%; /* 在較小螢幕上縮小圖片 */
+    max-width: 80%;
   }
 }
-
 @media (max-width: 768px) {
   .main-photo {
-    max-width: 70%; /* 手機裝置上進一步縮小 */
+    max-width: 70%;
+    max-height: 300px;
   }
 }
 </style>
