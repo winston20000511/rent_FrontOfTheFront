@@ -31,7 +31,11 @@
                 class="text-center text-gray-500" :headerStyle="col.headerStyle" :sortable="col.sortable">
                 <!-- 自定義 'photos' 列的內容 -->
                 <template v-if="col.field === 'photos'" #body="slotProps">
-                    <img src="#" alt="沒圖片">
+                    <div class="flex gap-2">
+                        <img v-for="(photo, index) in slotProps.data.photos" :key="index"
+                            :src="`data:image/jpeg;base64,${photo.base64}`" alt="房屋圖片"
+                            style="width: 50px; height: 50px; object-fit: cover;" />
+                    </div>
                 </template>
                 <!-- 自定義 'status' 列的內容 -->
                 <template v-if="col.field === 'status'" #body="slotProps">
@@ -271,4 +275,5 @@ watch(activeTab, (newValue) => {
     text-align: center;
     /* 文字置中 */
 }
+
 </style>
