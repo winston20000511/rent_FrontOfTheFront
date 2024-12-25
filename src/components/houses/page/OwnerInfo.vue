@@ -1,8 +1,13 @@
 <template>
   <div class="owner-info-container">
     <div v-if="ownerInfo" class="owner-basic">
-      <Avatar :image="ownerInfo.picture || '/src/assets/no-photo.png'" size="large" shape="circle" class="owner-avatar"
-        @error="handleImageError" />
+      <Avatar
+        :image="ownerInfo.picture || '/src/assets/no-photo.png'"
+        size="large"
+        shape="circle"
+        class="owner-avatar"
+        @error="handleImageError"
+      />
       <div class="owner-text">
         <p class="owner-name">{{ ownerInfo.name }}</p>
         <p class="owner-phone">{{ ownerInfo.phone }}</p>
@@ -11,24 +16,29 @@
     <div v-else class="loading-owner">正在加載屋主資訊...</div>
 
     <div class="owner-actions flex gap-2">
-      <Button 
-        v-if="!isOwner" 
-        label="傳送訊息" 
-        icon="pi pi-comments" 
-        class="p-button-outlined p-button-warning" 
-        @click="sendMessage" 
+      <Button
+        v-if="!isOwner"
+        label="傳送訊息"
+        icon="pi pi-comments"
+        class="p-button-outlined p-button-warning"
+        @click="sendMessage"
       />
-      <Button 
-        v-if="!isOwner" 
-        label="預約看房" 
-        icon="pi pi-calendar-plus" 
-        class="p-button-warning" 
-        @click="openBookingView" 
+      <Button
+        v-if="!isOwner"
+        label="預約看房"
+        icon="pi pi-calendar-plus"
+        class="p-button-warning"
+        @click="openBookingView"
       />
     </div>
 
     <!-- BookingView 彈窗 -->
-    <BookingView v-if="showBookingView" :isVisible="showBookingView" @closeView="closeBookingView" :houseId="houseId" />
+    <BookingView
+      v-if="showBookingView"
+      :isVisible="showBookingView"
+      @closeView="closeBookingView"
+      :houseId="houseId"
+    />
   </div>
 </template>
 
@@ -60,6 +70,22 @@ export default {
     this.fetchOwnerInfo();
   },
   methods: {
+    parseJwt(token) {
+      try {
+        const base64Url = token.split(".")[1];
+        const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+        const jsonPayload = decodeURIComponent(
+          atob(base64)
+            .split("")
+            .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+            .join("")
+        );
+        return JSON.parse(jsonPayload);
+      } catch (error) {
+        console.error("JWT 解析失敗:", error);
+        return null;
+      }
+    },
     async fetchOwnerInfo() {
       try {
         const token = localStorage.getItem("jwt");
@@ -91,8 +117,8 @@ export default {
           phone: data.phone || "",
           picture: data.picture
             ? `data:image/jpeg;base64,${btoa(
-              String.fromCharCode(...new Uint8Array(data.picture))
-            )}`
+                String.fromCharCode(...new Uint8Array(data.picture))
+              )}`
             : "/src/assets/no-photo.png",
         };
 
@@ -122,12 +148,48 @@ export default {
       this.showBookingView = false;
     },
 
-    sendMessage() {
-      alert(`已發送訊息給 ${this.ownerInfo.name}`);
+    async sendMessage() {
+      console.log("[ownerInfo]arrival send function");
+
+      const token = localStorage.getItem("jwt");
+      console.log(localStorage.getItem("jwt"));
+
+      if (!token) {
+        return alert("未登入");
+      }
+      const decodedToken = this.parseJwt(token);
+      if (!decodedToken) {
+        return alert("JWT 解析錯誤，請重新登入");
+      }
+
+      console.log("current login userId:", decodedToken.userId);
+      console.log("owner userId:", this.ownerInfo.userId);
+
+      const messagePayload = {
+        senderId: decodedToken.userId,
+        receiverId: this.ownerInfo.userId,
+        message: "hi 我對你的 物件 有興趣",
+      };
+
+      try {
+        const response = await axios.post(
+          `${import.meta.env.VITE_APIURL}/messages/send`,
+          messagePayload,
+          {
+            headers: {
+              authorization: `${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+        alert("Message sent successfully!");
+      } catch (error) {
+        console.error(`[Chat] Failed to send message:`, error.message);
+      }
     },
 
     handleImageError(event) {
-      event.target.src = '/src/assets/no-photo.png';
+      event.target.src = "/src/assets/no-photo.png";
     },
   },
 };
