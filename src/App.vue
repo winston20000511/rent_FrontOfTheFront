@@ -78,7 +78,8 @@ const addMarker = (locations) => {
 }
 
 .app-main {
-  flex: 1; /* 填滿剩餘空間 */
+  flex: 1;
+  /* 填滿剩餘空間 */
   display: flex;
   flex-direction: column;
 }
