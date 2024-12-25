@@ -33,6 +33,32 @@
             <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header"
                 class="text-center text-gray-500" :headerStyle="col.headerStyle" :sortable="col.sortable">
 
+                <!-- 自定義 'user' 列的內容 -->
+                <template v-if="col.field === 'userName'" #body="slotProps">
+
+                    <div class="relative inline-block">
+                        <!-- 主要顯示的姓名 -->
+                        <div class="font-bold text-black cursor-pointer"
+                            @click="togglePopover(slotProps.data.bookingId)">
+                            {{ slotProps.data.userName }}
+                        </div>
+
+                        <!-- Popover 區塊 -->
+                        <div v-if="isPopoverVisible(slotProps.data.bookingId)" class="popover-content" absolute >
+                            <div class="flex justify-between items-center">
+                                <p>📧 {{ slotProps.data.userEmail }}</p>
+                                <Button icon="pi pi-copy" @click="copyToClipboard(slotProps.data.userEmail)"
+                                    class="p-button-rounded p-button-text" />
+                            </div>
+                            <div class="flex justify-between items-center mt-2">
+                                <p>📞 {{ slotProps.data.userPhone }}</p>
+                                <Button icon="pi pi-copy" @click="copyToClipboard(slotProps.data.userPhone)"
+                                    class="p-button-rounded p-button-text" />
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
                 <!-- 自定義 'photos' 列的內容 -->
                 <template v-if="col.field === 'photos'" #body="slotProps">
                     <div class="flex items-center justify-center gap-2" style="width: 100%; height: 80px;">
@@ -141,6 +167,7 @@ import placeholderImage from "@/assets/no-image.png";
 import 'primeicons/primeicons.css'
 import { Tag } from 'primevue';
 import { useToast } from "primevue/usetoast";
+import Popover from 'primevue/popover';
 
 
 const BASE_URL = import.meta.env.VITE_APIURL
@@ -150,10 +177,22 @@ const bookingList = ref([]);    // 載入的預約列表
 const filteredBookingList = ref([]); // 過濾後的預約列表
 const activeTab = ref(0); // 默認 0:顯示全部
 const toast = useToast();   //右上角提示視窗 (可以直接使用)
+const activePopoverId = ref(null); // 用於追蹤目前顯示的 Popover ID
 const selectedBooking = ref({}); // 目前選擇的預約
 const cancelBookingDialog = ref(false);
 const processBookingDialog = ref(false);
 const loading = ref(false); // 轉圈圈
+
+// 切換指定行的 Popover 可見性
+const togglePopover = (bookingId) => {
+    activePopoverId.value = activePopoverId.value === bookingId ? null : bookingId;
+};
+
+// 確認 Popover 是否顯示
+const isPopoverVisible = (bookingId) => {
+    return activePopoverId.value === bookingId;
+};
+
 
 // 搜尋功能
 const filters = ref({
@@ -165,7 +204,7 @@ const columns = [
     { field: 'photos', header: '', sortable: false, headerStyle: 'width: 10%;' },
     { field: 'houseTitle', header: '房屋名稱', sortable: false, headerStyle: 'width: 15%;' },
     { field: 'houseAddress', header: '房屋地址', sortable: false, headerStyle: 'width: 25%;' },
-    { field: 'housePrice', header: '房屋租金', sortable: false, headerStyle: 'width: 10%;' },
+    { field: 'userName', header: '預約人', sortable: false, headerStyle: 'width: 10%;' },
     { field: 'bookingDate', header: '預約時間', sortable: true, headerStyle: 'width: 20%;' },
     { field: 'status', header: '狀態', sortable: false, headerStyle: 'width: 10%;' },
     { field: 'operate', header: '操作', sortable: false, headerStyle: 'width: 10%;' }
@@ -400,6 +439,11 @@ onMounted(() => {
 //     console.log("這是測試 搜尋: " + filters.value.global.value)
 // }, { deep: true });
 
+// 測試搜尋
+// watch(activePopoverId, () => {
+//     console.log("這是測試 搜尋: " + activePopoverId.value)
+// }, { deep: true });
+
 </script>
 
 <style scoped>
@@ -428,9 +472,28 @@ onMounted(() => {
     /* 添加邊框 */
 }
 
+/** 確認窗 文字背景色 */
 .booking-time-container span {
     color: #333;
     /* 文字顏色 */
+}
+
+.popover-content {
+    width: 300px;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+
+    position: absolute;
+    top: 120%; 
+    left: 0; 
+    background-color: white;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    padding: 10px;
+    z-index: 10; 
 }
 
 
