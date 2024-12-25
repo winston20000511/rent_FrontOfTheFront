@@ -49,7 +49,7 @@
     }
   
     try {
-      const response = await api.post("/user/resetPassword", {
+      const response = await api.put("http://localhost:8080/api/user/resetPassword", {
         token,
         newPassword: password.value,
       });

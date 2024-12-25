@@ -25,10 +25,18 @@
         />
       </div>
       <p v-if="errorMessage" class="error text-danger">{{ errorMessage }}</p>
-      <button type="submit" class="btn btn-primary w-100 g-recaptcha">
-        登入
+      <button type="submit" class="btn btn-primary w-100">登入</button>
+      <!-- Google 登入按鈕 -->
+    <div class="google-login-btn-container">
+      <button
+        type="button"
+        class="btn btn-dark w-100 mt-3"
+        @click="googleLogin"
+      >
+        使用 Google 帳號登入
       </button>
-
+    </div>
+      
       <!-- 忘記密碼按鈕 -->
       <button
         type="button"
@@ -111,6 +119,13 @@ export default {
             reject(new Error("reCAPTCHA 執行失敗：" + error.message));
           });
       });
+
+    },
+
+    googleLogin() {
+      // 點擊按鈕後，將頁面導向 Google 登入 API 路徑
+      window.location.href = "http://localhost:8080/api/user/google/login";
+
     },
 
     closeForgotPassword() {
@@ -129,6 +144,7 @@ export default {
     document.head.appendChild(script);
   },
 };
+
 </script>
 
 <style scoped>
