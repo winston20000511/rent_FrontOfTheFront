@@ -14,6 +14,10 @@ import CollectHouseList from '@/components/houses/CollectHouseList.vue';
 import BookingListByGuest from '@/components/Booking/BookingListByGuest.vue';
 import BookingListByHost from '@/components/Booking/BookingListByHost.vue';
 import MyAdvertisements from '@/components/Ads/MyAdvertisements.vue';
+import ResetPassword from '@/components/User/ResetPassword.vue'; // 新增 ResetPassword 匯入
+import MemberCenter from '@/components/User/MemberCenter.vue';
+import EditProfile from '@/components/User/EditProfile.vue';
+import DeactivateAccount from '@/components/User/DeactivateAccount.vue';
 
 const routes = [
   {
@@ -28,18 +32,22 @@ const routes = [
     component: ForgotPassword,
   },
   {
-    path: '/edit-user', // 編輯用戶頁面
+    path: '/reset-password', // 重設密碼頁面路徑
+    name: 'ResetPassword',
+    component: ResetPassword, // 顯示 ResetPassword
+  },
+  {
+    path: '/edit-user', // 編輯用戶頁面路徑
     name: 'EditUser',
     component: EditUserPage,
   },
   {
     path: '/member-center', // 會員中心
     name: 'MemberCenter',
-    component: MemberCenter, // 對應你提供的路徑
-    redirect: '/member-center/my-houses', // 默認跳轉到我的房屋
+    component: MemberCenter, // 顯示 MemberCenter
     children: [
       {
-        path: 'edit-profile', // 修改會員資料
+        path: 'edit-profile', // 子路由，顯示 EditProfile
         name: 'EditProfile',
         component: EditProfile,
       },
@@ -75,6 +83,9 @@ const routes = [
         path: 'my-orders', // 編輯用戶
         name: 'MyOrders',
         component: MyOrders,
+        path: '/deactivate-account',
+        name: 'DeactivateAccount',
+        component: DeactivateAccount,
       },
     ],
   },

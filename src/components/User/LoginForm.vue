@@ -48,6 +48,7 @@
 // 引入自訂的 Axios API 模組
 import api from "../../api/api"; // Authorization 自動添加的功能見 api.js
 import ForgotPassword from "../../components/User/ForgotPassword.vue"; // 引入 ForgotPassword 組件
+import { useAuthStore } from "@/stores/auth"; // 引入 Pinia 的 authStore
 
 export default {
   components: {
@@ -80,6 +81,10 @@ export default {
 
         // 儲存 token 到 localStorage
         localStorage.setItem("jwt", token);
+
+        // 更新 authStore 的登入狀態
+        const authStore = useAuthStore();
+        authStore.isLoggedIn = true;
 
         // 登入成功提示並跳轉至會員中心
         alert("登入成功！");
