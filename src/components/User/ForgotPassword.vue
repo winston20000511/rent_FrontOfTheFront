@@ -53,7 +53,7 @@ defineEmits(["close"]);
 async function submitForm() {
   try {
     // 傳送 POST 請求至後端 API
-    const response = await api.post("http://localhost:8080/api/user/forgotPassword", {
+    const response = await api.post("http://localhost:8080/api/forgot/forgotPassword", {
       email: email.value, // 傳送的資料包含電子信箱
     });
 
