@@ -15,8 +15,7 @@ import BookingListByGuest from '@/components/Booking/BookingListByGuest.vue';
 import BookingListByHost from '@/components/Booking/BookingListByHost.vue';
 import MyAdvertisements from '@/components/Ads/MyAdvertisements.vue';
 import ResetPassword from '@/components/User/ResetPassword.vue'; // 新增 ResetPassword 匯入
-import MemberCenter from '@/components/User/MemberCenter.vue';
-import EditProfile from '@/components/User/EditProfile.vue';
+
 import DeactivateAccount from '@/components/User/DeactivateAccount.vue';
 
 const routes = [

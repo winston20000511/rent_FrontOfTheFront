@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted, onUnmounted, ref } from 'vue';
 import { Offcanvas } from 'bootstrap';
-import { ref } from 'vue';
+
 import { useRouter } from 'vue-router'; // 引入 useRouter
 import { useAuthStore } from '@/stores/auth';
 import { useOption } from '@/stores/optionStore';
