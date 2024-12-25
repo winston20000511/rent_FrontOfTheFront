@@ -1,4 +1,3 @@
-<!-- src/components/houses/page/OwnerInfo.vue -->
 <template>
   <div class="owner-info-container">
     <div v-if="ownerInfo" class="owner-basic">
@@ -12,8 +11,20 @@
     <div v-else class="loading-owner">正在加載屋主資訊...</div>
 
     <div class="owner-actions flex gap-2">
-      <Button label="傳送訊息" icon="pi pi-comments" class="p-button-outlined p-button-warning" @click="sendMessage" />
-      <Button label="預約看房" icon="pi pi-calendar-plus" class="p-button-warning" @click="openBookingView" />
+      <Button 
+        v-if="!isOwner" 
+        label="傳送訊息" 
+        icon="pi pi-comments" 
+        class="p-button-outlined p-button-warning" 
+        @click="sendMessage" 
+      />
+      <Button 
+        v-if="!isOwner" 
+        label="預約看房" 
+        icon="pi pi-calendar-plus" 
+        class="p-button-warning" 
+        @click="openBookingView" 
+      />
     </div>
 
     <!-- BookingView 彈窗 -->
@@ -22,7 +33,6 @@
 </template>
 
 <script>
-
 import Button from "primevue/button";
 import Avatar from "primevue/avatar";
 import BookingView from "@/View/BookingView.vue";
@@ -43,6 +53,7 @@ export default {
     return {
       ownerInfo: null,
       showBookingView: false,
+      isOwner: false, // 新增狀態用於判斷是否為屋主
     };
   },
   mounted() {
@@ -55,6 +66,10 @@ export default {
         if (!token) {
           throw new Error("未找到 token");
         }
+
+        // 解析 USERID
+        const userIdFromToken = this.parseUserIdFromToken(token);
+
         const resp = await fetch(
           `http://localhost:8080/api/houses/ownerInfo/${this.houseId}`,
           {
@@ -68,6 +83,8 @@ export default {
           throw new Error(errorText || "未知錯誤");
         }
         const data = await resp.json();
+
+        // 設定 ownerInfo
         this.ownerInfo = {
           userId: data.userId || "",
           name: data.name || "",
@@ -78,22 +95,40 @@ export default {
             )}`
             : "/src/assets/no-photo.png",
         };
+
+        // 比對 TOKEN 中的 USERID 與 API 返回的 USERID
+        this.isOwner = userIdFromToken === this.ownerInfo.userId;
       } catch (error) {
         console.error("取得屋主資訊失敗:", error);
       }
     },
+
+    parseUserIdFromToken(token) {
+      try {
+        const payloadBase64 = token.split(".")[1]; // 提取 payload 部分
+        const decodedPayload = JSON.parse(atob(payloadBase64)); // Base64 解碼
+        return decodedPayload.userid || ""; // 假設 USERID 在 payload 的 userid 欄位
+      } catch (e) {
+        console.error("無法解析 TOKEN:", e);
+        return "";
+      }
+    },
+
     openBookingView() {
       this.showBookingView = true;
     },
+
     closeBookingView() {
       this.showBookingView = false;
     },
+
     sendMessage() {
       alert(`已發送訊息給 ${this.ownerInfo.name}`);
     },
+
     handleImageError(event) {
       event.target.src = '/src/assets/no-photo.png';
-    }
+    },
   },
 };
 </script>
@@ -132,7 +167,6 @@ export default {
   justify-content: center; /* 按钮组居中 */
   gap: 1rem;
 }
-
 
 .owner-name {
   font-weight: bold;
