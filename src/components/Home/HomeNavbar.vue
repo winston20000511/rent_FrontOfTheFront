@@ -108,7 +108,6 @@ const emits = defineEmits(['add-marker','signInClicked'])
     const showLKeyWrodList = async (data)=>{
         searchListReuslt.value = [];
         data.forEach(k=>{
-
             searchListReuslt.value.push({
                 id: Date.now() + Math.random(),
                 address: k.address,
@@ -155,9 +154,8 @@ const emits = defineEmits(['add-marker','signInClicked'])
 
     const checkPaidDate = (item)=>{
         const dateSpec = '1999-01-01T00:00:00';
-        
         const sourceDate = new Date(item.paidDate);
-        const targetDate = new Date(dateSpec)
+        const targetDate = new Date(dateSpec);
         if (sourceDate>targetDate){
             return "bi bi-hand-thumbs-up"
         }else{
@@ -190,96 +188,6 @@ const handleSignInClick = () => {
         <h1>house</h1>
       </div>
     </div>
-
-    <!-- <div class="offcanvas offcanvas-end" 
-    data-bs-scroll="true" 
-    data-bs-backdrop="false" 
-    tabindex="-1" 
-    id="offcanvasScrolling" 
-    aria-labelledby="offcanvasScrollingLabel" 
-    ref="myOffcanvasRef">
-      <div class="offcanvas-header">
-        <h5 class="offcanvas-title" id="offcanvasScrollingLabel">User Setting</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-      </div>
-      <div class="offcanvas-body container py-1 px-4 bg-body custom-left-shadow">
-            <p class="option-title">租金範圍</p>
-            <div class="row gy-4">
-                <div class="col-12 col-md-6">
-                    <label for="price-minimum">Minimum</label>
-                    <input type="text" id="price-minimum" class="form-control" value=0>
-                </div>
-                <div class="col-12 col-md-6">
-                    <label for="price-maximum">Maximum</label>
-                    <input type="text" id="price-maximum" class="form-control" value=0>
-                </div>
-                <div class="col-12 col-md-6">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="adfirst" checked>
-                        <label class="form-check-label" for="adfirst">
-                            廣告優先
-                        </label>
-                    </div>
-                </div>
-            </div>
-            <p class="option-title">房屋類型</p>
-            <div class="row gy-4">
-                <div class="col-12 col-md-6">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="house-typeone" checked>
-                        <label class="form-check-label" for="house-typeone">
-                            透天
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="house-typetwo" checked>
-                        <label class="form-check-label" for="house-typetwo">
-                            獨立套房
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="house-typethree" checked>
-                        <label class="form-check-label" for="house-typethree">
-                            分租套房
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="house-typefour" checked>
-                        <label class="form-check-label" for="house-typefour">
-                            雅房
-                        </label>
-                    </div>
-                </div>
-            </div>
-            <p class="option-title">搜尋方式</p>
-            <div class="row gy-4">
-                <div class="col-12 col-md-12">
-                    <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
-                        <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked>
-                        <label class="btn btn-outline-primary" for="btnradio1">廣告優先</label>
-
-                        <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off">
-                        <label class="btn btn-outline-primary" for="btnradio2">價錢優先</label>
-
-                        <input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off">
-                        <label class="btn btn-outline-primary" for="btnradio3">點擊優先</label>
-                    </div>
-                    
-                    <div class="btn-group" role="group" aria-label="Basic radio toggle button group" style="margin-top: 5px;" >
-                        <input type="radio" class="btn-check" name="btnradio2" id="btnradio11" autocomplete="off" checked>
-                        <label class="btn btn-outline-primary" for="btnradio11">低到高</label>
-
-                        <input type="radio" class="btn-check" name="btnradio2" id="btnradio22" autocomplete="off">
-                        <label class="btn btn-outline-primary" for="btnradio22">高到低</label>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div> -->
-
-    <!-- data-bs-toggle="offcanvas" 
-    data-bs-target="#offcanvasScrolling" 
-    aria-controls="offcanvasScrolling" -->
 
   <div class="filter" id="filter">
     <input type="text" 
@@ -371,7 +279,7 @@ const handleSignInClick = () => {
 }
 .fa-magnifying-glass{
   position: fixed;
-  top: 12%; /* 固定於視窗頂部 60px */
+  top: 11%; /* 固定於視窗頂部 60px */
   left: 62%; /* 基本定位 */
   transform: translate(-50%,-50%) /* 調整位置 */
 }
