@@ -63,9 +63,25 @@
 
                   <!-- 我的廣告 -->
                   <li class="nav-item" role="presentation">
-                    <router-link to="/member-center/ads" class="nav-link" :class="{ active: activeTab === 'ads' }"
-                      role="tab">
-                      我的廣告
+                    <router-link
+                      to="/member-center/my-advertisements"
+                      class="nav-link"
+                      :class="{ active: activeTab === 'ads' }"
+                      role="tab"
+                    >
+                      我的VIP物件清單
+                    </router-link>
+                  </li>
+
+                  <!-- 我的訂單 -->
+                  <li class="nav-item" role="presentation">
+                    <router-link
+                      to="/member-center/my-orders"
+                      class="nav-link"
+                      :class="{ active: activeTab === 'orders' }"
+                      role="tab"
+                    >
+                      VIP物件訂單
                     </router-link>
                   </li>
 
@@ -118,6 +134,12 @@ export default {
         this.activeTab = "ads";
       } else if (to.path === "/member-center/homeowner") {
         this.activeTab = "homeowner";
+      } else if (to.path === "/member-center/reservation") {
+        this.activeTab = "reservation";
+      } else if (to.path === "/member-center/my-advertisements") {
+        this.activeTab = "ads";
+      } else if (to.path === "/member-center/my-orders") {
+        this.activeTab = "orders";
       }
     },
   },
@@ -135,6 +157,12 @@ export default {
       this.activeTab = "ads";
     } else if (this.$route.path === "/member-center/homeowner") {
       this.activeTab = "homeowner";
+    } else if (this.$route.path === "/member-center/reservation") {
+      this.activeTab = "reservation";
+    } else if (this.$route.path === "/member-center/my-advertisements") {
+      this.activeTab = "ads";
+    } else if (this.$route.path === "/member-center/my-orders") {
+      this.activeTab = "orders";
     }
 
     // 動態載入會員資料

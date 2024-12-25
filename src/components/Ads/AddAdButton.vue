@@ -17,16 +17,14 @@
         : "bg-green-500 hover:bg-green-400 focus:ring-green-300";
     });
 
-    const toggleNoAdHouses = () => {
-    emit("toggle-no-ad-houses");
+    function toggleNoAdHouses(){
+      emit("toggle-no-ad-houses");
     };
 
     // watch(source, callback, options?)
     watch(
       () => props.showAdList,
-      (newValue) => {
-          buttonText.value = newValue ? "為物件新增VIP服務+" : "結束新增服務";
-      },
+      (newValue) => {buttonText.value = newValue ? "為物件新增VIP服務+" : "結束新增服務";},
       { immediate: true }
     ); 
 

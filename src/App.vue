@@ -1,7 +1,8 @@
 <script setup>
 import { RouterView } from 'vue-router';
 import { useRouter } from 'vue-router';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import 'bootstrap-icons/font/bootstrap-icons.min.css';
@@ -18,6 +19,20 @@ const showChatPopup = ref(false);
 const toggleChatPopup = () => {
   showChatPopup.value = !showChatPopup.value;
 };
+
+const showChatApp = ref(true);
+const route = useRoute();
+watch(
+  () => route.path,
+  (newPath) => {
+    if (newPath === '/order-confirm' || newPath === '/order-complete') {
+      showChatApp.value = false;
+    } else {
+      showChatApp.value = true;
+    }
+  },
+  { immediate: true }
+);
 
 const showLoginPage = ref(false); // 控制 LoginPage 的顯示
 const toggleLoginPage = () => {
@@ -54,7 +69,7 @@ const addMarker = (locations) => {
     <!-- 聊天彈窗和按鈕 -->
     <div>
       <ChatPopup v-if="showChatPopup" @close="toggleChatPopup" />
-      <button class="chat-button" @click="toggleChatPopup">
+      <button v-if="showChatApp" class="chat-button" @click="toggleChatPopup">
         <i class="bi bi-chat-dots-fill"></i>
       </button>
     </div>

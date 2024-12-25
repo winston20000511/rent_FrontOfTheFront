@@ -15,7 +15,6 @@ import PopUpMessage from "@/components/Ads/PopUpMessage.vue";
 import Overlay from "@/components/Ads/Overlay.vue";
 import AdDetailModal from "@/components/Ads/AdDetailModal.vue";
 import CartList from "@/components/Ads/CartList.vue";
-import TestAdList from "./TestAdList.vue";
 
 const filters = reactive({
   page: 1,
@@ -40,17 +39,21 @@ const noAdHouses = ref([]);
 const adtypes = ref([]);
 const showCart = ref(false);
 
-let token = localStorage.getItem('jwt');
+let token = localStorage.getItem("jwt");
 
 // 取得購物車所需資料：購物車內容 + 使用者擁有的優惠券數量
 const cartStore = useCart();
 
 // 初始化
 onMounted(async () => {
+  isLoading.value = true;
   await filterAds();
   cartStore.initializeCart();
   await getAdtypeAndId();
+  isLoading.value = false;
 });
+
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
 // 篩選條件變更
 const changeFilter = (filterName, filterValue) => {
@@ -66,11 +69,15 @@ const changeFilter = (filterName, filterValue) => {
 const filterAds = async () => {
   console.log("篩選條件: ", filters);
 
+  isLoading.value = true;
   try {
     let url = "http://localhost:8080/api/advertisements/filter";
     const response = await fetch(url, {
       method: "POST",
-      headers: { "Content-Type": "application/json", authorization: `${token}` },
+      headers: {
+        "Content-Type": "application/json",
+        authorization: `${token}`,
+      },
       body: JSON.stringify(filters),
     });
     const data = await response.json();
@@ -80,8 +87,8 @@ const filterAds = async () => {
     ads.value = content;
     totalPages.value = total;
 
-    if(!ads){
-        return;
+    if (!ads) {
+      return;
     }
 
     if (currentPage.value > totalPages.value) {
@@ -93,10 +100,14 @@ const filterAds = async () => {
     }
 
     // 等待 Vue 更新 DOM
-    await nextTick();
+    // await nextTick();
+    await delay(200);
+    
     console.log("Updated ads:", ads.value);
   } catch (error) {
     console.error("發送請求時發生錯誤: ", error);
+  } finally {
+    isLoading.value = false;
   }
 };
 
@@ -119,6 +130,7 @@ const closeAdDetail = () => {
   showOverlay.value = false;
   showAdDetail.value = false;
   detail.value = {};
+  console.log("close ad detail showAdDeatil.value: ", showAdDetail.value);
 };
 
 // 顯示無廣告的物件
@@ -143,7 +155,7 @@ const getAdtypeAndId = async () => {
   const url = "http://localhost:8080/api/advertisements/adtypes";
   const response = await fetch(url, {
     method: "POST",
-    headers: { "Content-Type": "application/json", authorization: `${token}` }
+    headers: { "Content-Type": "application/json", authorization: `${token}` },
   });
   const data = await response.json();
 
@@ -158,8 +170,11 @@ const filterNoAdHouses = async () => {
   try {
     const response = await fetch(url, {
       method: "POST",
-      headers: { "Content-Type": "application/json", authorization: `${token}` },
-      body: JSON.stringify(filters.page)
+      headers: {
+        "Content-Type": "application/json",
+        authorization: `${token}`,
+      },
+      body: JSON.stringify(filters.page),
     });
     const data = await response.json();
 
@@ -167,7 +182,6 @@ const filterNoAdHouses = async () => {
 
     noAdHouses.value = data.content;
     console.log("no ad houses: ", noAdHouses.value);
-
   } catch (error) {
     console.error("請求錯誤: ", error);
   }
@@ -177,15 +191,16 @@ const filterNoAdHouses = async () => {
 const toggleCart = () => {
   if (showCart.value === true) {
     showCart.value = false;
+    showOverlay.value = false;
   } else {
     showCart.value = true;
+    showOverlay.value = true;
   }
 };
 
 // 刪除廣告結果處理
 const handleDeleteAdResult = (result) => {
-
-  console.log("delete result: ", result)
+  console.log("delete result: ", result);
   messageTitle.value = result.messageTitle;
   messageContent.value = result.message;
   showMessage.value = true;
@@ -200,6 +215,14 @@ const closeMessage = () => {
   showMessage.value = false;
 };
 
+const closeOnOverlayClick = () => {
+  console.log("close on overlay click: ", showAdDetail.value);
+  showMessage.value = false;
+  showCart.value = false;
+  showAdDetail.value = false;
+  showOverlay.value = false;
+};
+
 // 監聽 input housetitle 變更
 watch(
   () => filters.housetitle,
@@ -212,8 +235,11 @@ watch(
 </script>
 
 <template>
-
   <AdPageTitle />
+
+  <div v-if="isLoading" class="loading-overlay">
+    <div class="spinner"></div>
+  </div>
 
   <div class="flex flex-wrap items-center space-x-6 mt-4 mb-6 px-6">
     <div class="flex items-center space-x-6 flex-grow">
@@ -253,13 +279,14 @@ watch(
         @ad-delete-result="handleDeleteAdResult"
         @detail="showAdDetailFunc"
       />
-        <NoAdHouseList
+
+      <NoAdHouseList
         v-if="showNoAdHouses"
         :noAdHouses="noAdHouses"
         :adtypes="adtypes"
         @filter-no-ad-houses="filterNoAdHouses"
       />
-      
+
       <Pagination
         :current-page="currentPage"
         :total-pages="totalPages"
@@ -268,7 +295,7 @@ watch(
     </div>
   </main>
 
-  <Overlay v-if="showOverlay" />
+  <Overlay v-show="showOverlay" @click="closeOnOverlayClick" />
   <PopUpMessage
     v-show="showMessage"
     :showMessage="showMessage"
@@ -281,19 +308,39 @@ watch(
     :detail="detail"
     @close-detail="closeAdDetail"
   />
-  <CartList
-    v-show="showCart"
-    @toggle-cart="toggleCart"
-  />
-
-  <TestAdList></TestAdList>
-  
+  <CartList v-show="showCart" @toggle-cart="toggleCart" />
 </template>
 
 <style scoped>
-@import url("https://npmcdn.com/flatpickr/dist/themes/dark.css");
-@import url("https://cdn.jsdelivr.net/npm/tailwindcss@^2.2.19/dist/tailwind.min.css");
-@import url("https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css");
-@import url("https://fonts.googleapis.com");
 @import url("/src/assets/adAndOrderFront.css");
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
 </style>

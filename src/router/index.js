@@ -13,6 +13,7 @@ import Houselist from '@/components/houses/houselist.vue';
 import CollectHouseList from '@/components/houses/CollectHouseList.vue';
 import BookingListByGuest from '@/components/Booking/BookingListByGuest.vue';
 import BookingListByHost from '@/components/Booking/BookingListByHost.vue';
+import MyAdvertisements from '@/components/Ads/MyAdvertisements.vue';
 
 const routes = [
   {
@@ -66,6 +67,14 @@ const routes = [
         path: 'homeowner', // 房屋預約
         name: 'BookingHost',
         component: BookingListByHost,
+        path: 'my-advertisements', // 編輯用戶
+        name: 'MyAdvertisements',
+        component: MyAdvertisements,
+      },
+      {
+        path: 'my-orders', // 編輯用戶
+        name: 'MyOrders',
+        component: MyOrders,
       },
     ],
   },
