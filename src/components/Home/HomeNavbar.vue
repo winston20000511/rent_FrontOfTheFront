@@ -2,15 +2,18 @@
 import { onMounted, onUnmounted , ref } from 'vue';
 import { Offcanvas } from 'bootstrap';
 import { useAuthStore } from '@/stores/auth';
+import { useOption } from '@/stores/optionStore';
+
 
 
 const authStore = useAuthStore(); // 引入 auth Store
+const optionStore = useOption();
 const searchInputRef = ref(null);
 const searchListRef = ref(null);
 const searchListPosRef = ref({top:0 , left:0 , width: 0}) 
 const searchListReuslt=ref([])   
-const myOffcanvasRef = ref(null);
-const offcanvasInstance= ref(null);
+// const myOffcanvasRef = ref(null);
+// const offcanvasInstance= ref(null);
 const iconBtnRef =ref(null);
 
 let isComposing = false; //判斷是否正在打字
@@ -23,9 +26,10 @@ const emits = defineEmits(['add-marker','signInClicked'])
 
     onMounted(() => {
     document.addEventListener('click', closeSearchList);
-    if (myOffcanvasRef.value) {
-        offcanvasInstance.value = new Offcanvas(myOffcanvasRef.value);
-    }
+    optionStore.initializeData();
+    // if (myOffcanvasRef.value) {
+    //     offcanvasInstance.value = new Offcanvas(myOffcanvasRef.value);
+    // }
     });
 
     onUnmounted(() => {
@@ -49,19 +53,23 @@ const emits = defineEmits(['add-marker','signInClicked'])
                 left: 0,
                 width: listRect.width
             };
-            console.log(searchInputRef.value)
             searchListRef.value.style.display='block';
         }
     }
     const closeSearchList = (event)=>{
-        if(searchListRef.value && !searchListRef.value.contains(event.target) &&
-            searchInputRef.value && !searchInputRef.value.contains(event.target) &&
-            myOffcanvasRef.value && !myOffcanvasRef.value.contains(event.target)){
+        // if(searchListRef.value && !searchListRef.value.contains(event.target) &&
+        //     searchInputRef.value && !searchInputRef.value.contains(event.target) &&
+        //     myOffcanvasRef.value && !myOffcanvasRef.value.contains(event.target)){
 
-            searchListPosRef.value.innerHTML="";
-            searchListRef.value.style.display ='none';
-            offcanvasInstance.value.hide();
+        //     searchListPosRef.value.innerHTML="";
+        //     searchListRef.value.style.display ='none';
+        //     offcanvasInstance.value.hide();
+        // }
+        if(searchListRef.value && !searchListRef.value.contains(event.target)){
+          searchListPosRef.value.innerHTML="";
+          searchListRef.value.style.display ='none';
         }
+
     }
     const clickSearchBtn = ()=>{
         showMapFetch();
@@ -73,13 +81,19 @@ const emits = defineEmits(['add-marker','signInClicked'])
     }
     
     const showKeyWordFetch = async () =>{
+        const input = {
+          origin: searchInputRef.value.value,
+          priority: optionStore.shareOptions.priority,
+          sort: optionStore.shareOptions.sort
+        }
+        // const merge = Object.assign({},input,optionStore.shareOptions)
 
         const response = await fetch(keywordUrl,{
             method:'POST',
-            headers: {'Content-Type': 'text/plain',
+            headers: {'Content-Type': 'application/json',
                     'authorization': `${token}`
             },
-            body:searchInputRef.value.value
+            body:JSON.stringify(input)
         });
 
         if (!response.ok){
@@ -94,7 +108,6 @@ const emits = defineEmits(['add-marker','signInClicked'])
     const showLKeyWrodList = async (data)=>{
         searchListReuslt.value = [];
         data.forEach(k=>{
-
             searchListReuslt.value.push({
                 id: Date.now() + Math.random(),
                 address: k.address,
@@ -110,15 +123,16 @@ const emits = defineEmits(['add-marker','signInClicked'])
         }
         
         const inputData = {
-            origin: searchInputRef.value.value
+            address: searchInputRef.value.value
         }
+        const merge = Object.assign({},inputData,optionStore.shareOptions)
 
         const response = await fetch(mapUrl,{
             method: 'POST',
             headers:{'Content-Type': 'application/json',
                 'authorization': `${token}`
             },
-            body: JSON.stringify(inputData)
+            body: JSON.stringify(merge)
         });
 
         if (!response.ok){
@@ -134,15 +148,14 @@ const emits = defineEmits(['add-marker','signInClicked'])
         searchInputRef.value.value=item.address;
         searchInputRef.value.innerHTML='';
         searchListRef.value.style.display ='none';
-        offcanvasInstance.value.hide();
+        // offcanvasInstance.value.hide();
         showMapFetch();
     }
 
     const checkPaidDate = (item)=>{
         const dateSpec = '1999-01-01T00:00:00';
-        
         const sourceDate = new Date(item.paidDate);
-        const targetDate = new Date(dateSpec)
+        const targetDate = new Date(dateSpec);
         if (sourceDate>targetDate){
             return "bi bi-hand-thumbs-up"
         }else{
@@ -176,100 +189,11 @@ const handleSignInClick = () => {
       </div>
     </div>
 
-    <div class="offcanvas offcanvas-end" 
-    data-bs-scroll="true" 
-    data-bs-backdrop="false" 
-    tabindex="-1" 
-    id="offcanvasScrolling" 
-    aria-labelledby="offcanvasScrollingLabel" 
-    ref="myOffcanvasRef">
-      <div class="offcanvas-header">
-        <h5 class="offcanvas-title" id="offcanvasScrollingLabel">User Setting</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-      </div>
-      <div class="offcanvas-body container py-1 px-4 bg-body custom-left-shadow">
-            <p class="option-title">租金範圍</p>
-            <div class="row gy-4">
-                <div class="col-12 col-md-6">
-                    <label for="price-minimum">Minimum</label>
-                    <input type="text" id="price-minimum" class="form-control" value=0>
-                </div>
-                <div class="col-12 col-md-6">
-                    <label for="price-maximum">Maximum</label>
-                    <input type="text" id="price-maximum" class="form-control" value=0>
-                </div>
-                <div class="col-12 col-md-6">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="adfirst" checked>
-                        <label class="form-check-label" for="adfirst">
-                            廣告優先
-                        </label>
-                    </div>
-                </div>
-            </div>
-            <p class="option-title">房屋類型</p>
-            <div class="row gy-4">
-                <div class="col-12 col-md-6">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="house-typeone" checked>
-                        <label class="form-check-label" for="house-typeone">
-                            透天
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="house-typetwo" checked>
-                        <label class="form-check-label" for="house-typetwo">
-                            獨立套房
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="house-typethree" checked>
-                        <label class="form-check-label" for="house-typethree">
-                            分租套房
-                        </label>
-                    </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="" id="house-typefour" checked>
-                        <label class="form-check-label" for="house-typefour">
-                            雅房
-                        </label>
-                    </div>
-                </div>
-            </div>
-            <p class="option-title">搜尋方式</p>
-            <div class="row gy-4">
-                <div class="col-12 col-md-12">
-                    <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
-                        <input type="radio" class="btn-check" name="btnradio" id="btnradio1" autocomplete="off" checked>
-                        <label class="btn btn-outline-primary" for="btnradio1">廣告優先</label>
-
-                        <input type="radio" class="btn-check" name="btnradio" id="btnradio2" autocomplete="off">
-                        <label class="btn btn-outline-primary" for="btnradio2">價錢優先</label>
-
-                        <input type="radio" class="btn-check" name="btnradio" id="btnradio3" autocomplete="off">
-                        <label class="btn btn-outline-primary" for="btnradio3">點擊優先</label>
-                    </div>
-                    
-                    <div class="btn-group" role="group" aria-label="Basic radio toggle button group" style="margin-top: 5px;" >
-                        <input type="radio" class="btn-check" name="btnradio2" id="btnradio11" autocomplete="off" checked>
-                        <label class="btn btn-outline-primary" for="btnradio11">低到高</label>
-
-                        <input type="radio" class="btn-check" name="btnradio2" id="btnradio22" autocomplete="off">
-                        <label class="btn btn-outline-primary" for="btnradio22">高到低</label>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
   <div class="filter" id="filter">
     <input type="text" 
             placeholder="Address, neighborhood, city, ZIP" 
             id="search" 
             class="form-control me-4" 
-            data-bs-toggle="offcanvas" 
-            data-bs-target="#offcanvasScrolling" 
-            aria-controls="offcanvasScrolling"
             ref="searchInputRef"
             v-on:input="showSearchList"
             v-on:compositionstart="compositionStart"
@@ -354,8 +278,10 @@ const handleSignInClick = () => {
     position: relative; /* 必須是相對定位 */
 }
 .fa-magnifying-glass{
-    position: absolute;
-    left: 90%;
+  position: fixed;
+  top: 11%; /* 固定於視窗頂部 60px */
+  left: 62%; /* 基本定位 */
+  transform: translate(-50%,-50%) /* 調整位置 */
 }
 .fa-magnifying-glass:hover{
 	font-size: 20px;

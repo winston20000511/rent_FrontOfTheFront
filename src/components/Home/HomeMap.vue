@@ -7,6 +7,7 @@ const map = shallowRef(null); // 地圖容器
 const mapMarkers = ref([]); //地圖標記
 const canvas = shallowRef(null); //繪筆
 const refbtnDraw = ref(null) //繪圖按鈕
+const refbtnConfig = ref(null) //地圖設定
 const isDrawingMode = ref(false); //按鈕切換繪圖模式
 
 let drawUrl='http://localhost:8080/api/draw';
@@ -19,7 +20,7 @@ let polygon = null;
 let token = localStorage.getItem('jwt');
 
 const store = useHouseCard()
-const emits = defineEmits(['add-marker'])
+const emits = defineEmits(['update-marker' , 'update-flipped'])
 const props = defineProps({
   markers: Object
 })
@@ -46,6 +47,7 @@ onMounted(() => {
       });
       //地圖按鈕在初始化完才顯示
       refbtnDraw.value.style.display = 'block'
+      refbtnConfig.value.style.display = 'block'
       // 初始化 Canvas  
       const canvasElement = canvas.value;
       context = canvasElement.getContext('2d');
@@ -75,7 +77,6 @@ onMounted(() => {
 
   watch(markers, (newMarkers) => {
     
-    console.log("ok")
     const list = newMarkers.searchList;
     const origin = newMarkers.searchOrigin;
     const avgPrice = newMarkers.avgPrice;
@@ -88,7 +89,7 @@ onMounted(() => {
 
       const buttonElement = document.createElement("button");
       buttonElement.className="btn-purple"
-      buttonElement.innerHTML=`${Number(marker.price)/1000}K`
+      buttonElement.innerHTML=`${(Number(marker.price)/1000).toFixed(1)}K`
       buttonElement.style.pointerEvents = "auto";
 
       var latlng = new google.maps.LatLng(marker.lat, marker.lng);
@@ -103,7 +104,7 @@ onMounted(() => {
 
     const buttonOrigin = document.createElement("button");
     buttonOrigin.className="btn-yellow"
-    buttonOrigin.innerHTML=`${(Number(avgPrice)/1000).toFixed(1)}K`
+    buttonOrigin.innerHTML=`${(Number(origin.price)/1000).toFixed(1)}K`
     buttonOrigin.style.pointerEvents = "auto";
     var latlng = new google.maps.LatLng(origin.lat, origin.lng);
     var mapMark = new google.maps.marker.AdvancedMarkerElement({
@@ -172,6 +173,13 @@ onMounted(() => {
     const context = canvasElement.getContext('2d');
     context.clearRect(0, 0, canvasElement.width, canvasElement.height);
   } 
+
+  //地圖設定頁面
+  function showConfig(){
+    // refbtnDraw.value.style.display='none';
+    // refbtnConfig.value.style.display='none';
+    emits('update-flipped')
+  }
 
   //Draw模式切換
   function toggleDrawingMode(event){
@@ -284,7 +292,7 @@ onMounted(() => {
     }
 
     const data = await response.json();
-    emits('add-marker',data)
+    emits('update-marker',data)
 
   }
 
@@ -304,8 +312,11 @@ onMounted(() => {
 
 <template>
   <div>
-    <button class="btn btn-outline-danger btnDraw" ref="refbtnDraw" @click="toggleDrawingMode">
-      {{ isDrawingMode ? '關閉繪圖模式' : '啟動繪圖模式' }}
+    <button class="btn btn-primary btnDraw" ref="refbtnDraw" @click="toggleDrawingMode">
+      <i class="bi bi-pencil-fill"></i>
+    </button>
+    <button class="btn btn-primary btnConfig" ref="refbtnConfig" @click="showConfig">
+      <i class="bi bi-exclamation-circle"></i>
     </button>
     <div ref="map" class="map-container" v-once></div>
     <canvas ref="canvas" class="drawing-canvas"></canvas>
@@ -335,9 +346,16 @@ onMounted(() => {
 }
 .btnDraw{
   display: none;
-  position: absolute;
-  top: 10px;
-  left: 60%;
+  position: fixed; /* 改為 fixed */
+  top: 60px; /* 距離視窗頂部 60px */
+  left: calc(100% - 50px); /* 從右側固定 */
+  z-index: 2;
+}
+.btnConfig{
+  display: none;
+  position: fixed; /* 改為 fixed */
+  top: 110px; /* 距離視窗頂部 60px */
+  left: calc(100% - 50px); /* 從右側固定 */
   z-index: 2;
 }
 .btn-purple {
@@ -347,7 +365,7 @@ onMounted(() => {
     padding: 3px; /* 增加按鈕內邊距 */
     border: none; /* 去掉邊框 */
     transition: background-color 0.3s ease;
-    width: 30px;
+    width: 40px;
 }
 
 .btn-purple:hover {

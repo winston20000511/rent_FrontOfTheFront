@@ -1,5 +1,6 @@
 <script setup>
 import { RouterView } from 'vue-router';
+import { useRouter } from 'vue-router';
 import { ref } from 'vue';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
@@ -12,6 +13,7 @@ import HouseCreate from './components/houses/HouseCreate.vue';
 import HouseUpdate from './components/houses/HouseUpdate.vue';
 import { useHouseCard } from './stores/CardHouseStore';
 
+const router = useRouter();
 const showChatPopup = ref(false);
 const toggleChatPopup = () => {
   showChatPopup.value = !showChatPopup.value;
@@ -46,7 +48,7 @@ const addMarker = (locations) => {
 
     <!-- 主內容 -->
     <main class="app-main">
-      <RouterView :markers="markers"></RouterView>
+      <RouterView :markers="markers" @add-marker="addMarker"></RouterView>
     </main>
 
     <!-- 聊天彈窗和按鈕 -->
