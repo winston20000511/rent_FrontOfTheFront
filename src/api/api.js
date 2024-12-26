@@ -9,24 +9,24 @@ const api = axios.create({
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('jwt');
   if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
+    config.headers.Authorization = `${token}`;
   }
   return config;
 });
 
 // 添加回應攔截器（可選）
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    // 可選：處理未授權錯誤或其他情況
-    if (error.response?.status === 401) {
-      alert("登入過期，請重新登入！");
-      localStorage.removeItem("jwt"); // 清除過期的 Token
-      window.location.href = "/login"; // 導向登入頁面
-    }
-    return Promise.reject(error);
-  }
-);
+// api.interceptors.response.use(
+//   (response) => response,
+//   (error) => {
+//     // 可選：處理未授權錯誤或其他情況
+//     if (error.response?.status === 401) {
+//       alert("登入過期，請重新登入！");
+//       localStorage.removeItem("jwt"); // 清除過期的 Token
+//       window.location.href = "/login"; // 導向登入頁面
+//     }
+//     return Promise.reject(error);
+//   }
+// );
 
 export default api;
 

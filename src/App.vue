@@ -1,6 +1,8 @@
 <script setup>
 import { RouterView } from 'vue-router';
-import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import 'bootstrap-icons/font/bootstrap-icons.min.css';
@@ -12,10 +14,25 @@ import HouseCreate from './components/houses/HouseCreate.vue';
 import HouseUpdate from './components/houses/HouseUpdate.vue';
 import { useHouseCard } from './stores/CardHouseStore';
 
+const router = useRouter();
 const showChatPopup = ref(false);
 const toggleChatPopup = () => {
   showChatPopup.value = !showChatPopup.value;
 };
+
+const showChatApp = ref(true);
+const route = useRoute();
+watch(
+  () => route.path,
+  (newPath) => {
+    if (newPath === '/order-confirm' || newPath === '/order-complete') {
+      showChatApp.value = false;
+    } else {
+      showChatApp.value = true;
+    }
+  },
+  { immediate: true }
+);
 
 const showLoginPage = ref(false); // 控制 LoginPage 的顯示
 const toggleLoginPage = () => {
@@ -46,13 +63,13 @@ const addMarker = (locations) => {
 
     <!-- 主內容 -->
     <main class="app-main">
-      <RouterView :markers="markers"></RouterView>
+      <RouterView :markers="markers" @add-marker="addMarker"></RouterView>
     </main>
 
     <!-- 聊天彈窗和按鈕 -->
     <div>
       <ChatPopup v-if="showChatPopup" @close="toggleChatPopup" />
-      <button class="chat-button" @click="toggleChatPopup">
+      <button v-if="showChatApp" class="chat-button" @click="toggleChatPopup">
         <i class="bi bi-chat-dots-fill"></i>
       </button>
     </div>
@@ -78,7 +95,8 @@ const addMarker = (locations) => {
 }
 
 .app-main {
-  flex: 1; /* 填滿剩餘空間 */
+  flex: 1;
+  /* 填滿剩餘空間 */
   display: flex;
   flex-direction: column;
 }

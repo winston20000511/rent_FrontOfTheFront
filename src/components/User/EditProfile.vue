@@ -37,7 +37,7 @@
                     class="form-control"
                     id="email"
                     v-model="user.email"
-                    disabled 
+                    disabled
                   />
                 </div>
 
@@ -108,17 +108,61 @@
                   />
                 </div>
 
-                <div class="mb-3">
-                  <label for="status" class="form-label">帳號狀態</label>
-                  <select class="form-select" id="status" v-model="user.status">
-                    <option value="0">停用</option>
-                    <option value="1">啟用</option>
-                  </select>
-                </div>
-
                 <button type="submit" class="btn btn-primary">儲存修改</button>
+                <!-- 新增刪除帳號按鈕 -->
+                <button
+                  type="button"
+                  class="btn btn-danger ms-2"
+                  data-bs-toggle="modal"
+                  data-bs-target="#confirmModal"
+                >
+                  刪除帳號
+                </button>
               </form>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap Modal -->
+    <div
+      class="modal fade"
+      id="confirmModal"
+      tabindex="-1"
+      aria-labelledby="confirmModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="confirmModalLabel">確認操作</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            確定要停用您的帳號嗎？此操作無法撤銷，未來將無法再登入。
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              取消
+            </button>
+            <button
+              type="button"
+              class="btn btn-danger"
+              @click="confirmDeactivate"
+              data-bs-dismiss="modal"
+            >
+              確定
+            </button>
           </div>
         </div>
       </div>
@@ -127,47 +171,58 @@
 </template>
 
 <script>
-import api from "../../api/api";  // 確保路徑正確
+import api from "../../api/api"; // 確保路徑正確
 
 export default {
   name: "EditProfile",
   data() {
     return {
       user: {
-        user_id: 1, // 假設的ID，您可以根據實際情況獲取
+        user_id: 1,
         name: "John Doe",
         email: "john@example.com",
         password: "",
         phone: "0912345678",
         picture: "",
         createtime: "2024-01-01",
-        gender: 0, // 0代表男，1代表女
+        gender: 0,
         coupon: 3,
-        status: 1, // 1代表啟用
+        status: 1,
       },
-      previewImage: null, // 預覽圖片
+      previewImage: null,
     };
   },
   methods: {
     handleFileUpload(event) {
       const file = event.target.files[0];
       if (file) {
-        this.previewImage = URL.createObjectURL(file); // 顯示預覽圖片
-        this.user.picture = file; // 可以將檔案傳送到後端
+        this.previewImage = URL.createObjectURL(file);
+        this.user.picture = file;
       }
     },
     submitForm() {
-      // 使用 api 來發送 PUT 請求，並自動加入 Authorization 標頭
       api
-        .put("http://localhost:8080/api/user/update", this.user)  // 待確認路徑！
+        .put("http://localhost:8080/api/user/update", this.user)
         .then((response) => {
           console.log("資料已儲存", response);
-          alert("資料已儲存！");
+          this.showModal("資料已儲存！");
         })
         .catch((error) => {
           console.error("儲存資料錯誤", error);
-          alert("儲存資料時發生錯誤！");
+          this.showModal("儲存資料時發生錯誤！");
         });
+    },
+    confirmDeactivate() {
+      console.log("帳號已停用");
+      this.$router.push({ name: "DeactivateAccount" });
+    },
+    showModal(message) {
+      this.modalMessage = message;
+      const modal = new bootstrap.Modal(
+        document.getElementById("alertModal"),
+        {}
+      );
+      modal.show();
     },
   },
 };
@@ -198,22 +253,8 @@ export default {
   font-weight: bold;
 }
 
-.btn-primary {
-  background-color: #007bff;
-  border: none;
-  font-weight: bold;
-  padding: 0.5rem 1.5rem;
-  margin-top: 1rem;
-}
-
 .img-thumbnail {
   max-width: 100%;
   border-radius: 5px;
-}
-
-@media (max-width: 768px) {
-  .card {
-    padding: 1rem;
-  }
 }
 </style>

@@ -3,7 +3,6 @@ import { ref, watch } from "vue";
 import Dialog from "primevue/dialog";
 import HouseView from "@/View/HouseView.vue";
 
-// 接收 props
 const props = defineProps({
   markers: {
     type: Object,
@@ -11,22 +10,67 @@ const props = defineProps({
   },
 });
 
-// 狀態
 const showView = ref(false);
 const selectedHouseId = ref(null);
+const clickCounts = ref({}); // 儲存每個房屋的點擊數
 
-// 監聽 markers
 watch(
   () => props.markers,
   (newVal) => {
-    console.log("Markers updated:", newVal);
-  }
+    if (newVal?.searchList?.length) {
+      // 初始化 clickCounts
+      newVal.searchList.forEach((house) => {
+        if (!clickCounts.value[house.houseid]) {
+          fetchClickCount(house.houseid);
+        }
+      });
+    }
+  },
+  { immediate: true }
 );
 
-function openHouseView(houseId) {
-  console.log("Open HouseView for houseId:", houseId);
-  selectedHouseId.value = Number(houseId); // HouseView 需要 Number
+async function openHouseView(houseId) {
+  selectedHouseId.value = Number(houseId);
   showView.value = true;
+
+  // 增加點擊數
+  try {
+    await incrementClickCount(houseId);
+    clickCounts.value[houseId] += 1; // 更新本地點擊數
+  } catch (error) {
+    console.error("Failed to increment click count:", error);
+  }
+}
+
+async function incrementClickCount(houseId) {
+  const response = await fetch(`/api/houses/${houseId}/incrementClick`, {
+    method: "PUT",
+    headers: {
+      Authorization: localStorage.getItem("jwt"),
+    },
+  });
+  if (!response.ok) {
+    throw new Error(`Failed to increment click count for houseId: ${houseId}`);
+  }
+}
+
+async function fetchClickCount(houseId) {
+  try {
+    const response = await fetch(`/api/houses/${houseId}/clickCount`, {
+      method: "GET",
+      headers: {
+        Authorization: localStorage.getItem("jwt"),
+      },
+    });
+    if (response.ok) {
+      const count = await response.json();
+      clickCounts.value[houseId] = count;
+    } else {
+      console.error(`Failed to fetch click count for houseId: ${houseId}`);
+    }
+  } catch (error) {
+    console.error("Error fetching click count:", error);
+  }
 }
 
 function closeHouseView() {
@@ -53,13 +97,17 @@ function closeHouseView() {
           <div class="card-body">
             <p class="card-text">NT${{ list.price }}</p>
             <p class="card-text">{{ list.address }}</p>
+            <!-- 顯示點擊數 -->
+            <div class="d-flex justify-content-end align-items-center">
+              <i class="pi pi-eye" style="margin-right: 5px;"></i>
+              <span class="text-muted">{{ clickCounts[list.houseid] || 0 }}</span>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Dialog 彈窗，appendTo="body" & breakpoints -->
   <Dialog
     v-model:visible="showView"
     modal
@@ -70,7 +118,6 @@ function closeHouseView() {
     :closable="true"
     @hide="showView = false"
   >
-    <!-- 將 HouseView 放入 Dialog -->
     <HouseView :houseId="selectedHouseId" @close="closeHouseView" />
   </Dialog>
 </template>

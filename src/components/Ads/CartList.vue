@@ -7,6 +7,7 @@ const emit = defineEmits(["toggle-cart"]);
 
 const selectedThirdParty = ref("linepay");
 const cartStore = useCart();
+cartStore.choosePayment = "linepay"; // 預設linepay
 
 // 優惠券
 const activeCouponIndex = ref(null);
@@ -40,6 +41,10 @@ function removeFromCart(adId) {
   cartStore.removeFromCart(adId);
 };
 
+function handlePaymentMethodSelection(event){
+  cartStore.choosePayment = event.target.dataset.value;
+  console.log("cartStore.choosePayment:", cartStore.choosePayment);
+}
 
 // 前往結帳
 function checkOut() {
@@ -68,7 +73,7 @@ function toggleCoupon(index) {
   }
 
   cartStore.loadCart();
-};
+}
 
 // 展開購物車中的物品詳細
 function toggleDetails(index) {
@@ -79,131 +84,157 @@ function toggleDetails(index) {
 const totalPrice = computed(() => {
   return cartStore.calculate.totalPrice;
 });
-const discountAmount = computed(() =>{
+const discountAmount = computed(() => {
   return cartStore.calculate.discountAmount;
-})
-
+});
 
 //
 </script>
 
 <template>
-  <!-- hidden-right -->
-  <div
-    class="fixed top-0 right-0 h-full bg-white shadow-lg transform z-50"
-    style="width: 360px"
-  >
-    <div class="flex justify-between px-4 py-3 border-b">
-      <h2 class="text-xl font-semibold">選購清單</h2>
+  <transition name="slide">
+    <div
+      class="fixed top-0 right-0 h-full bg-white shadow-lg transform z-50"
+      style="width: 360px"
+    >
+      <div class="flex justify-between px-4 py-3 border-b">
+        <h2 class="text-xl font-semibold">選購清單</h2>
+        <button
+          class="text-xl font-bold text-gray-600 hover:text-gray-800 focus:outline-none"
+          @click="toggleCart"
+        >
+          ×
+        </button>
+      </div>
+
+      <div class="p-4 flex-1 overflow-y-auto" style="height: 320px">
+        <div
+          v-for="(cartItem, index) in cartStore.cartItems"
+          :key="index"
+          class="p-3 border rounded-lg shadow-sm mb-4"
+        >
+          <div class="flex justify-between">
+            <div>
+              <p class="text-sm font-bold">編號：{{ cartItem.adId }}</p>
+              <p class="text-sm">
+                方案：{{ cartItem.adtypeId }} &nbsp; X &nbsp; NTD
+                {{ cartItem.adPrice }}
+              </p>
+
+              <div class="flex items-center">
+                <button
+                  class="text-blue-500 underline hover:text-blue-700 mr-2"
+                  @click="toggleDetails(index)"
+                >
+                  <span class="text-lg">
+                    {{ expandedIndex === index ? "&#9652;" : "&#9662;" }}
+                  </span>
+                </button>
+              </div>
+            </div>
+            <div>
+              <div class="mb-2">
+                <button
+                  class="rounded bg-yellow-500 hover:bg-yellow-300 text-white text-sm px-2 py-1"
+                  @click="toggleCoupon(index)"
+                >
+                  {{ activeCouponIndex === index ? "已使用" : "優惠券" }}
+                </button>
+              </div>
+              <div class="text-right">
+                <button
+                  class="bg-red-500 text-white text-sm px-2 py-1 rounded hover:bg-red-400"
+                  @click="removeFromCart(cartItem.adId)"
+                >
+                  移除
+                </button>
+              </div>
+            </div>
+          </div>
+          <div
+            v-show="expandedIndex === index"
+            class="mt-2 bg-gray-50 p-3 border-t text-sm text-gray-600"
+          >
+            <p>房屋編號：{{ "天數" }}</p>
+            <p>推播時長：{{ "天數" }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="p-4 border-t">
+        <p class="text-lg font-semibold mb-1">
+          總價：<span class="text-green-600">${{ totalPrice }}</span>
+        </p>
+        <p class="text-sm text-gray-600 mb-1">
+          已套用優惠：- NTD {{ discountAmount }}
+        </p>
+        <p class="text-sm text-gray-500">
+          剩餘優惠券數量：{{ cartStore.couponNumber }}
+        </p>
+
+        <p class="text-lg font-semibold mt-3 mb-1">選擇付款方式</p>
+        <div class="flex justfy-between">
+          <label class="flex items-center">
+            <input
+              type="radio"
+              name="third-party"
+              value="linepay"
+              data-value="Linepay"
+              v-model="selectedThirdParty"
+              class="mr-2"
+              checked
+              @change="handlePaymentMethodSelection"
+            />
+            <span class="text-gray-700"> LINEPAY </span>
+          </label>
+
+          <label class="flex items-center">
+            <input
+              type="radio"
+              name="third-party"
+              value="ecpay"
+              data-value="Credit"
+              v-model="selectedThirdParty"
+              @change="handlePaymentMethodSelection"
+              class="ml-8 mr-2"
+            />
+            <span class="text-gray-700"
+              ><i class="fa-solid fa-credit-card"></i> 信用卡</span
+            >
+          </label>
+        </div>
+      </div>
+
       <button
-        class="text-xl font-bold text-gray-600 hover:text-gray-800 focus:outline-none"
-        @click="toggleCart"
+        class="fixed bottom-0 w-full px-4 py-2 bg-green-600 text-white text-center shadow hover:bg-green-700"
+        @click="checkOut"
       >
-        ×
+        前往結帳
       </button>
     </div>
+  </transition>
 
-    <div class="p-4 flex-1 overflow-y-auto" style="height: 320px">
-      <div
-        v-for="(cartItem, index) in cartStore.cartItems"
-        :key="index"
-        class="p-3 border rounded-lg shadow-sm mb-4"
-      >
-        <div class="flex justify-between">
-          <div>
-            <p class="text-sm font-bold">編號：{{ cartItem.adId }}</p>
-            <p class="text-sm">
-              方案：{{ cartItem.adtypeId }} &nbsp; X &nbsp; NTD
-              {{ cartItem.adPrice }}
-            </p>
-
-            <div class="flex items-center">
-              <button
-                class="text-blue-500 underline hover:text-blue-700 mr-2"
-                @click="toggleDetails(index)"
-              >
-                <span class="text-lg">
-                  {{ expandedIndex === index ? "&#9652;" : "&#9662;" }}
-                </span>
-              </button>
-            </div>
-          </div>
-          <div>
-            <div class="mb-2">
-              <button
-                class="rounded bg-yellow-500 hover:bg-yellow-300 text-white text-sm px-2 py-1"
-                @click="toggleCoupon(index)"
-              >
-                {{ activeCouponIndex === index ? "已使用" : "優惠券" }}
-              </button>
-            </div>
-            <div class="text-right">
-              <button
-                class="bg-red-500 text-white text-sm px-2 py-1 rounded hover:bg-red-400"
-                @click="removeFromCart(cartItem.adId)"
-              >
-                移除
-              </button>
-            </div>
-          </div>
-        </div>
-        <div
-          v-show="expandedIndex === index"
-          class="mt-2 bg-gray-50 p-3 border-t text-sm text-gray-600"
-        >
-          <p>房屋編號：{{ "天數" }}</p>
-          <p>推播時長：{{ "天數" }}</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="p-4 border-t">
-      <p class="text-lg font-semibold mb-1">
-        總價：<span class="text-green-600"
-          >${{ totalPrice }}</span
-        >
-      </p>
-      <p class="text-sm text-gray-600 mb-1">已套用優惠：- NTD {{ discountAmount }}</p>
-      <p class="text-sm text-gray-500">
-        剩餘優惠券數量：{{ cartStore.couponNumber }}
-      </p>
-
-      <p class="text-lg font-semibold mt-3 mb-1">選擇付款方式</p>
-      <div class="flex justfy-between">
-        <label class="flex items-center">
-          <input
-            type="radio"
-            name="third-party"
-            value="linepay"
-            v-model="selectedThirdParty"
-            class="mr-2"
-            checked
-          />
-          <span class="text-gray-700"> LINEPAY </span>
-        </label>
-
-        <label class="flex items-center">
-          <input
-            type="radio"
-            name="third-party"
-            value="ecpay"
-            v-model="selectedThirdParty"
-            class="ml-8 mr-2"
-          />
-          <span class="text-gray-700"
-            ><i class="fa-solid fa-credit-card"></i> 信用卡</span
-          >
-        </label>
-      </div>
-    </div>
-
-    <button
-      class="fixed bottom-0 w-full px-4 py-2 bg-green-600 text-white text-center shadow hover:bg-green-700"
-      @click="checkOut"
-    >
-      前往結帳
-    </button>
-  </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+
+  .cart-panel {
+    transform: translateX(100%);
+  }
+
+  .slide-enter-active,
+  .slide-leave-active {
+    transition: transform 0.3s ease-in-out;
+  }
+
+  .slide-enter-from,
+  .slide-leave-to {
+    transform: translateX(100%);
+  }
+  
+  .slide-enter-to,
+  .slide-leave-from {
+    transform: translateX(0);
+  }
+
+</style>

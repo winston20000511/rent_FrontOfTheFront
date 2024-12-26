@@ -3,25 +3,46 @@
     <h2 class="text-center section-title">新增房屋</h2>
     <hr>
     <form @submit.prevent="submitForm">
-      <div class="form-group"> <label for="title">標題</label> <input type="text" id="title" class="form-control"
-          v-model="form.title" required /> </div>
-      <div class="form-row">
-        <div class="form-group col-md-6"> <label for="price">價格</label> <input type="number" id="price"
-            class="form-control" v-model.number="form.price" required min="0" /> </div>
-        <div class="form-group col-md-6"> <label for="size">坪數</label> <input type="number" id="size"
-            class="form-control" v-model.number="form.size" required min="1" /> </div>
+      <div class="form-group" :class="{'is-invalid': errors.title}"> 
+        <label for="title">標題</label> 
+        <input type="text" id="title" class="form-control" v-model="form.title" @input="validateTitle" required />
+        <div v-if="errors.title" class="invalid-feedback">標題不可包含特殊字元！</div>
       </div>
-      <div class="form-group"> <label for="address">詳細地址</label> <input type="text" id="address" class="form-control"
-          v-model="form.address" required /> </div>
       <div class="form-row">
-        <div class="form-group col-md-3"> <label for="room">房間數</label> <input type="number" id="room"
-            class="form-control" v-model.number="form.room" required min="0" /> </div>
-        <div class="form-group col-md-3"> <label for="bathroom">浴廁數量</label> <input type="number" id="bathroom"
-            class="form-control" v-model.number="form.bathroom" required min="0" /> </div>
-        <div class="form-group col-md-3"> <label for="livingroom">客廳數量</label> <input type="number" id="livingroom"
-            class="form-control" v-model.number="form.livingroom" required min="0" /> </div>
-        <div class="form-group col-md-3"> <label for="floor">樓層</label> <input type="number" id="floor"
-            class="form-control" v-model.number="form.floor" required min="-3" /> </div>
+        <div class="form-group col-md-6" :class="{'is-invalid': errors.price}"> 
+          <label for="price">價格</label> 
+          <input type="number" id="price" class="form-control" v-model.number="form.price" required min="0" />
+        </div>
+        <div class="form-group col-md-6" :class="{'is-invalid': errors.size}"> 
+          <label for="size">坪數</label> 
+          <input type="number" id="size" class="form-control" v-model.number="form.size" required min="1" />
+        </div>
+      </div>
+      <div class="form-group"> 
+        <label for="address">詳細地址</label> 
+        <input type="text" id="address" class="form-control" v-model="form.address" required /> 
+      </div>
+      <div class="form-row">
+        <div class="form-group col-md-3" :class="{'is-invalid': errors.room}"> 
+          <label for="room">房間數</label> 
+          <input type="number" id="room" class="form-control" v-model.number="form.room" required min="0" max="255" @input="validateNumber('room')" />
+          <div v-if="errors.room" class="invalid-feedback">請輸入 0 到 255 之間的數字！</div>
+        </div>
+        <div class="form-group col-md-3" :class="{'is-invalid': errors.bathroom}"> 
+          <label for="bathroom">浴廁數量</label> 
+          <input type="number" id="bathroom" class="form-control" v-model.number="form.bathroom" required min="0" max="255" @input="validateNumber('bathroom')" />
+          <div v-if="errors.bathroom" class="invalid-feedback">請輸入 0 到 255 之間的數字！</div>
+        </div>
+        <div class="form-group col-md-3" :class="{'is-invalid': errors.livingroom}"> 
+          <label for="livingroom">客廳數量</label> 
+          <input type="number" id="livingroom" class="form-control" v-model.number="form.livingroom" required min="0" max="255" @input="validateNumber('livingroom')" />
+          <div v-if="errors.livingroom" class="invalid-feedback">請輸入 0 到 255 之間的數字！</div>
+        </div>
+        <div class="form-group col-md-3" :class="{'is-invalid': errors.floor}"> 
+          <label for="floor">樓層</label> 
+          <input type="number" id="floor" class="form-control" v-model.number="form.floor" required min="-3" max="255" @input="validateNumber('floor')" />
+          <div v-if="errors.floor" class="invalid-feedback">請輸入 -3 到 255 之間的數字！</div>
+        </div>
       </div>
       <div class="form-group"> <label for="houseType">房屋類型</label> <select id="houseType" class="form-control"
           v-model="form.houseType" required>
@@ -225,7 +246,18 @@ export default {
       fee: false,
       genderRestrictions: false,
     });
-
+    const validateTitle = () => {
+      const regex = /^[\w\s\u4e00-\u9fa5]*$/; // 僅允許中英文、數字、空格
+      errors.title = !regex.test(form.title);
+    };
+    const validateNumber = (field) => {
+      const value = form[field];
+      if (field === 'floor') {
+        errors[field] = value < -3 || value > 255;
+      } else {
+        errors[field] = value < 0 || value > 255;
+      }
+    };
     const genderOption = ref(null);
     const images = ref([]);
     const bookingForm = ref({});
@@ -363,6 +395,9 @@ export default {
       removeImage,
       submitForm,
       bookingForm,
+      validateTitle,
+      validateNumber,
+      errors,
     };
   },
 };
@@ -388,7 +423,14 @@ body {
   margin-bottom: 10px;
   text-align: center;
 }
-
+.is-invalid {
+  border-color: red;
+}
+.invalid-feedback {
+  color: red;
+  font-size: 0.9em;
+  margin-top: 5px;
+}
 hr {
   margin: 20px 0;
   /* 增加 <hr> 與其他文字間的間隔 */

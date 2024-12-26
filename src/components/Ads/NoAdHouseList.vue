@@ -26,7 +26,7 @@ const selectedHouseId = ref("");
 const selectedAdtype = ref("");
 
 // 初始化資料
-const initializeData = () => {
+function initializeData(){
   if (props.noAdHouses.length > 0 && props.adtypes.length > 0) {
     console.log("初始化載入");
     selectedAdtypes.value = props.noAdHouses.map(
@@ -34,29 +34,30 @@ const initializeData = () => {
     );
   } else {
     console.log("沒有符合資料");
-  }
+  };
+
   isDataLoaded.value = true;
 };
 
 watch(
   [() => props.noAdHouses, () => props.adtypes],
-    () => {
-      initializeData(); 
-    },
-    { immediate: true }
+  () => {
+    initializeData();
+  },
+  { immediate: true }
 );
 
-const getHouseAndAdtypeInfo = (index) => {
+function getHouseAndAdtypeInfo(index) {
   selectedAdtype.value = selectedAdtypes.value[index];
   selectedHouseId.value = props.noAdHouses[index].houseId;
-};
+}
 
 // 插入廣告資料表
 async function addAd(houseId, adtypeId) {
   if (!houseId || !adtypeId) {
-    console.error("House ID: ", houseId, " or Adtype ID is missing: ", adtypeId);
+    console.error( "House ID: ", houseId, " or Adtype ID is missing: ", adtypeId );
     return;
-  }
+  };
 
   const selectedInfo = {
     houseId,
@@ -67,25 +68,33 @@ async function addAd(houseId, adtypeId) {
     const url = "http://localhost:8080/api/advertisements";
     const response = await fetch(url, {
       method: "POST",
-      headers: { "Content-Type": "application/json", authorization: `${token}` },
+      headers: {
+        "Content-Type": "application/json",
+        authorization: `${token}`,
+      },
       body: JSON.stringify(selectedInfo),
     });
-    const success = await response.json();
 
-    console.log("廣告新增結果: ", success);
+    const success = await response.json();
 
     if (success) {
       alert("新增成功");
       emit("filter-no-ad-houses");
     } else {
       alert("新增失敗");
-    }
+    };
+
   } catch (error) {
     console.error("Error adding ad:", error);
-  }
-}
-</script>
+    
+  };
+};
 
+function checkHouseInfo(){
+  console.log("check house info");
+}
+
+</script>
 
 <template>
   <div>
@@ -112,11 +121,15 @@ async function addAd(houseId, adtypeId) {
             <th class="px-4 py-3 font-semibold">新增廣告</th>
           </tr>
         </thead>
-        <tbody >
-          <tr v-if="props.noAdHouses.length === 0" class="text-center py-6 text-gray-500">
+        <tbody>
+          <tr
+            v-if="props.noAdHouses.length === 0"
+            class="text-center py-6 text-gray-500"
+          >
             <td class="px-4 py-3" colspan="5">沒有符合資料</td>
           </tr>
-          <tr v-else
+          <tr
+            v-else
             v-for="(noAdHouse, index) in props.noAdHouses"
             :key="index"
             class="text-center"
@@ -125,6 +138,7 @@ async function addAd(houseId, adtypeId) {
             <td class="px-4 py-3">
               <button
                 class="px-3 py-1 text-sm text-blue-600 bg-blue-100 rounded hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                @click="checkHouseInfo"
               >
                 查看
               </button>
@@ -147,7 +161,9 @@ async function addAd(houseId, adtypeId) {
             <td class="px-4 py-3 text-center">
               <button
                 class="px-4 py-2 text-white bg-green-500 rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400"
-                @click="addAd(noAdHouse.houseId, selectedAdtypes[index]?.adtypeId)"
+                @click="
+                  addAd(noAdHouse.houseId, selectedAdtypes[index]?.adtypeId)
+                "
               >
                 新增
               </button>
@@ -158,4 +174,3 @@ async function addAd(houseId, adtypeId) {
     </div>
   </div>
 </template>
-

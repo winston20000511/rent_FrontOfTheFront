@@ -26,6 +26,16 @@
       </div>
       <p v-if="errorMessage" class="error text-danger">{{ errorMessage }}</p>
       <button type="submit" class="btn btn-primary w-100">登入</button>
+      <!-- Google 登入按鈕 -->
+    <div class="google-login-btn-container">
+      <button
+        type="button"
+        class="btn btn-dark w-100 mt-3"
+        @click="googleLogin"
+      >
+        使用 Google 帳號登入
+      </button>
+    </div>
       
       <!-- 忘記密碼按鈕 -->
       <button
@@ -46,6 +56,7 @@
 // 引入自訂的 Axios API 模組
 import api from "../../api/api"; // Authorization 自動添加的功能見 api.js
 import ForgotPassword from "../../components/User/ForgotPassword.vue"; // 引入 ForgotPassword 組件
+import { useAuthStore } from "@/stores/auth"; // 引入 Pinia 的 authStore
 
 export default {
   components: {
@@ -62,11 +73,17 @@ export default {
   methods: {
     async handleLogin() {
       try {
-        // 發送登入請求到後端
-        const response = await api.post("http://localhost:8080/api/user/login", {
-          email: this.email,
-          password: this.password,
-        });
+        const recaptchaToken = await this.executeRecaptcha();
+
+        debugger;
+        const response = await api.post(
+          `http://localhost:8080/api/user/login`,
+          {
+            email: this.email,
+            password: this.password,
+            recaptchaToken,
+          }
+        );
 
         // 後端回傳 JWT token
         const token = response.data.token;
@@ -74,21 +91,54 @@ export default {
         // 儲存 token 到 localStorage
         localStorage.setItem("jwt", token);
 
+        // 更新 authStore 的登入狀態
+        const authStore = useAuthStore();
+        authStore.isLoggedIn = true;
+
         // 登入成功提示並跳轉至會員中心
         alert("登入成功！");
-        this.$router.push("/memberCenter");
+        this.$router.push("/member-Center");
       } catch (error) {
         // 錯誤處理
         this.errorMessage =
-          error.response?.data?.message || "登入失敗，請檢查帳號或密碼。";
+          error.response?.data?.message ||
+          `登入失敗，請檢查帳號或密碼。（錯誤：${error.message}）`;
+        console.error("登入錯誤詳情：", error.response || error);
       }
     },
+    executeRecaptcha() {
+      return new Promise((resolve, reject) => {
+        if (!window.grecaptcha) {
+          reject(new Error("reCAPTCHA 尚未載入，請稍後再試"));
+          return;
+        };
+        
+        window.grecaptcha
+          .execute(import.meta.env.VITE_RECAPTCHA_SITE_KEY, { action: "login" })
+          .then(resolve)
+          .catch((error) => {
+            reject(new Error("reCAPTCHA 執行失敗：" + error.message));
+          });
+      });
+    },
+
     closeForgotPassword() {
       // 關閉 ForgotPassword 組件
       this.showForgotPassword = false;
     },
   },
+  mounted() {
+    // 載入 Google reCAPTCHA v3
+    const script = document.createElement("script");
+    script.src = `https://www.google.com/recaptcha/api.js?render=${
+      import.meta.env.VITE_RECAPTCHA_SITE_KEY
+    }`;
+    script.async = true;
+    script.defer = true;
+    document.head.appendChild(script);
+  },
 };
+
 </script>
 
 <style scoped>
