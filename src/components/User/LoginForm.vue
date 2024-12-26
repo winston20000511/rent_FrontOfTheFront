@@ -25,10 +25,25 @@
         />
       </div>
       <p v-if="errorMessage" class="error text-danger">{{ errorMessage }}</p>
+<<<<<<< HEAD
       <button type="submit" class="btn btn-primary w-100 g-recaptcha">
         登入
       </button>
 
+=======
+      <button type="submit" class="btn btn-primary w-100">登入</button>
+      <!-- Google 登入按鈕 -->
+    <div class="google-login-btn-container">
+      <button
+        type="button"
+        class="btn btn-dark w-100 mt-3"
+        @click="googleLogin"
+      >
+        使用 Google 帳號登入
+      </button>
+    </div>
+      
+>>>>>>> origin/newShelly
       <!-- 忘記密碼按鈕 -->
       <button
         type="button"
@@ -129,6 +144,7 @@ export default {
     document.head.appendChild(script);
   },
 };
+
 </script>
 
 <style scoped>
