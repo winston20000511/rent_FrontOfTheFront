@@ -43,6 +43,7 @@ const routes = [
   {
     path: '/member-center', // 會員中心
     name: 'MemberCenter',
+    redirect: '/member-center/my-houses', 
     component: MemberCenter, // 顯示 MemberCenter
     children: [
       {

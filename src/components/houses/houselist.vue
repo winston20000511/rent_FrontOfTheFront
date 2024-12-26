@@ -1,4 +1,4 @@
-span<template>
+<template>
   <div class="house-list-container">
     <!-- 標題 -->
     <h2 class="title">房屋管理系統</h2>
@@ -8,35 +8,66 @@ span<template>
 
     <!-- 搜尋欄與新增房屋按鈕 -->
     <div class="action-bar">
-      <Button label="新增房屋" icon="pi pi-plus" class="p-button-success action-button large-button"
-        @click="showCreateForm = true" />
+      <Button
+        label="新增房屋"
+        icon="pi pi-plus"
+        class="p-button-success action-button large-button"
+        @click="showCreateForm = true"
+      />
       <div class="search-bar">
         <span class="p-input-icon-left">
           <i class="pi pi-search search-icon"></i>
-          <InputText v-model="filters['global'].value" placeholder="搜尋房屋..." class="search-input" />
+          <InputText
+            v-model="filters['global'].value"
+            placeholder="搜尋房屋..."
+            class="search-input"
+          />
         </span>
       </div>
     </div>
 
     <!-- 房屋列表 -->
-    <DataTable :value="houses" responsiveLayout="scroll" :paginator="true" :rows="5" class="custom-table"
-    :filters="filters" filterDisplay="row" :sortField="sortField" :sortOrder="sortOrder">
+    <DataTable
+      :value="houses"
+      responsiveLayout="scroll"
+      :paginator="true"
+      :rows="5"
+      class="custom-table"
+      :filters="filters"
+      filterDisplay="row"
+      :sortField="sortField"
+      :sortOrder="sortOrder"
+    >
       <!-- 房屋圖片 -->
       <Column header="圖片" style="width: 150px">
         <template #body="slotProps">
           <div class="image-container">
-            <img v-if="slotProps.data.images && slotProps.data.images.length > 0" :src="slotProps.data.images[0]"
-              alt="House Image" class="image-preview" />
+            <img
+              v-if="slotProps.data.images && slotProps.data.images.length > 0"
+              :src="slotProps.data.images[0]"
+              alt="House Image"
+              class="image-preview"
+            />
             <span v-else>無圖片</span>
           </div>
         </template>
       </Column>
 
       <!-- 房屋名稱 -->
-      <Column field="title" header="房屋名稱" :sortable="true" style="width: 200px" />
+      <Column
+        field="title"
+        header="房屋名稱"
+        :sortable="true"
+        style="width: 200px"
+      />
 
       <!-- 地址 -->
-      <Column field="address" header="地址" :sortable="true" style="width: 200px" />
+      <Column
+        field="address"
+        header="地址"
+        :sortable="true"
+        style="width: 200px"
+      />
 
       <!-- 價格 -->
       <Column field="price" header="價格" :sortable="true" style="width: 150px">
@@ -57,39 +88,69 @@ span<template>
       <!-- 操作 -->
       <Column header="操作" style="width: 250px">
         <template #body="slotProps">
-          <Button icon="pi pi-eye" class="p-button-rounded p-button-text p-button-info action-button large-button"
+          <Button
+            icon="pi pi-eye"
+            class="p-button-rounded p-button-text p-button-info action-button large-button"
             @click="
               showHouseView = true;
-            selectedHouseId = slotProps.data.houseId;
-            console.log('Selected House ID:', selectedHouseId);
-            " />
-          <Button icon="pi pi-pencil" class="p-button-rounded p-button-text p-button-warning action-button large-button"
+              selectedHouseId = slotProps.data.houseId;
+              console.log('Selected House ID:', selectedHouseId);
+            "
+          />
+          <Button
+            icon="pi pi-pencil"
+            class="p-button-rounded p-button-text p-button-warning action-button large-button"
             @click="
               showEditForm = true;
-            selectedHouseId = slotProps.data.houseId;
-            " />
-          <Button icon="pi pi-trash" class="p-button-rounded p-button-text p-button-danger action-button large-button"
-            @click="confirmDelete(slotProps.data.houseId)" />
+              selectedHouseId = slotProps.data.houseId;
+            "
+          />
+          <Button
+            icon="pi pi-trash"
+            class="p-button-rounded p-button-text p-button-danger action-button large-button"
+            @click="confirmDelete(slotProps.data.houseId)"
+          />
         </template>
       </Column>
     </DataTable>
 
     <!-- 編輯房屋表單彈窗 -->
-    <Dialog v-model:visible="showEditForm" :modal="true" :dismissableMask="false" header="編輯房屋資訊" class="dialog-theme">
+    <Dialog
+      v-model:visible="showEditForm"
+      :modal="true"
+      :dismissableMask="false"
+      header="編輯房屋資訊"
+      class="dialog-theme"
+      style="width: 80vw;"
+    >
       <div class="dialog-container">
         <HouseUpdate :houseId="selectedHouseId" @close="showEditForm = false" />
       </div>
     </Dialog>
 
     <!-- 查看房屋表單彈窗 -->
-    <Dialog v-model:visible="showHouseView" :modal="true" :dismissableMask="true" header="查看房屋資訊" class="dialog-theme">
+    <Dialog
+      v-model:visible="showHouseView"
+      :modal="true"
+      :dismissableMask="true"
+      header="查看房屋資訊"
+      class="dialog-theme"
+      style="width: 80vw;"
+    >
       <div class="dialog-container">
         <HouseView :houseId="selectedHouseId" @close="showHouseView = false" />
       </div>
     </Dialog>
 
     <!-- 新增房屋表單彈窗 -->
-    <Dialog v-model:visible="showCreateForm" :modal="true" :dismissableMask="false" header="新增房屋" class="dialog-theme">
+    <Dialog
+      v-model:visible="showCreateForm"
+      :modal="true"
+      :dismissableMask="false"
+      header="新增房屋"
+      class="dialog-theme"
+      style="width: 80vw;"
+    >
       <div class="dialog-container">
         <HouseCreate @close="showCreateForm = false" />
       </div>
@@ -104,11 +165,10 @@ import DataTable from "primevue/datatable";
 import Column from "primevue/column";
 import Dialog from "primevue/dialog";
 
-import HouseCreate from "./HouseCreate.vue";
 import HouseUpdate from "./HouseUpdate.vue";
 import HouseView from "@/View/HouseView.vue";
 import { ConfirmDialog } from "primevue";
-
+import HouseCreate from "./HouseCreate.vue";
 
 export default {
   components: {
@@ -141,7 +201,7 @@ export default {
         message: "您確定要下架這個房屋嗎？",
         header: "確認刪除",
         icon: "pi pi-exclamation-triangle",
-        accept: () => this.deleteHouse(houseId)
+        accept: () => this.deleteHouse(houseId),
       });
     },
     async deleteHouse(houseId) {
@@ -372,5 +432,77 @@ export default {
 
 .p-button-info:hover {
   background-color: #3b82f6;
+}
+
+/* 響應式設計 */
+@media (max-width: 768px) {
+  .dialog-theme {
+    width: 95vw;
+    max-width: 600px;
+  }
+
+  .custom-table ::v-deep(.p-datatable-thead > tr > th) {
+    font-size: 0.9em;
+  }
+
+  .custom-table ::v-deep(.p-datatable-tbody > tr > td) {
+    font-size: 0.9em;
+  }
+
+  .action-button {
+    font-size: 1rem;
+    padding: 10px 15px;
+  }
+
+  .large-button {
+    font-size: 1.2rem;
+    padding: 12px 20px;
+  }
+
+  .search-input {
+    width: 200px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dialog-theme {
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+    padding: 5px;
+  }
+
+  .action-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-input {
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .custom-table ::v-deep(.p-datatable-thead > tr > th) {
+    font-size: 0.8em;
+  }
+
+  .custom-table ::v-deep(.p-datatable-tbody > tr > td) {
+    font-size: 0.8em;
+  }
+
+  .action-button {
+    font-size: 1rem;
+    padding: 8px 12px;
+    margin-bottom: 5px;
+  }
+
+  .large-button {
+    font-size: 1rem;
+    padding: 10px 15px;
+  }
+
+  .dialog-container {
+    padding: 5px;
+  }
 }
 </style>
