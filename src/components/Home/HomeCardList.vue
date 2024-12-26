@@ -76,6 +76,21 @@ async function fetchClickCount(houseId) {
 function closeHouseView() {
   showView.value = false;
 }
+
+function getCardClass(item){
+
+  const dateSpec = '1999-01-01T00:00:00';
+  const sourceDate = new Date(item);
+  const targetDate = new Date(dateSpec);
+
+  if (sourceDate > targetDate) {
+    return "col-12 col-md-6 py-4 bg-info bg-opacity-25 text-white p-3"
+  } else {
+    return "col-12 col-md-6 py-4 "
+  }
+
+}
+
 </script>
 
 <template>
@@ -84,7 +99,7 @@ function closeHouseView() {
       <div
         v-for="list in markers.searchList"
         :key="list.houseid"
-        class="col-12 col-md-6 py-4"
+        :class="getCardClass(list.paidDate)"
       >
         <div class="card card-shadow clickable-card" style="width: 100%"
           @click="openHouseView(list.houseid)"

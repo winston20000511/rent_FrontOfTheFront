@@ -123,11 +123,7 @@ onMounted(() => {
   // 開始繪圖
   function startDrawing(event) {
     isDrawing = true;
-    points = [];
-    if (polygon) {
-        polygon.setMap(null); // 移除多邊形
-        polygon = null;       // 清空變數
-    }
+    clearPoint();
 
     addPoint(event);
     const { offsetX, offsetY } = event;
@@ -135,6 +131,13 @@ onMounted(() => {
     context.moveTo(offsetX, offsetY);
 
 
+  }
+  function clearPoint(){
+    points = [];
+    if (polygon) {
+        polygon.setMap(null); // 移除多邊形
+        polygon = null;       // 清空變數
+    }
   }
 
   // 繪製中

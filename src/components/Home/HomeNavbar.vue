@@ -83,6 +83,7 @@ const enterSearchBtn = (event) => {
 }
 
 const showKeyWordFetch = async () => {
+
   const input = {
     origin: searchInputRef.value.value,
     priority: optionStore.shareOptions.priority,
@@ -189,7 +190,9 @@ const handleSignInClick = () => {
   <div class="navbar">
     <!-- 左側：Logo 和標題 -->
     <div class="nav-left">
-      <img src="../../assets/Logo3.jpg" alt="Logo" class="nav-logo" />
+      <router-link to="/">
+        <img src="../../assets/Logo3.jpg" alt="Logo" class="nav-logo" />
+      </router-link>
       <div class="nav-title">
         <h1>house</h1>
       </div>
@@ -291,7 +294,7 @@ const handleSignInClick = () => {
 
 .fa-magnifying-glass {
   position: fixed;
-  top: 11%;
+  top: 7.5%;
   /* 固定於視窗頂部 60px */
   left: 62%;
   /* 基本定位 */

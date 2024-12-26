@@ -75,7 +75,6 @@ export default {
       try {
         const recaptchaToken = await this.executeRecaptcha();
 
-        debugger;
         const response = await api.post(
           `http://localhost:8080/api/user/login`,
           {
