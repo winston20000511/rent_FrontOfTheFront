@@ -25,12 +25,6 @@
         />
       </div>
       <p v-if="errorMessage" class="error text-danger">{{ errorMessage }}</p>
-<<<<<<< HEAD
-      <button type="submit" class="btn btn-primary w-100 g-recaptcha">
-        登入
-      </button>
-
-=======
       <button type="submit" class="btn btn-primary w-100">登入</button>
       <!-- Google 登入按鈕 -->
     <div class="google-login-btn-container">
@@ -43,7 +37,6 @@
       </button>
     </div>
       
->>>>>>> origin/newShelly
       <!-- 忘記密碼按鈕 -->
       <button
         type="button"
@@ -82,6 +75,7 @@ export default {
       try {
         const recaptchaToken = await this.executeRecaptcha();
 
+        debugger;
         const response = await api.post(
           `http://localhost:8080/api/user/login`,
           {
