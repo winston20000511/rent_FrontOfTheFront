@@ -5,11 +5,7 @@
         <!-- 會員資料區 -->
         <div class="member-info card mb-4 shadow">
           <div class="card-body d-flex align-items-center">
-            <img
-              :src="memberPicture"
-              alt="會員大頭貼"
-              class="member-avatar rounded-circle"
-            />
+            <img :src="memberPicture" alt="會員大頭貼" class="member-avatar rounded-circle" />
             <div class="ml-3">
               <h5 class="mb-0">你好，{{ memberName }}！</h5>
               <p class="text-muted mb-0">歡迎來到會員中心</p>
@@ -27,12 +23,8 @@
                 <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
                   <!-- 修改會員資料 -->
                   <li class="nav-item" role="presentation">
-                    <router-link
-                      to="/member-center/edit-profile"
-                      class="nav-link"
-                      :class="{ active: activeTab === 'profile' }"
-                      role="tab"
-                    >
+                    <router-link to="/member-center/edit-profile" class="nav-link"
+                      :class="{ active: activeTab === 'profile' }" role="tab">
                       修改會員資料
                     </router-link>
                   </li>
@@ -63,13 +55,9 @@
 
                   <!-- 預約介面總覽 -->
                   <li class="nav-item" role="presentation">
-                    <router-link
-                      to="/member-center/reservation"
-                      class="nav-link"
-                      :class="{ active: activeTab === 'reservation' }"
-                      role="tab"
-                    >
-                      預約介面總覽
+                    <router-link to="/member-center/my-booking" class="nav-link"
+                      :class="{ active: activeTab === 'booking' }" role="tab">
+                      我的預約
                     </router-link>
                   </li>
 
@@ -94,6 +82,14 @@
                       role="tab"
                     >
                       VIP物件訂單
+                    </router-link>
+                  </li>
+
+                  <!-- 屋主介面總覽 -->
+                  <li class="nav-item" role="presentation">
+                    <router-link to="/member-center/homeowner" class="nav-link"
+                      :class="{ active: activeTab === 'homeowner' }" role="tab">
+                      屋主預約管理
                     </router-link>
                   </li>
                 </ul>
@@ -132,6 +128,12 @@ export default {
         this.activeTab = "houses";
       } else if (to.path === "/member-center/my-collections") {
         this.activeTab = "collections";
+      } else if (to.path === "/member-center/my-booking") {
+        this.activeTab = "booking";
+      } else if (to.path === "/member-center/ads") {
+        this.activeTab = "ads";
+      } else if (to.path === "/member-center/homeowner") {
+        this.activeTab = "homeowner";
       } else if (to.path === "/member-center/reservation") {
         this.activeTab = "reservation";
       } else if (to.path === "/member-center/my-advertisements") {
@@ -149,6 +151,12 @@ export default {
       this.activeTab = "houses";
     } else if (this.$route.path === "/member-center/my-collections") {
       this.activeTab = "collections";
+    } else if (this.$route.path === "/member-center/my-booking") {
+      this.activeTab = "booking";
+    } else if (this.$route.path === "/member-center/ads") {
+      this.activeTab = "ads";
+    } else if (this.$route.path === "/member-center/homeowner") {
+      this.activeTab = "homeowner";
     } else if (this.$route.path === "/member-center/reservation") {
       this.activeTab = "reservation";
     } else if (this.$route.path === "/member-center/my-advertisements") {

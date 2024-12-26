@@ -2,10 +2,8 @@
 import { ref, watch, onMounted, onUnmounted } from 'vue'
 import VueDatePicker from '@vuepic/vue-datepicker'
 import '@vuepic/vue-datepicker/dist/main.css'
-import Accordion from 'primevue/accordion';
-import AccordionPanel from 'primevue/accordionpanel';
-import AccordionHeader from 'primevue/accordionheader';
-import AccordionContent from 'primevue/accordioncontent';
+import { Fieldset } from 'primevue';
+
 
 
 // const props = defineProps(['modelValue']); // 來自父組件的數據
@@ -118,149 +116,125 @@ watch(timeOption, (newValue) => {
 
 <template>
 
-    <div class="card">
-        <Accordion value="">
-            <AccordionPanel value="0">
-                <AccordionHeader>目前使用預設</AccordionHeader>
-                <AccordionContent>
-                    <div class=" m-1 ">
-                        <!-- 設定預約時段 -->
-                        <div class="booking-child align-items-center">
+    <Fieldset legend="　可進行設定" :toggleable="true" collapsed>
+        <!-- 設定預約時段 -->
+        <div class="booking-child align-items-center">
 
-                            <h5 class="p-1">日期</h5>
-                            <div class="p-1">
-                                <div class="row align-items-center" style="margin: 0;">
-                                    <div class="col">
-                                        <VueDatePicker class="p-1 " v-model="form.minDate" model-type="yyyy-MM-dd"
-                                            :min-date='new Date()' :enable-time-picker="false" v-bind="datePickerProps"
-                                            @update:model-value="onDateChangeAndOption" />
-                                    </div>
-                                    -
-                                    <div class="col ">
-                                        <VueDatePicker class="p-1 " v-model="form.maxDate" model-type="yyyy-MM-dd"
-                                            :min-date='form.minDate' :enable-time-picker="false"
-                                            v-bind="datePickerProps" @update:model-value="onDateOption" />
-                                    </div>
-                                </div>
-
-                                <div class="d-flex justify-content-end">
-                                    <label class="btn  p-1" for="option-month-one">
-                                        <input type="radio" id="option-month-one" value="month" v-model="dateOption" />
-                                        一個月
-                                    </label>
-                                    <label class="btn p-1" for="option-month-three">
-                                        <input type="radio" id="option-month-three" value="three-months"
-                                            v-model="dateOption" />
-                                        三個月
-                                    </label>
-                                    <label class="btn p-1" for="option-month-six">
-                                        <input type="radio" id="option-month-six" value="six-months"
-                                            v-model="dateOption" />
-                                        半年
-                                    </label>
-                                    <label class="btn p-1" for="option-month-twelve">
-                                        <input type="radio" id="option-month-twelve" value="year"
-                                            v-model="dateOption" />
-                                        一年
-                                    </label>
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                        <!-- 設定可看房時段 -->
-                        <div class="booking-child align-items-center">
-
-                            <h5 class=" p-1">時段</h5>
-                            <div class=" p-1">
-                                <div class="row align-items-center " style="margin: 0;">
-                                    <div class="col">
-                                        <VueDatePicker class="p-1 col" v-model="form.minTime" :enable-minutes="false"
-                                            time-picker :max-time="{ hours: 22, minutes: 59 }" v-bind="datePickerProps"
-                                            @update:model-value="onTimeChangeAndOption" />
-                                    </div>
-                                    -
-                                    <div class="col">
-                                        <VueDatePicker class="p-1 col" v-model="form.maxTime" :enable-minutes="false"
-                                            time-picker
-                                            :min-time="{ hours: form.minTime?.hours ? form.minTime.hours + 1 : 8 }"
-                                            :max-time="{ hours: 24 }" v-bind="datePickerProps"
-                                            @update:model-value="onTimeOption" />
-                                    </div>
-                                </div>
-                                <div class="d-flex justify-content-end">
-
-                                    <div class="p-1">
-                                        <label class="btn p-1" for="date-timeOption-default">
-                                            <input type="radio" id="date-timeOption-default" value="default"
-                                                v-model="timeOption" />
-                                            預設時段
-                                        </label>
-                                        <label class="btn p-1" for="date-timeOption-all">
-                                            <input type="radio" id="date-timeOption-all" value="all"
-                                                v-model="timeOption" />
-                                            全天
-                                        </label>
-                                        <!-- {{ form.minTime.hours }} - {{ form.maxTime.hours }} -->
-                                    </div>
-
-                                </div>
-                            </div>
-
-
-                        </div>
-
-                        <!-- 設定可看房的星期 -->
-                        <div class="booking-child align-items-center">
-
-                            <h5 class=" p-1">星期</h5>
-                            <div class=" p-1">
-                                <fieldset class="btn-group p-2 d-flex justify-content-around" role="group">
-                                    <label v-for="(day, index) in daysOfWeek" :key="index" class="p-1">
-                                        <input type="checkbox" v-model="form.week[index]" />
-                                        {{ day }}
-                                    </label>
-                                </fieldset>
-                            </div>
-
-                        </div>
-
-                        <!-- 設定看房時間 -->
-                        <div class="booking-child align-items-center mb-2">
-                            <h5 class="p-1">間隔</h5>
-                            <div class="p-1">
-                                <select v-model="form.duration" class="form-select">
-                                    <option value="" disabled>選擇預約間隔</option>
-                                    <option v-for="duration in durationOptions" :key="duration" :value="duration">{{
-                                        duration }}分鐘
-                                    </option>
-                                </select>
-                            </div>
-
-                        </div>
+            <h5 class="p-1">日期</h5>
+            <div class="p-1">
+                <div class="row align-items-center" style="margin: 0;">
+                    <div class="col">
+                        <VueDatePicker class="p-1 " v-model="form.minDate" model-type="yyyy-MM-dd"
+                            :min-date='new Date()' :enable-time-picker="false" v-bind="datePickerProps"
+                            @update:model-value="onDateChangeAndOption" />
                     </div>
-                </AccordionContent>
-            </AccordionPanel>
+                    -
+                    <div class="col ">
+                        <VueDatePicker class="p-1 " v-model="form.maxDate" model-type="yyyy-MM-dd"
+                            :min-date='form.minDate' :enable-time-picker="false" v-bind="datePickerProps"
+                            @update:model-value="onDateOption" />
+                    </div>
+                </div>
 
-        </Accordion>
-    </div>
+                <div class="d-flex justify-content-end">
+                    <label class="btn  p-1" for="option-month-one">
+                        <input type="radio" id="option-month-one" value="month" v-model="dateOption" />
+                        一個月
+                    </label>
+                    <label class="btn p-1" for="option-month-three">
+                        <input type="radio" id="option-month-three" value="three-months" v-model="dateOption" />
+                        三個月
+                    </label>
+                    <label class="btn p-1" for="option-month-six">
+                        <input type="radio" id="option-month-six" value="six-months" v-model="dateOption" />
+                        半年
+                    </label>
+                    <label class="btn p-1" for="option-month-twelve">
+                        <input type="radio" id="option-month-twelve" value="year" v-model="dateOption" />
+                        一年
+                    </label>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- 設定可看房時段 -->
+        <div class="booking-child align-items-center">
+
+            <h5 class=" p-1">時段</h5>
+            <div class=" p-1">
+                <div class="row align-items-center " style="margin: 0;">
+                    <div class="col">
+                        <VueDatePicker class="p-1 col" v-model="form.minTime" :enable-minutes="false" time-picker
+                            :max-time="{ hours: 22, minutes: 59 }" v-bind="datePickerProps"
+                            @update:model-value="onTimeChangeAndOption" />
+                    </div>
+                    -
+                    <div class="col">
+                        <VueDatePicker class="p-1 col" v-model="form.maxTime" :enable-minutes="false" time-picker
+                            :min-time="{ hours: form.minTime?.hours ? form.minTime.hours + 1 : 8 }"
+                            :max-time="{ hours: 24 }" v-bind="datePickerProps" @update:model-value="onTimeOption" />
+                    </div>
+                </div>
+                <div class="d-flex justify-content-end">
+
+                    <div class="p-1">
+                        <label class="btn p-1" for="date-timeOption-default">
+                            <input type="radio" id="date-timeOption-default" value="default" v-model="timeOption" />
+                            預設時段
+                        </label>
+                        <label class="btn p-1" for="date-timeOption-all">
+                            <input type="radio" id="date-timeOption-all" value="all" v-model="timeOption" />
+                            全天
+                        </label>
+                        <!-- {{ form.minTime.hours }} - {{ form.maxTime.hours }} -->
+                    </div>
+
+                </div>
+            </div>
 
 
+        </div>
+
+        <!-- 設定可看房的星期 -->
+        <div class="booking-child align-items-center">
+
+            <h5 class=" p-1">星期</h5>
+            <div class=" p-1">
+                <fieldset class="btn-group p-2 d-flex justify-content-around" role="group">
+                    <label v-for="(day, index) in daysOfWeek" :key="index" class="p-1">
+                        <input type="checkbox" v-model="form.week[index]" />
+                        {{ day }}
+                    </label>
+                </fieldset>
+            </div>
+
+        </div>
+
+        <!-- 設定看房時間 -->
+        <div class="booking-child align-items-center mb-2">
+            <h5 class="p-1">間隔</h5>
+            <div class="p-1">
+                <select v-model="form.duration" class="form-select">
+                    <option value="" disabled>選擇預約間隔</option>
+                    <option v-for="duration in durationOptions" :key="duration" :value="duration">{{
+                        duration }}分鐘
+                    </option>
+                </select>
+            </div>
+
+        </div>
 
 
-
+    </Fieldset>
 
 
 </template>
 
 <style lang="css" scoped>
-.card {
-    --p-accordion-panel-border-color: green;
-    --p-accordion-panel-border-width: 0px;
-
-
-
-
+::v-deep(.p-fieldset-legend) {
+    border: none;
+    background: transparent;
 }
 </style>

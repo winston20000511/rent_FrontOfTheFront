@@ -25,10 +25,18 @@
         />
       </div>
       <p v-if="errorMessage" class="error text-danger">{{ errorMessage }}</p>
-      <button type="submit" class="btn btn-primary w-100 g-recaptcha">
-        登入
+      <button type="submit" class="btn btn-primary w-100">登入</button>
+      <!-- Google 登入按鈕 -->
+    <div class="google-login-btn-container">
+      <button
+        type="button"
+        class="btn btn-dark w-100 mt-3"
+        @click="googleLogin"
+      >
+        使用 Google 帳號登入
       </button>
-
+    </div>
+      
       <!-- 忘記密碼按鈕 -->
       <button
         type="button"
@@ -48,6 +56,7 @@
 // 引入自訂的 Axios API 模組
 import api from "../../api/api"; // Authorization 自動添加的功能見 api.js
 import ForgotPassword from "../../components/User/ForgotPassword.vue"; // 引入 ForgotPassword 組件
+import { useAuthStore } from "@/stores/auth"; // 引入 Pinia 的 authStore
 
 export default {
   components: {
@@ -66,6 +75,7 @@ export default {
       try {
         const recaptchaToken = await this.executeRecaptcha();
 
+        debugger;
         const response = await api.post(
           `http://localhost:8080/api/user/login`,
           {
@@ -81,9 +91,13 @@ export default {
         // 儲存 token 到 localStorage
         localStorage.setItem("jwt", token);
 
+        // 更新 authStore 的登入狀態
+        const authStore = useAuthStore();
+        authStore.isLoggedIn = true;
+
         // 登入成功提示並跳轉至會員中心
         alert("登入成功！");
-        this.$router.push("/memberCenter");
+        this.$router.push("/member-Center");
       } catch (error) {
         // 錯誤處理
         this.errorMessage =
@@ -124,6 +138,7 @@ export default {
     document.head.appendChild(script);
   },
 };
+
 </script>
 
 <style scoped>
