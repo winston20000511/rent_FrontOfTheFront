@@ -13,6 +13,7 @@ import Houselist from '@/components/houses/houselist.vue';
 import CollectHouseList from '@/components/houses/CollectHouseList.vue';
 import BookingListByGuest from '@/components/Booking/BookingListByGuest.vue';
 import BookingListByHost from '@/components/Booking/BookingListByHost.vue';
+import ComplaintForm from '@/View/comp.vue';
 
 const routes = [
   {
@@ -103,6 +104,11 @@ const routes = [
     path: "/booking/guest", // 開發用，不一定刪掉
     name: "bookingbyguest",
     component: BookingListByGuest,
+  },
+  {
+    path:"/suggest",
+    name:"ComplaintForm",
+    component: ComplaintForm,
   },
 ];
 

@@ -4,6 +4,8 @@
     <div class="sidebar">
 
       <div class="chat-list">
+        <a href="/suggest" class="user-item fake-button">提交您的寶貴建議
+        </a>
         <div v-for="user in chatUsers" :key="user.userId" class="user-item"
           :class="{ 'selected-user': user.userName === selectedUserName }" @click="selectChat(user)">
 
@@ -37,28 +39,28 @@
         <div v-if="searchBarVisible" class="search-buttons">
           <button @click="prevMatch" class="toggle-prev">⬆</button>
           <button @click="nextMatch" class="toggle-next">⬇</button>
+        </div>
       </div>
-    </div>
 
-    <!-- message bar -->
-    <div class="messages" ref="messageContainer">
-      <div v-for="(message, index) in messages" :key="index" :class="[
-        { 'message-right': message.isSender, 'message-left': message.isReceiver },
-        { highlight: index === highlightedIndex }
-      ]" :data-index="index">
-        <div class="message-text" v-html="highlightText(message.text)"></div>
-        <div class="message-timestamp">{{ formatTimestamp(message.timestamp) }}</div>
+      <!-- message bar -->
+      <div class="messages" ref="messageContainer">
+        <div v-for="(message, index) in messages" :key="index" :class="[
+          { 'message-right': message.isSender, 'message-left': message.isReceiver },
+          { highlight: index === highlightedIndex }
+        ]" :data-index="index">
+          <div class="message-text" v-html="highlightText(message.text)"></div>
+          <div class="message-timestamp">{{ formatTimestamp(message.timestamp) }}</div>
+        </div>
       </div>
-    </div>
 
-    <!-- input MSG -->
-    <div class="input">
-      <textarea v-model="newMessage" placeholder="Type your message..."></textarea>
-      <button @click="sendMessage" class="send-button"><i class="bi bi-send"></i></button>
-    </div>
+      <!-- input MSG -->
+      <div class="input">
+        <textarea v-model="newMessage" placeholder="Type your message..."></textarea>
+        <button @click="sendMessage" class="send-button"><i class="bi bi-send"></i></button>
+      </div>
 
-    <slot></slot>
-  </div>
+      <slot></slot>
+    </div>
   </div>
 </template>
 
@@ -409,4 +411,12 @@ onUnmounted(() => {
 } */
 
 /* input end ???? */
+.fake-button {
+  text-decoration: none;
+  color: rgb(238, 30, 30);
+  font-size: large;
+  background-color: white;
+  width: 100%;
+  height: 50px;
+}
 </style>
