@@ -55,10 +55,10 @@ const addMarker = (locations) => {
 
 <template>
   <div class="app-container">
-  
+
     <!-- 全局導航欄 -->
     <header class="app-header">
-      <HomeNavbar @signInClicked="toggleLoginPage" @add-marker="addMarker"/>
+      <HomeNavbar @signInClicked="toggleLoginPage" @add-marker="addMarker" />
     </header>
 
     <!-- 主內容 -->
@@ -88,15 +88,16 @@ const addMarker = (locations) => {
 
 .app-header {
   width: 100%;
-  height: 30vh;
+  height: 15vh;
   border-bottom: 1px solid lightgray;
   display: flex;
   justify-content: space-between;
 }
 
 .app-main {
-  flex: 1;
+  /* flex: 1; */
   /* 填滿剩餘空間 */
+  height: 85vh;
   display: flex;
   flex-direction: column;
 }

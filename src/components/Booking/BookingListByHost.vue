@@ -53,8 +53,7 @@
                     <div class="relative inline-block">
 
                         <!-- 主要顯示的姓名 -->
-                        <div v-if="slotProps.data.userStatus === 1"
-                            class=" clickable-name"
+                        <div v-if="slotProps.data.userStatus === 1" class=" clickable-name "
                             :class="{ 'active': isPopoverVisible(slotProps.data.bookingId) }"
                             @click="togglePopover(slotProps.data.bookingId)">
                             {{ slotProps.data.userName }}
@@ -176,7 +175,7 @@
 
                 <!-- 同意按鈕 -->
                 <Button label="同意" icon="pi pi-check" severity="success" @click="processBooking(selectedBooking, true)"
-                    style="width: 48%;" :loading="loading" />
+                    style="width: 48%;" :loading="loading" v-if="selectedBooking.userStatus === 1" />
             </div>
             <template #footer>
 
