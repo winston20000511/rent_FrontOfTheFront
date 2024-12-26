@@ -4,46 +4,38 @@
     <hr />
     <form @submit.prevent="submitForm">
       <!-- 房屋基本資料 -->
-      <div class="form-group">
+      <div class="form-group" :class="{ 'is-invalid': errors.title }">
         <label for="title">標題</label>
-        <input type="text" id="title" class="form-control" v-model="form.title" required />
+        <input type="text" id="title" class="form-control" v-model="form.title" @input="validateTitle" required />
+        <div v-if="errors.title" class="invalid-feedback">標題不可包含特殊字元！</div>
       </div>
 
       <div class="form-row">
-        <div class="form-group col-md-6">
-          <label for="price">價格</label>
-          <input type="number" id="price" class="form-control" v-model.number="form.price" required min="0" />
-        </div>
-        <div class="form-group col-md-6">
-          <label for="size">坪數</label>
-          <input type="number" id="size" class="form-control" v-model.number="form.size" required min="1" />
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="address">詳細地址</label>
-        <input type="text" id="address" class="form-control" v-model="form.address" required />
-      </div>
-
-      <div class="form-row">
-        <div class="form-group col-md-3">
+        <div class="form-group col-md-3" :class="{ 'is-invalid': errors.room }">
           <label for="room">房間數</label>
-          <input type="number" id="room" class="form-control" v-model.number="form.room" required min="0" />
+          <input type="number" id="room" class="form-control" v-model.number="form.room" required min="0" max="255"
+            @input="validateNumber('room')" />
+          <div v-if="errors.room" class="invalid-feedback">請輸入 0 到 255 之間的數字！</div>
         </div>
-        <div class="form-group col-md-3">
+        <div class="form-group col-md-3" :class="{ 'is-invalid': errors.bathroom }">
           <label for="bathroom">浴廁數量</label>
-          <input type="number" id="bathroom" class="form-control" v-model.number="form.bathroom" required min="0" />
+          <input type="number" id="bathroom" class="form-control" v-model.number="form.bathroom" required min="0"
+            max="255" @input="validateNumber('bathroom')" />
+          <div v-if="errors.bathroom" class="invalid-feedback">請輸入 0 到 255 之間的數字！</div>
         </div>
-        <div class="form-group col-md-3">
+        <div class="form-group col-md-3" :class="{ 'is-invalid': errors.livingroom }">
           <label for="livingroom">客廳數量</label>
-          <input type="number" id="livingroom" class="form-control" v-model.number="form.livingroom" required min="0" />
+          <input type="number" id="livingroom" class="form-control" v-model.number="form.livingroom" required min="0"
+            max="255" @input="validateNumber('livingroom')" />
+          <div v-if="errors.livingroom" class="invalid-feedback">請輸入 0 到 255 之間的數字！</div>
         </div>
-        <div class="form-group col-md-3">
+        <div class="form-group col-md-3" :class="{ 'is-invalid': errors.floor }">
           <label for="floor">樓層</label>
-          <input type="number" id="floor" class="form-control" v-model.number="form.floor" required min="-3" />
+          <input type="number" id="floor" class="form-control" v-model.number="form.floor" required min="-3" max="255"
+            @input="validateNumber('floor')" />
+          <div v-if="errors.floor" class="invalid-feedback">請輸入 -3 到 255 之間的數字！</div>
         </div>
       </div>
-
       <div class="form-group">
         <label for="houseType">房屋類型</label>
         <select id="houseType" class="form-control" v-model="form.houseType" required>
@@ -390,7 +382,18 @@ export default {
       this.removedImages.push(toRemove);   // 記錄要刪除的圖片
       this.existingImages.splice(idx, 1);  // 立即從畫面移除
     },
-
+    validateTitle() {
+      const regex = /^[\w\s\u4e00-\u9fa5]*$/; // 僅允許中英文、數字、空格
+      this.errors.title = !regex.test(this.form.title);
+    },
+    validateNumber(field) {
+      const value = this.form[field];
+      if (field === 'floor') {
+        this.errors[field] = value < -3 || value > 255;
+      } else {
+        this.errors[field] = value < 0 || value > 255;
+      }
+    },
     // 4) 提交更新 (含文字、布林、新圖片、刪除列表)
     async submitForm() {
       try {
@@ -500,6 +503,7 @@ export default {
   border-radius: 8px;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
+
 .section-title {
   color: #2c3e50;
   font-weight: bold;
@@ -507,25 +511,40 @@ export default {
   margin-bottom: 10px;
   text-align: center;
 }
+
 .form-row {
   display: flex;
   flex-wrap: wrap;
   gap: 20px;
 }
+
 .form-group {
   flex: 1;
 }
+
+.is-invalid {
+  border-color: red;
+}
+
+.invalid-feedback {
+  color: red;
+  font-size: 0.9em;
+  margin-top: 5px;
+}
+
 .image-preview {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   margin-top: 10px;
 }
+
 .preview-item {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
+
 .preview-item img {
   width: 100px;
   height: 100px;
@@ -533,6 +552,7 @@ export default {
   object-fit: cover;
   margin-bottom: 5px;
 }
+
 .remove-btn {
   font-size: 0.8rem;
   padding: 4px 8px;

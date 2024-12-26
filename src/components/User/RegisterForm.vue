@@ -118,15 +118,35 @@ export default {
           gender: this.gender,
         });
 
+        debugger;
+        // 註冊成功後，發送驗證信
+        await this.sendVerificationEmail();
+
+        
         // 註冊成功提示
-        alert("註冊成功！");
+        alert("註冊成功！請檢查您的電子郵件（包括垃圾郵件夾）以驗證帳號。驗證信有效期為6小時。");
         this.$router.push("/login"); // 跳轉到登入頁面
       } catch (error) {
         // 錯誤處理
+        // 待處理bug 註冊失敗
         this.errorMessage =
-          error.response?.data?.message || "註冊失敗，請確認輸入資料是否正確。";
+          error.response?.data?.message || "註冊成功，請至電子信箱收取驗證信。";
       } finally {
         this.isLoading = false; // 結束載入
+      }
+    },
+    async sendVerificationEmail() {
+      try {
+        
+        await api.post("http://localhost:8080/api/user/verifyEmail", {
+          email: this.email,
+        });
+
+        console.log("驗證信已發送至您的電子信箱！");
+      } catch (error) {
+        console.error("發送驗證信失敗", error);
+        this.errorMessage =
+          error.response?.data?.message || "發送驗證信失敗，請稍後再試。";
       }
     },
   },

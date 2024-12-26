@@ -12,6 +12,7 @@ import 'primeicons/primeicons.css';
 import ConfirmationService from 'primevue/confirmationservice';
 import ConfirmDialog from 'primevue/confirmdialog';
 import ToastService from "primevue/toastservice";
+import { VueReCaptcha } from "vue-recaptcha-v3";
 
 const app = createApp(App)
 app.config.globalProperties.$axios = axios;
@@ -31,6 +32,7 @@ app.use(createPinia())
 app.use(ConfirmationService); // 註冊 ConfirmationService
 app.use(ToastService);
 app.component('ConfirmDialog', ConfirmDialog); 
+app.use(VueReCaptcha, { siteKey: import.meta.env.VITE_RECAPTCHA_SITE_KEY });
 app.use(router)
 app.mount('#app')
 

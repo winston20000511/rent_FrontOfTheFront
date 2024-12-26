@@ -41,34 +41,55 @@ onMounted(async () => {
     isLoading.value = false;
   }
 
-  // 載入時禁止返回上一頁
-  // // 1. 推送當前頁面到歷史紀錄
-  // window.history.pushState(null, "", window.location.href);
+  載入時禁止返回上一頁
+  // 1. 推送當前頁面到歷史紀錄
+  window.history.pushState(null, "", window.location.href);
 
-  // // 2. 設置 onpopstate 事件，防止返回上一頁
-  // window.onpopstate = function(){
-  //   window.history.pushState(null, "", window.location.href)
-  // };
+  // 2. 設置 onpopstate 事件，防止返回上一頁
+  window.onpopstate = function(){
+    window.history.pushState(null, "", window.location.href)
+  };
 
-  // onBeforeUnmount(() => {
-  //   window.onpopstate = null;  // 清理事件處理器
-  // });
+  onBeforeUnmount(() => {
+    window.onpopstate = null;  // 清理事件處理器
+  });
 });
 
+async function processOrderCreation(){
+
+  const result = await createOrder();
+  console.log("processOrderCreation result: ", result);
+
+  if(result){
+    handlePayment(result.merchantTradNo);
+  }else{
+    console.error("付款失敗");
+  };
+
+};
+
+async function createOrder(){
+  console.log("cartStore 資料: ", cartStore);
+  const result = await cartStore.createOrder();
+  return result;
+};
+
 // 處理付款邏輯
-const handlePayment = async () => {
+async function handlePayment(merchantTradNo){
   // await nextTick();
 
   if (!formContainer.value) {
     throw new Error("formContainer尚未初始化");
   }
 
-  const headers = { "Content-Type": "application/json", authorization: `${token}` };
+  const headers = {
+    "Content-Type": "application/json",
+    authorization: `${token}`,
+  };
   const body = merchantTradNo;
 
   if (cartStore.thirdParty === "linepay") {
     console.log("呼叫LINEPAY");
-    cartStore.choosePayment = "linepay";
 
     const linepayResponse = await processPayment(
       "LINEPAY",
@@ -77,33 +98,38 @@ const handlePayment = async () => {
       headers
     );
 
-    if (linepayResponse && linepayResponse.paymentUrl) {
+    const responseJson = await linepayResponse.json();
+
+    if (responseJson && responseJson.paymentUrl) {
       cartStore.clearCart();
-      window.location.href = linepayResponse.paymentUrl;
+      window.location.href = responseJson.paymentUrl;
     };
   };
-  
+
   if (cartStore.thirdParty === "ecpay") {
     console.log("呼叫ECpay");
-    cartStore.choosePayment = "Credit";
 
-    const formHtml = await processPayment(
+    const formHTMLResponse = await processPayment(
       "綠界支付",
       "http://localhost:8080/api/ecpay/ecpayCheckout",
       body,
       headers
     );
 
-    if (formHtml) {
+    const formHTML = await formHTMLResponse.text();
+
+    console.log("綠界回傳: ", formHTML)
+
+    if (formHTML) {
+      console.log("有得到綠界html");
       cartStore.clearCart();
       const tempDiv = document.createElement("div");
-      tempDiv.innerHTML = formHtml.trim();
+      tempDiv.innerHTML = formHTML.trim();
       const formElement = tempDiv.firstChild;
       console.log("formElement", formElement);
       formContainer.value.appendChild(formElement);
       formElement.submit();
     };
-
   };
 };
 
@@ -118,14 +144,14 @@ async function processPayment(paymentType, url, body, headers) {
 
     if (!response.ok) throw new Error("支付請求失敗");
 
-    return await response.json(); // 或根據需要處理返回格式
+    // return await response.json(); // 或根據需要處理返回格式
+    return response;
   } catch (error) {
     console.error(`${paymentType} 付款失敗: `, error);
     this.$router.push({ name: "ads" });
     return null;
-  };
-};
-
+  }
+}
 </script>
 
 <template>
@@ -221,7 +247,7 @@ async function processPayment(paymentType, url, body, headers) {
         <tr>
           <td colspan="8" class="text-right">
             <button
-              @click="handlePayment"
+              @click="processOrderCreation"
               type="button"
               class="px-4 py-2 m-4 bg-blue-500 text-white rounded-md hover:bg-blue-400 transition duration-300"
             >

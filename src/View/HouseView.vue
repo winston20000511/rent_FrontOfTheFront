@@ -102,19 +102,21 @@ async function removeFavorite() {
 
     <hr />
 
-    <!-- 房屋圖片 -->
-    <HousePhotos :houseId="houseId" />
-    <hr />
-
-    <!-- 房屋標題 -->
     <HouseTitle :houseId="houseId" />
+
+    <hr />
+    <HousePhotos :houseId="houseId" />
+
     <hr />
 
     <div class="info-container">
       <!-- 房屋信息 -->
       <HouseInfo :houseId="houseId" />
       <!-- 房東信息 -->
+       <hr>
+
       <OwnerInfo :houseId="houseId" />
+
     </div>
 
     <hr />
@@ -165,4 +167,9 @@ async function removeFavorite() {
   flex-direction: column;
   gap: 10px;
 }
+
+hr{
+  margin: 10px;
+}
+
 </style>

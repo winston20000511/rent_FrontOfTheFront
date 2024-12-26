@@ -1,12 +1,10 @@
 <template>
   <div class="collect-list-container">
-    <!-- 确保 ConfirmDialog 位于页面顶层 -->
-    <ConfirmDialog />
 
-    <!-- 标题 -->
     <h2 class="title">我的收藏列表</h2>
 
-    <!-- 搜索栏 -->
+    <ConfirmDialog />
+
     <div class="action-bar">
       <div class="search-bar">
         <span class="p-input-icon-left">
@@ -17,40 +15,27 @@
     </div>
 
     <!-- 房屋列表 -->
-    <DataTable
-      :value="filteredHouses"
-      responsiveLayout="scroll"
-      :paginator="true"
-      :rows="5"
-      class="custom-table teal-theme"
-      :filters="filters"
-      filterDisplay="row"
-      :sortField="sortField"
-      :sortOrder="sortOrder"
-      @sort="onSort"
-    >
-      <!-- 房屋图片 -->
-      <Column header="图片" style="width: 150px">
+    <DataTable :value="filteredHouses" responsiveLayout="scroll" :paginator="true" :rows="5"
+      class="custom-table teal-theme" :filters="filters" filterDisplay="row" :sortField="sortField"
+      :sortOrder="sortOrder" @sort="onSort">
+      <!-- 房屋圖片 -->
+      <Column header="圖片" style="width: 150px">
         <template #body="slotProps">
           <div class="image-container">
-            <img
-              v-if="slotProps.data.images && slotProps.data.images.length > 0"
-              :src="slotProps.data.images[0]"
-              alt="House Image"
-              class="image-preview"
-            />
-            <span v-else>無圖片</span>
+            <img v-if="slotProps.data.images && slotProps.data.images.length > 0" :src="slotProps.data.images[0]"
+              alt="House Image" class="image-preview" />
+            <img v-else src="../../assets/no-image.png" alt="無圖片"></img>
           </div>
         </template>
       </Column>
 
-      <!-- 房屋名称 -->
+
       <Column field="title" header="房屋名稱" :sortable="true" style="width: 200px" />
 
-      <!-- 地址 -->
+
       <Column field="address" header="地址" :sortable="true" style="width: 200px" />
 
-      <!-- 价格 -->
+
       <Column field="price" header="價格" :sortable="true" style="width: 150px">
         <template #body="slotProps">
           {{ slotProps.data.price ? `$${slotProps.data.price}` : "未提供價格" }}
@@ -60,25 +45,20 @@
       <!-- 操作 -->
       <Column header="操作" style="width: 250px">
         <template #body="slotProps">
-          <Button
-            label="查看"
-            icon="pi pi-eye"
-            class="teal-theme-button"
-            @click="openHouseView(slotProps.data.houseId)"
-          />
-          <Button
-            label="刪除"
-            icon="pi pi-trash"
-            class="teal-theme-button"
-            @click="confirmDelete(slotProps.data.houseId)"
-          />
+          <Button label="查看" icon="pi pi-eye" class="teal-theme-button"
+            @click="openHouseView(slotProps.data.houseId)" />
+          <Button label="刪除" icon="pi pi-trash" class="teal-theme-button"
+            @click="confirmDelete(slotProps.data.houseId)" />
         </template>
       </Column>
     </DataTable>
 
-    <!-- 查看房屋表单弹窗 -->
-    <Dialog v-model:visible="showHouseView" :modal="true" header="查看房屋資訊" class="dialog-theme">
-      <HouseView :houseId="selectedHouseId" @close="closeHouseView" />
+
+    <Dialog v-model:visible="showHouseView" :modal="true" 
+    :dismissableMask="true" header="查看房屋資訊" class="dialog-theme">
+    <div class="dialog-container">
+    <HouseView :houseId="selectedHouseId" @close="closeHouseView" />
+    </div>
     </Dialog>
   </div>
 </template>
@@ -89,8 +69,9 @@ import Button from "primevue/button";
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
 import Dialog from "primevue/dialog";
-import ConfirmDialog from "primevue/confirmdialog";
+
 import HouseView from "@/View/HouseView.vue";
+import { ConfirmDialog } from "primevue";
 
 export default {
   name: "CollectList",
@@ -105,7 +86,7 @@ export default {
   },
   data() {
     return {
-      houses: [], // 用来存放收藏的房屋数据 (含图片)
+      houses: [],
       filters: { global: { value: null, matchMode: "contains" } },
       sortField: null,
       sortOrder: null,
@@ -183,6 +164,7 @@ export default {
     },
     closeHouseView() {
       this.showHouseView = false;
+
     },
 
     // 删除收藏
@@ -193,19 +175,17 @@ export default {
           headers: this.getAuthHeaders(),
         });
         this.houses = this.houses.filter((h) => h.houseId !== houseId);
+        this.loadHouses();
       } catch (error) {
         console.error("删除收藏失败:", error);
       }
     },
 
-    // 显示确认框
     confirmDelete(houseId) {
-      confirmDialog({
+      this.$confirm.require({
         message: "您確定要移除這個收藏嗎？",
         header: "確認移除收藏",
         icon: "pi pi-exclamation-triangle",
-        acceptLabel: "是",
-        rejectLabel: "否",
         accept: () => this.deleteHouse(houseId),
       });
     },
@@ -327,5 +307,11 @@ export default {
 .dialog-theme ::v-deep(.p-dialog-header) {
   background-color: #008080;
   color: #ffffff;
+}
+.dialog-container {
+  background-color: #ffffff;
+  padding: 10px;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 </style>

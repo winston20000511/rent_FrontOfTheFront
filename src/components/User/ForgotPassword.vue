@@ -20,21 +20,9 @@
             type="email"
             class="form-control"
             id="email"
+            v-model="email"
             name="email"
             placeholder="請輸入電子信箱"
-            required
-          />
-        </div>
-
-        <!-- 驗證碼欄位 -->
-        <div class="mb-3">
-          <label for="verificationCode" class="form-label">驗證碼</label>
-          <input
-            type="text"
-            class="form-control"
-            id="verificationCode"
-            name="verificationCode"
-            placeholder="請輸入下方「數字驗證碼」"
             required
           />
         </div>
@@ -53,19 +41,20 @@
 </template>
 
 <script setup>
-import api from "../../api/api"; // api.js的路徑存在於 src/api/ 目錄下，等同於"../../api/api"
+import { ref } from "vue";
+import api from "../../api/api"; // api.js 的路徑存在於 src/api/ 目錄下
+
+// 定義狀態變數
+const email = ref(""); // 綁定輸入框中的電子信箱
 
 // 定義可觸發的事件
-defineEmits(['close']);
+defineEmits(["close"]);
 
 async function submitForm() {
-  const email = document.getElementById("email").value;
-  const verificationCode = document.getElementById("verificationCode").value;
-
   try {
-    const response = await api.post("http://localhost:8080/api/user/forgotPassword", {
-      email,
-      verificationCode
+    // 傳送 POST 請求至後端 API
+    const response = await api.post("http://localhost:8080/api/forgot/forgotPassword", {
+      email: email.value, // 傳送的資料包含電子信箱
     });
 
     // 假設成功後的回應處理
