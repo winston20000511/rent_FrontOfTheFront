@@ -81,7 +81,7 @@ function checkIfCouponUsed(ad, price){
               <tr v-for="(item, index) in detail.adIds" :key="index">
                 <td class="px-4 py-2 text-center">{{ item }}</td>
                 <td class="px-4 py-2 text-center">
-                  {{ detail.adtypes[index] }}
+                  {{ detail.adtypes[index].substring(0,2) }}天
                 </td>
                 <td class="px-4 py-2 text-center">
                   {{ detail.adtypesPrices[index] }}

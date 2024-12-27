@@ -84,6 +84,8 @@ const filterAds = async () => {
     console.log("篩選廣告結果: ", data);
     const { content, totalPages: total } = data;
 
+    console.log("篩選到的廣告: ", data);
+
     ads.value = content;
     totalPages.value = total;
 

@@ -1,5 +1,7 @@
 <script setup>
 import { ref, watch, defineComponent } from "vue";
+import Dialog from "primevue/dialog"; // 引入Dialog元件
+import HouseView from "@/View/HouseView.vue"; // 假設您有一個顯示房屋詳細資料的組件
 
 defineComponent({ name: "noadhouselist" });
 
@@ -25,8 +27,11 @@ const selectedAdtypes = ref([]);
 const selectedHouseId = ref("");
 const selectedAdtype = ref("");
 
+// 控制 Modal 顯示狀態
+const showHouseModal = ref(false);
+
 // 初始化資料
-function initializeData(){
+function initializeData() {
   if (props.noAdHouses.length > 0 && props.adtypes.length > 0) {
     console.log("初始化載入");
     selectedAdtypes.value = props.noAdHouses.map(
@@ -34,10 +39,10 @@ function initializeData(){
     );
   } else {
     console.log("沒有符合資料");
-  };
+  }
 
   isDataLoaded.value = true;
-};
+}
 
 watch(
   [() => props.noAdHouses, () => props.adtypes],
@@ -47,17 +52,18 @@ watch(
   { immediate: true }
 );
 
-function getHouseAndAdtypeInfo(index) {
-  selectedAdtype.value = selectedAdtypes.value[index];
-  selectedHouseId.value = props.noAdHouses[index].houseId;
+// 用於打開查看房屋資料的函式
+function checkHouseInfo(houseId) {
+  selectedHouseId.value = houseId; // 設置選中的房屋ID
+  showHouseModal.value = true; // 顯示 Modal
 }
 
 // 插入廣告資料表
 async function addAd(houseId, adtypeId) {
   if (!houseId || !adtypeId) {
-    console.error( "House ID: ", houseId, " or Adtype ID is missing: ", adtypeId );
+    console.error("House ID: ", houseId, " or Adtype ID is missing: ", adtypeId);
     return;
-  };
+  }
 
   const selectedInfo = {
     houseId,
@@ -82,18 +88,11 @@ async function addAd(houseId, adtypeId) {
       emit("filter-no-ad-houses");
     } else {
       alert("新增失敗");
-    };
-
+    }
   } catch (error) {
     console.error("Error adding ad:", error);
-    
-  };
-};
-
-function checkHouseInfo(){
-  console.log("check house info");
+  }
 }
-
 </script>
 
 <template>
@@ -138,7 +137,7 @@ function checkHouseInfo(){
             <td class="px-4 py-3">
               <button
                 class="px-3 py-1 text-sm text-blue-600 bg-blue-100 rounded hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
-                @click="checkHouseInfo"
+                @click="checkHouseInfo(noAdHouse.houseId)"
               >
                 查看
               </button>
@@ -161,9 +160,7 @@ function checkHouseInfo(){
             <td class="px-4 py-3 text-center">
               <button
                 class="px-4 py-2 text-white bg-green-500 rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400"
-                @click="
-                  addAd(noAdHouse.houseId, selectedAdtypes[index]?.adtypeId)
-                "
+                @click="addAd(noAdHouse.houseId, selectedAdtypes[index]?.adtypeId)"
               >
                 新增
               </button>
@@ -172,5 +169,23 @@ function checkHouseInfo(){
         </tbody>
       </table>
     </div>
+
+    <!-- 房屋詳細資訊 Modal -->
+    <Dialog
+      v-model:visible="showHouseModal"
+      header="房屋詳細資料"
+      :modal="true"
+      :dismissableMask="true"
+      class="dialog-theme"
+    >
+      <HouseView :houseId="selectedHouseId" @close="showHouseModal = false" />
+    </Dialog>
   </div>
 </template>
+
+<style scoped>
+.dialog-theme .p-dialog {
+  width: 80%;
+  max-width: 800px;
+}
+</style>
