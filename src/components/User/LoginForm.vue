@@ -93,9 +93,9 @@ export default {
         const authStore = useAuthStore();
         authStore.isLoggedIn = true;
 
-        // 登入成功提示並跳轉至會員中心
+        // 登入成功提示並跳轉回首頁
         alert("登入成功！");
-        this.$router.push("/member-Center");
+        this.$router.push("/");
 
         // 在登入成功後觸發 'login-success' 事件
         this.$emit('login-success');

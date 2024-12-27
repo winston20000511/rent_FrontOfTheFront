@@ -12,7 +12,7 @@
                 <div class="mb-3">
                   <label for="user_id" class="form-label">使用者ID</label>
                   <input
-                    type="text"
+                    type="text" 
                     class="form-control"
                     id="user_id"
                     v-model="user.userId"
@@ -42,7 +42,8 @@
                 </div>
 
                 <div class="mb-3">
-                  <label for="password" class="form-label">密碼</label>
+                  <label for="password" class="form-label">密碼</label><div></div>
+                  <small class="form-text">密碼需至少8個字母，並包含英數字</small>
                   <input
                     type="password"
                     class="form-control"
@@ -52,7 +53,8 @@
                 </div>
 
                 <div class="mb-3">
-                  <label for="phone" class="form-label">手機</label>
+                  <label for="phone" class="form-label">手機</label><div></div>
+                  <small class="form-text">手機格式須為09xx-xxx-xxx</small>
                   <input
                     type="text"
                     class="form-control"
@@ -71,7 +73,7 @@
                   />
                   <img
                     v-if="previewImage"
-                    :src="previewImage"
+                    :src="`data:image/jpeg;base64,${previewImage}`"
                     alt="Profile Picture"
                     class="img-thumbnail mt-3"
                     width="100"
@@ -209,10 +211,10 @@ export default {
       });
   },
   methods: {
-    // 2. 使用 POST 請求更新會員資料
+    // 2. 使用 PUT 請求更新會員資料
     updateUser() {
       api
-        .post("http://localhost:8080/api/user/update", this.user) // 更新會員資料的 API
+        .put("http://localhost:8080/api/user/update", this.user) // 更新會員資料的 API
         .then(() => {
           alert("會員資料更新成功！");
         })
@@ -230,6 +232,18 @@ export default {
 </script>
 
 <style scoped>
+.form-text {
+  color: red;          /* 設定文字顏色為紅色 */
+}
+
+.form-label {
+  margin-bottom: 2px; /* 減少標籤和下一行之間的間距 */
+}
+
+.form-text {
+  margin-top: 2px; /* 減少提示文字和標籤之間的間距 */
+
+}
 .edit-profile {
   font-family: 'Arial', sans-serif;
 }

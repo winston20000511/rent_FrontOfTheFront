@@ -1,6 +1,8 @@
 <template>
   <!-- 包裹內容的外層容器 -->
-  <div class="login-page-container">
+  <div 
+    class="login-page-container" 
+    @click.self="closeLoginPage"> <!-- 點擊外層容器時觸發關閉事件 -->
     <div class="row">
       <!-- 左側背景區域 -->
       <div class="col-md-6 left-side"></div>

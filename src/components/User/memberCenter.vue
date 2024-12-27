@@ -5,7 +5,7 @@
         <!-- 會員資料區 -->
         <div class="member-info card mb-4 shadow">
           <div class="card-body d-flex align-items-center">
-            <img :src="memberPicture.base64" alt="會員大頭貼" class="member-avatar rounded-circle" />
+            <img :src="memberPicture" alt="會員大頭貼" class="member-avatar rounded-circle" />
             <div class="ml-3">
               <h5 class="mb-0">你好，{{ memberName }}！</h5>
               <p class="text-muted mb-0">歡迎來到會員中心</p>
@@ -176,19 +176,36 @@ export default {
           const response = await api.post(
             "http://localhost:8080/api/user/userSimpleInfo"
           );
+          console.log(response.data);
           const { name, picture } = response.data;
+          console.log(picture);
+          this.memberPicture=`data:image/jpeg;base64,${picture}`;
+          //this.memberPicture = atob(picture);
+          console.log(atob(picture));
 
+          
         // 設定會員資料
         this.memberName = name;
-        this.memberPicture = picture || "https://via.placeholder.com/80"; // 預設圖片
+        //this.memberPicture = picture || "https://via.placeholder.com/80"; // 預設圖片
       } catch (error) {
         console.error("無法取得會員資料", error);
       }
     },
+    
   },
 };
 </script>
 
 <style scoped>
-/* 與原版一致 */
+.member-avatar {
+  width: 80px; /* 調整大頭貼寬度 */
+  height: 80px; /* 調整大頭貼高度，讓它保持正方形 */
+  margin-right: 10px; /* 與「你好」之間的間距 */
+  object-fit: cover; /* 確保圖片以適當比例顯示 */
+}
+
+.member-info .card-body {
+  display: flex;
+  align-items: center;
+}
 </style>
