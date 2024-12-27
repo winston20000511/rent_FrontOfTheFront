@@ -99,6 +99,7 @@ function getCardClass(item){
       <div
         v-for="list in markers.searchList"
         :key="list.houseid"
+        class=""
         :class="getCardClass(list.paidDate)"
       >
         <div class="card card-shadow clickable-card" style="width: 100%"
