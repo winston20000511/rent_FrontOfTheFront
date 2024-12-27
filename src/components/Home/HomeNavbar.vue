@@ -215,15 +215,15 @@ const handleSignInClick = () => {
     <ul class="nav-right">
       <!-- 只有登入後才顯示 MemberCenter -->
       <li v-if="authStore.isLoggedIn">
-        <RouterLink to="/member-center">MemberCenter</RouterLink>
+        <RouterLink to="/member-center" class="nav-button">會員中心</RouterLink>
       </li>
       <!-- 顯示會員頭像 -->
       <li v-if="authStore.isLoggedIn && authStore.profilePicture">
         <img :src="authStore.profilePicture" alt="Profile Picture" class="user-avatar" />
       </li>
       <li>
-        <button @click="handleSignInClick">
-          {{ authStore.isLoggedIn ? 'Logout' : 'Sign In' }}
+        <button @click="handleSignInClick" class="nav-button">
+          {{ authStore.isLoggedIn ? '登出' : '登入' }}
         </button>
       </li>
     </ul>
@@ -231,6 +231,21 @@ const handleSignInClick = () => {
 </template>
 
 <style scoped>
+.nav-button {
+  font-size: 20px;
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  text-decoration: none;
+  cursor: pointer;
+  display: inline-block;
+  text-align: center;
+}
+.nav-button:hover {
+  background-color: #0056b3;
+}
 /* Navbar 容器 */
 .navbar {
   display: flex;

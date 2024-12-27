@@ -1,6 +1,6 @@
 <template>
   <div class="register-container">
-    <h2>註冊</h2>
+    <h2 class="register-title">註冊</h2>
     <form @submit.prevent="submitRegister">
       <div class="mb-3">
         <label for="registerName" class="form-label">姓名</label>
@@ -154,6 +154,15 @@ export default {
 </script>
 
 <style scoped>
+.terms-link {
+  color: blue; /* 設定文字顏色為藍色 */
+  text-decoration: underline; /* 添加底線 */
+}
+.register-title {
+  font-size: 3rem; /* 設定字體大小為3rem，約等於斗大的字 */
+  font-weight: bold; /* 使字體加粗 */
+  margin-bottom: 20px; /* 設定底部邊距 */
+}
 .register-container {
   max-width: 400px;
   margin: 50px auto;

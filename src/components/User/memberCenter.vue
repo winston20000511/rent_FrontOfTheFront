@@ -5,7 +5,7 @@
         <!-- 會員資料區 -->
         <div class="member-info card mb-4 shadow">
           <div class="card-body d-flex align-items-center">
-            <img :src="memberPicture" alt="會員大頭貼" class="member-avatar rounded-circle" />
+            <img :src="memberPicture.base64" alt="會員大頭貼" class="member-avatar rounded-circle" />
             <div class="ml-3">
               <h5 class="mb-0">你好，{{ memberName }}！</h5>
               <p class="text-muted mb-0">歡迎來到會員中心</p>
@@ -108,6 +108,7 @@
 </template>
 
 <script>
+import axios from "axios";
 import api from "../../api/api"; // 假設 API 模組已設定 Authorization 標頭
 
 export default {
@@ -172,10 +173,10 @@ export default {
     async fetchMemberData() {
       try {
         // 從後端 API 獲取會員資料
-        const response = await api.get(
-          "http://localhost:8080/api/user/userCenter"
-        );
-        const { name, picture } = response.data;
+          const response = await api.post(
+            "http://localhost:8080/api/user/userSimpleInfo"
+          );
+          const { name, picture } = response.data;
 
         // 設定會員資料
         this.memberName = name;

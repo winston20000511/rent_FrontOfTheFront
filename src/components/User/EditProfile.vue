@@ -15,7 +15,7 @@
                     type="text"
                     class="form-control"
                     id="user_id"
-                    v-model="user.user_id"
+                    v-model="user.userId"
                     disabled
                   />
                 </div>
@@ -84,7 +84,7 @@
                     type="text"
                     class="form-control"
                     id="createtime"
-                    v-model="user.createtime"
+                    v-model="user.createTime"
                     disabled
                   />
                 </div>
@@ -172,57 +172,58 @@
 
 <script>
 import api from "../../api/api"; // 確保路徑正確
-
 export default {
   name: "EditProfile",
   data() {
     return {
       user: {
-        user_id: 1,
-        name: "John Doe",
-        email: "john@example.com",
+        userId: "", 
+        name: "",
+        email: "",
         password: "",
-        phone: "0912345678",
+        phone: "",
         picture: "",
-        createtime: "2024-01-01",
-        gender: 0,
+        createTime: "",
+        gender: null,
         coupon: 3,
-        status: 1,
+        status: null,
       },
-      previewImage: null,
     };
   },
+  created() {
+    // 1. 使用 post 請求載入目前登入會員資料
+    api
+      .post("http://localhost:8080/api/user/userCenter") // 獲取會員資料的 API
+      .then((response) => {
+        this.user = {
+          ...response.data,
+          password: "", // 預防直接顯示密碼，保留為空
+        };
+        // this.user.userId = response.data.userId
+        console.log(response.data)
+        console.log(JSON.stringify(this.user))
+      })
+      .catch((error) => {
+        console.error("載入會員資料失敗", error);
+        alert("無法載入會員資料，請稍後再試！");
+      });
+  },
   methods: {
-    handleFileUpload(event) {
-      const file = event.target.files[0];
-      if (file) {
-        this.previewImage = URL.createObjectURL(file);
-        this.user.picture = file;
-      }
-    },
-    submitForm() {
+    // 2. 使用 POST 請求更新會員資料
+    updateUser() {
       api
-        .put("http://localhost:8080/api/user/update", this.user)
-        .then((response) => {
-          console.log("資料已儲存", response);
-          this.showModal("資料已儲存！");
+        .post("http://localhost:8080/api/user/update", this.user) // 更新會員資料的 API
+        .then(() => {
+          alert("會員資料更新成功！");
         })
         .catch((error) => {
-          console.error("儲存資料錯誤", error);
-          this.showModal("儲存資料時發生錯誤！");
+          console.error("更新會員資料失敗", error);
+          alert("更新失敗，請檢查輸入內容！");
         });
     },
-    confirmDeactivate() {
-      console.log("帳號已停用");
-      this.$router.push({ name: "DeactivateAccount" });
-    },
-    showModal(message) {
-      this.modalMessage = message;
-      const modal = new bootstrap.Modal(
-        document.getElementById("alertModal"),
-        {}
-      );
-      modal.show();
+   // 3. 提交表單
+   submitForm() {
+      this.updateUser();
     },
   },
 };
