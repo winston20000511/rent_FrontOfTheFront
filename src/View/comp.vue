@@ -109,7 +109,7 @@ function initializeCurrentUser() {
     console.log("JWT 解碼結果:", decoded);
 
     formData.value.user_id = decoded.userId || decoded.sub || "";
-    formData.value.username = decoded.userName || decoded.name || "";
+    formData.value.username = decoded.username || decoded.name || "";
     console.log("當前用戶信息:",
       'userId:', formData.value.user_id,
       'name:', formData.value.username);
