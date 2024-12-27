@@ -112,8 +112,8 @@
 
                 <!-- 自定義 'operate' 列的內容 -->
                 <template v-if="col.field === 'operate'" #body="slotProps">
-                    <Button v-if="slotProps.data.status === 0" label="處　理" severity="info"
-                        @click="confirmProcessBooking(slotProps.data)"><i class="bi bi-text-paragraph">處　理</i></Button>
+                    <Button v-if="slotProps.data.status === 0" label="進行確認" severity="info"
+                        @click="confirmProcessBooking(slotProps.data)" />
                     <Button v-if="slotProps.data.status === 1" label="取消預約" severity="danger"
                         @click="confirmcancelBooking(slotProps.data)" />
                 </template>
