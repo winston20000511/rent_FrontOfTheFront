@@ -177,6 +177,7 @@ export const useCart = defineStore("cart", {
     clearCart() {
       this.cartItems = [];
       this.thirdPartry = null;
+      this.cartId = null;
     },
 
     async getCouponNumber() {

@@ -98,7 +98,7 @@ const discountAmount = computed(() => {
       style="width: 360px"
     >
       <div class="flex justify-between px-4 py-3 border-b">
-        <h2 class="text-xl font-semibold">選購清單</h2>
+        <h2 class="text-xl font-semibold">申請清單</h2>
         <button
           class="text-xl font-bold text-gray-600 hover:text-gray-800 focus:outline-none"
           @click="toggleCart"

@@ -62,6 +62,7 @@ async function processOrderCreation(){
 
   if(result){
     handlePayment(result.merchantTradNo);
+    cartStore.clearCart();
   }else{
     console.error("付款失敗");
   };
@@ -92,39 +93,37 @@ async function handlePayment(merchantTradNo){
     console.log("呼叫LINEPAY");
 
     const linepayResponse = await processPayment(
-      "LINEPAY",
+      "linepay",
       "http://localhost:8080/api/linepay/request",
       body,
       headers
     );
 
-    const responseJson = await linepayResponse.json();
+    console.log("linepay response json: ", linepayResponse);
 
-    if (responseJson && responseJson.paymentUrl) {
+    if (linepayResponse && linepayResponse.paymentUrl) {
       cartStore.clearCart();
-      window.location.href = responseJson.paymentUrl;
-    };
+      window.location.href = linepayResponse.paymentUrl;
+    }
   };
 
   if (cartStore.thirdParty === "ecpay") {
     console.log("呼叫ECpay");
 
     const formHTMLResponse = await processPayment(
-      "綠界支付",
+      "ecpay",
       "http://localhost:8080/api/ecpay/ecpayCheckout",
       body,
       headers
     );
 
-    const formHTML = await formHTMLResponse.text();
+    console.log("ECpay 回應 HTML: ", formHTMLResponse);
 
-    console.log("綠界回傳: ", formHTML)
-
-    if (formHTML) {
-      console.log("有得到綠界html");
+    if (formHTMLResponse) {
+      console.log("有得到綠界 HTML");
       cartStore.clearCart();
       const tempDiv = document.createElement("div");
-      tempDiv.innerHTML = formHTML.trim();
+      tempDiv.innerHTML = formHTMLResponse.trim();
       const formElement = tempDiv.firstChild;
       console.log("formElement", formElement);
       formContainer.value.appendChild(formElement);
@@ -144,14 +143,21 @@ async function processPayment(paymentType, url, body, headers) {
 
     if (!response.ok) throw new Error("支付請求失敗");
 
-    // return await response.json(); // 或根據需要處理返回格式
-    return response;
+    if (paymentType === "linepay") {
+      const data = await response.json();
+      return data;
+    } else if (paymentType === "ecpay") {
+      const formHTML = await response.text();
+      return formHTML;
+    }
+    
   } catch (error) {
     console.error(`${paymentType} 付款失敗: `, error);
     this.$router.push({ name: "ads" });
     return null;
   }
 }
+
 </script>
 
 <template>
