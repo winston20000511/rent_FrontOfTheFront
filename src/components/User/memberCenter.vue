@@ -108,6 +108,7 @@
 </template>
 
 <script>
+import axios from "axios";
 import api from "../../api/api"; // 假設 API 模組已設定 Authorization 標頭
 
 export default {
@@ -172,22 +173,39 @@ export default {
     async fetchMemberData() {
       try {
         // 從後端 API 獲取會員資料
-        const response = await api.post(
-          "http://localhost:8080/api/user/userCenter"
-        );
-        const { name, picture } = response.data;
+          const response = await api.post(
+            "http://localhost:8080/api/user/userSimpleInfo"
+          );
+          console.log(response.data);
+          const { name, picture } = response.data;
+          console.log(picture);
+          this.memberPicture=`data:image/jpeg;base64,${picture}`;
+          //this.memberPicture = atob(picture);
+          console.log(atob(picture));
 
+          
         // 設定會員資料
         this.memberName = name;
-        this.memberPicture = picture || "https://via.placeholder.com/80"; // 預設圖片
+        //this.memberPicture = picture || "https://via.placeholder.com/80"; // 預設圖片
       } catch (error) {
         console.error("無法取得會員資料", error);
       }
     },
+    
   },
 };
 </script>
 
 <style scoped>
-/* 與原版一致 */
+.member-avatar {
+  width: 80px; /* 調整大頭貼寬度 */
+  height: 80px; /* 調整大頭貼高度，讓它保持正方形 */
+  margin-right: 10px; /* 與「你好」之間的間距 */
+  object-fit: cover; /* 確保圖片以適當比例顯示 */
+}
+
+.member-info .card-body {
+  display: flex;
+  align-items: center;
+}
 </style>

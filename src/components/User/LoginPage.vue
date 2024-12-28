@@ -1,13 +1,15 @@
 <template>
   <!-- 包裹內容的外層容器 -->
-  <div class="login-page-container">
+  <div 
+    class="login-page-container" 
+    @click.self="closeLoginPage"> <!-- 點擊外層容器時觸發關閉事件 -->
     <div class="row">
       <!-- 左側背景區域 -->
       <div class="col-md-6 left-side"></div>
 
       <!-- 右側登入/註冊區域 -->
       <div class="col-md-6 form-container">
-        <h3 class="text-center mb-4">Welcome to Rent189</h3>
+        <h1 class="text-center mb-4 rent189-title">Welcome to Rent189</h1>
 
         <!-- 模式切換按鈕 -->
         <ul class="nav nav-tabs mb-3" id="formTab" role="tablist">
@@ -46,7 +48,7 @@
             id="login" 
             role="tabpanel" 
             aria-labelledby="login-tab">
-            <LoginForm />
+            <LoginForm @login-success="handleLoginSuccess" />
           </div>
           <div 
             class="tab-pane fade" 
@@ -69,6 +71,7 @@
 </template>
 
 <script setup>
+import { defineEmits } from 'vue';
 import LoginForm from './LoginForm.vue';
 import RegisterForm from './RegisterForm.vue';
 
@@ -77,11 +80,22 @@ const emit = defineEmits(['closeLoginPage']);
 
 // 關閉登入頁面的方法
 const closeLoginPage = () => {
-  emit('closeLoginPage'); // 傳遞事件給 HomeView.vue
+  emit('closeLoginPage'); // 傳遞事件給父元件
+};
+
+// 處理登入成功的方法
+const handleLoginSuccess = () => {
+  closeLoginPage(); // 關閉登入頁面
 };
 </script>
 
 <style scoped>
+/* 標題Welcome to Rent189 */
+.rent189-title {
+  font-size: 2.0rem; /* 調整標題大小 */
+  font-weight: bold; /* 設置粗體 */
+  color: #333; /* 字體顏色，可以根據需求修改 */
+}
 /* 外層容器樣式 */
 .login-page-container {
   width: 100%;
@@ -113,7 +127,7 @@ const closeLoginPage = () => {
   width: 50%; /* 變寬 */
   max-width: 700px;
   min-width: 500px;
-  height: auto; /* 根據內容調整高度 */
+  height: 90vh; /* 高度在這裡改！！目前是占滿視窗高度的 85% */
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -124,5 +138,6 @@ const closeLoginPage = () => {
 .close-btn {
   width: 100%;
   margin-top: 1rem;
+  align-self: flex-end;
 }
 </style>

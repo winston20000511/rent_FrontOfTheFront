@@ -1,51 +1,41 @@
 <script setup>
 import { onMounted, onUnmounted, ref } from 'vue';
 import { Offcanvas } from 'bootstrap';
-
-import { useRouter } from 'vue-router'; // 引入 useRouter
+import { useRouter } from 'vue-router';
 import { useAuthStore } from '@/stores/auth';
 import { useOption } from '@/stores/optionStore';
 
-
-
-const authStore = useAuthStore(); // 引入 auth Store
+const authStore = useAuthStore();
 const optionStore = useOption();
 const searchInputRef = ref(null);
 const searchListRef = ref(null);
-const searchListPosRef = ref({ top: 0, left: 0, width: 0 })
-const searchListReuslt = ref([])
-// const myOffcanvasRef = ref(null);
-// const offcanvasInstance= ref(null);
+const searchListPosRef = ref({ top: 0, left: 0, width: 0 });
+const searchListReuslt = ref([]);
 const iconBtnRef = ref(null);
 
-let isComposing = false; //判斷是否正在打字
-let keywordUrl = 'http://localhost:8080/api/keyword'
-let mapUrl = 'http://localhost:8080/api/map'
+let isComposing = false;
+let keywordUrl = 'http://localhost:8080/api/keyword';
+let mapUrl = 'http://localhost:8080/api/map';
 let token = localStorage.getItem('jwt');
 
-
-const emits = defineEmits(['add-marker', 'signInClicked'])
+const emits = defineEmits(['add-marker', 'signInClicked']);
 
 onMounted(() => {
-  document.addEventListener('click', closeSearchList);
+  document.addEventListener('click', handleClickOutside);
   optionStore.initializeData();
-  // if (myOffcanvasRef.value) {
-  //     offcanvasInstance.value = new Offcanvas(myOffcanvasRef.value);
-  // }
 });
 
 onUnmounted(() => {
-  // 移除事件監聽器
-  document.removeEventListener('click', closeSearchList);
+  document.removeEventListener('click', handleClickOutside);
 });
 
 const compositionStart = () => {
   isComposing = true;
-}
+};
 const compostitionEnd = () => {
   isComposing = false;
   showKeyWordFetch();
-}
+};
 
 const showSearchList = () => {
   if (searchInputRef.value) {
@@ -53,142 +43,126 @@ const showSearchList = () => {
     searchListPosRef.value = {
       top: listRect.height,
       left: 0,
-      width: listRect.width
+      width: listRect.width,
     };
     searchListRef.value.style.display = 'block';
   }
-}
-const closeSearchList = (event) => {
-  // if(searchListRef.value && !searchListRef.value.contains(event.target) &&
-  //     searchInputRef.value && !searchInputRef.value.contains(event.target) &&
-  //     myOffcanvasRef.value && !myOffcanvasRef.value.contains(event.target)){
+};
 
-  //     searchListPosRef.value.innerHTML="";
-  //     searchListRef.value.style.display ='none';
-  //     offcanvasInstance.value.hide();
-  // }
-  if (searchListRef.value && !searchListRef.value.contains(event.target)) {
-    searchListPosRef.value.innerHTML = "";
+const closeSearchList = () => {
+  if (searchListRef.value) {
     searchListRef.value.style.display = 'none';
+    searchListReuslt.value = [];
   }
+};
 
-}
+const handleClickOutside = (event) => {
+  // 檢查點擊是否發生在搜尋表單或搜尋清單外
+  if (
+    searchListRef.value &&
+    !searchListRef.value.contains(event.target) &&
+    searchInputRef.value &&
+    !searchInputRef.value.contains(event.target)
+  ) {
+    closeSearchList();
+  }
+};
+
 const clickSearchBtn = () => {
   showMapFetch();
-}
+};
+
 const enterSearchBtn = (event) => {
   if (event.key === 'Enter') {
     showMapFetch();
   }
-}
+};
 
 const showKeyWordFetch = async () => {
 
   const input = {
     origin: searchInputRef.value.value,
     priority: optionStore.shareOptions.priority,
-    sort: optionStore.shareOptions.sort
-  }
-  // const merge = Object.assign({},input,optionStore.shareOptions)
+    sort: optionStore.shareOptions.sort,
+  };
 
   const response = await fetch(keywordUrl, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'authorization': `${token}`
+      authorization: `${token}`,
     },
-    body: JSON.stringify(input)
+    body: JSON.stringify(input),
   });
 
   if (!response.ok) {
-    throw new Error('Network response was not ok')
+    throw new Error('Network response was not ok');
   }
 
   const data = await response.json();
-  console.log('Data received:', data);
   showLKeyWrodList(data);
-}
+};
 
-const showLKeyWrodList = async (data) => {
-  searchListReuslt.value = [];
-  data.forEach(k => {
-    searchListReuslt.value.push({
-      id: Date.now() + Math.random(),
-      address: k.address,
-      paidDate: k.paidDate,
-    });
-  })
-
-}
+const showLKeyWrodList = (data) => {
+  searchListReuslt.value = data.map((k) => ({
+    id: Date.now() + Math.random(),
+    address: k.address,
+    paidDate: k.paidDate,
+  }));
+};
 
 const showMapFetch = async (address) => {
   if (address) {
     searchInputRef.value.value = address;
   }
 
-  const inputData = {
-    address: searchInputRef.value.value
-  }
-  const merge = Object.assign({}, inputData, optionStore.shareOptions)
+  const inputData = { address: searchInputRef.value.value };
+  const merge = Object.assign({}, inputData, optionStore.shareOptions);
 
   const response = await fetch(mapUrl, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'authorization': `${token}`
+      authorization: `${token}`,
     },
-    body: JSON.stringify(merge)
+    body: JSON.stringify(merge),
   });
 
   if (!response.ok) {
-    throw new Error('Network response was not ok')
+    throw new Error('Network response was not ok');
   }
 
   const data = await response.json();
-  console.log(data);
-  emits('add-marker', data)
-}
+  emits('add-marker', data);
+};
 
 const handleListClick = (item) => {
   searchInputRef.value.value = item.address;
-  searchInputRef.value.innerHTML = '';
-  searchListRef.value.style.display = 'none';
-  // offcanvasInstance.value.hide();
+  closeSearchList();
   showMapFetch();
-}
+};
 
 const checkPaidDate = (item) => {
   const dateSpec = '1999-01-01T00:00:00';
   const sourceDate = new Date(item.paidDate);
   const targetDate = new Date(dateSpec);
-  if (sourceDate > targetDate) {
-    return "bi bi-hand-thumbs-up"
-  } else {
-    return ""
-  }
+  return sourceDate > targetDate ? 'bi bi-hand-thumbs-up' : '';
+};
 
-}
-
-
-const router = useRouter(); // 初始化 router
+const router = useRouter();
 
 const handleSignInClick = () => {
-  // 如果未登入，發送事件通知父組件顯示 LoginPage
   if (!authStore.isLoggedIn) {
     emits('signInClicked');
   } else {
-    // 如果已登入，執行登出邏輯
     authStore.logout();
-    router.push('/'); // 跳轉至首頁 HomeView.vue
+    router.push('/');
   }
 };
-
-
 </script>
 
 <template>
   <div class="navbar">
-    <!-- 左側：Logo 和標題 -->
     <div class="nav-left">
       <router-link to="/">
         <img src="../../assets/Logo3.jpg" alt="Logo" class="nav-logo" />
@@ -199,34 +173,49 @@ const handleSignInClick = () => {
     </div>
 
     <div class="filter" id="filter">
-      <input type="text" placeholder="Address, neighborhood, city, ZIP" id="search" class="form-control me-4"
-        ref="searchInputRef" v-on:input="showSearchList" v-on:compositionstart="compositionStart"
-        v-on:compositionend="compostitionEnd" v-on:click="showSearchList" v-on:keyup="enterSearchBtn">
+      <input
+        type="text"
+        placeholder="Address, neighborhood, city, ZIP"
+        id="search"
+        class="form-control me-4"
+        ref="searchInputRef"
+        v-on:input="showSearchList"
+        v-on:compositionstart="compositionStart"
+        v-on:compositionend="compostitionEnd"
+        v-on:click="showSearchList"
+        v-on:keyup="enterSearchBtn"
+      />
       <i class="fa-solid fa-magnifying-glass" ref="iconBtnRef" v-on:click="clickSearchBtn"></i>
-      <ul class="searchList position-absolute mt-1 bg-white border rounded shadow" ref="searchListRef" v-bind:style="{
-        top: `${searchListPosRef.top}px`,
-        left: `${searchListPosRef.left}px`,
-        width: `${searchListPosRef.width}px`
-      }">
-        <li v-for="item in searchListReuslt" v-bind:key="item.id" class="custom-list"
-          v-on:click="handleListClick(item)">
-          {{ item.address }}<i :class="checkPaidDate(item)"></i></li>
+      <ul
+        class="searchList position-absolute mt-1 bg-white border rounded shadow"
+        ref="searchListRef"
+        v-bind:style="{
+          top: `${searchListPosRef.top}px`,
+          left: `${searchListPosRef.left}px`,
+          width: `${searchListPosRef.width}px`,
+        }"
+      >
+        <li
+          v-for="item in searchListReuslt"
+          v-bind:key="item.id"
+          class="custom-list"
+          v-on:click="handleListClick(item)"
+        >
+          {{ item.address }}<i :class="checkPaidDate(item)"></i>
+        </li>
       </ul>
     </div>
 
-    <!-- 右側：MemberCenter 和 Sign In/Logout -->
     <ul class="nav-right">
-      <!-- 只有登入後才顯示 MemberCenter -->
       <li v-if="authStore.isLoggedIn">
-        <RouterLink to="/member-center">MemberCenter</RouterLink>
+        <RouterLink to="/member-center" class="nav-button">會員中心</RouterLink>
       </li>
-      <!-- 顯示會員頭像 -->
       <li v-if="authStore.isLoggedIn && authStore.profilePicture">
         <img :src="authStore.profilePicture" alt="Profile Picture" class="user-avatar" />
       </li>
       <li>
-        <button @click="handleSignInClick">
-          {{ authStore.isLoggedIn ? 'Logout' : 'Sign In' }}
+        <button @click="handleSignInClick" class="nav-button">
+          {{ authStore.isLoggedIn ? '登出' : '登入' }}
         </button>
       </li>
     </ul>
@@ -234,6 +223,21 @@ const handleSignInClick = () => {
 </template>
 
 <style scoped>
+.nav-button {
+  font-size: 20px;
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  text-decoration: none;
+  cursor: pointer;
+  display: inline-block;
+  text-align: center;
+}
+.nav-button:hover {
+  background-color: #0056b3;
+}
 /* Navbar 容器 */
 .navbar {
   display: flex;
