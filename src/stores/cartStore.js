@@ -55,16 +55,7 @@ export const useCart = defineStore("cart", {
     updateToken(newToken){
       this.token = newToken;
       localStorage.setItem("jwt", newToken);  // 更新 localStorage 中的 token
-      console.log("Token 已更新: ", newToken);
-    },
-
-    initStorageListener(){
-      window.addEventListener("storage", (event) => {
-        if (event.key === "jwt") {
-          this.token = localStorage.getItem("jwt");
-          console.log("Token 已更新: ", this.token);
-        }
-      });
+      console.log("1. Token 已更新: ", newToken);
     },
 
     // 取得購物車畫面中的完整資料: 購物車內容 + 優惠券數量
@@ -77,8 +68,6 @@ export const useCart = defineStore("cart", {
 
     // 載入購物車
     async loadCart() {
-
-      console.log("pinia loadCart中的token: ", this.token)
 
       try {
         let url = "http://localhost:8080/api/cart/list";

@@ -91,7 +91,6 @@ export default {
         // 更新 pinia store 中的 token
         const cartStore = useCart();
         cartStore.updateToken(token);
-        console.log("login中cart store中的token: ", cartStore.token);
 
         // 儲存 token 到 localStorage
         localStorage.setItem("jwt", token);
