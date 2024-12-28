@@ -68,7 +68,7 @@ const addMarker = (locations) => {
 
     <!-- 聊天彈窗和按鈕 -->
     <div>
-      <ChatPopup v-if="showChatPopup" @close="toggleChatPopup" />
+      <ChatPopup v-if="showChatPopup" class="chat-popup" @close="toggleChatPopup" />
       <button v-if="showChatApp" class="chat-button" @click="toggleChatPopup">
         <i class="bi bi-chat-dots-fill"></i>
       </button>
@@ -103,7 +103,7 @@ const addMarker = (locations) => {
 
 .chat-button {
   position: fixed;
-  bottom: 20px;
+  bottom: 90px;
   right: 20px;
   width: 50px;
   height: 50px;
@@ -119,7 +119,19 @@ const addMarker = (locations) => {
   z-index: 9999;
 }
 
+
 .chat-button:hover {
   background-color: #0056b3;
+}
+
+.chat-popup {
+  position: fixed;
+  bottom: 140px; /* 根據需要設置，這樣讓它與按鈕有相同的間距 */
+  right: 20px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  z-index: 10000; /* 確保 ChatPopup 顯示在按鈕之上 */
 }
 </style>

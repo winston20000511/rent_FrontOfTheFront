@@ -172,7 +172,7 @@ export default {
     async fetchMemberData() {
       try {
         // 從後端 API 獲取會員資料
-        const response = await api.get(
+        const response = await api.post(
           "http://localhost:8080/api/user/userCenter"
         );
         const { name, picture } = response.data;

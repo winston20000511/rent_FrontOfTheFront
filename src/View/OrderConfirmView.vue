@@ -159,11 +159,6 @@ async function processPayment(paymentType, url, body, headers) {
     訂單確認
   </div>
 
-  <div>檢驗付款方式{{ cartStore.thirdParty }}</div>
-  <div>檢驗付款方式{{ cartStore.choosePayment }}</div>
-  <div>使用優惠券{{ cartStore.couponUsage }}</div>
-  <div>使用優惠券{{ cartStore.totalAmount }}</div>
-
   <div v-if="isLoading" class="text-center mt-10">
     <p>資料加載中...</p>
   </div>
@@ -245,7 +240,7 @@ async function processPayment(paymentType, url, body, headers) {
           </td>
         </tr>
         <tr>
-          <td colspan="8" class="text-right">
+          <td colspan="7" class="text-right">
             <button
               @click="processOrderCreation"
               type="button"

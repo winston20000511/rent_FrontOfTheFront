@@ -49,7 +49,7 @@ function handlePaymentMethodSelection(event){
 // 前往結帳
 function checkOut() {
   cartStore.thirdParty = selectedThirdParty.value;
-  router.push({ name: "orderConfirm" });
+  router.push({ name: "OrderConfirm" });
 }
 
 function toggleCoupon(index) {

@@ -75,6 +75,8 @@ const routes = [
         path: 'homeowner', // 房屋預約
         name: 'BookingHost',
         component: BookingListByHost,
+      },
+      {
         path: 'my-advertisements', // 編輯用戶
         name: 'MyAdvertisements',
         component: MyAdvertisements,
@@ -83,6 +85,8 @@ const routes = [
         path: 'my-orders', // 編輯用戶
         name: 'MyOrders',
         component: MyOrders,
+      },
+      {
         path: '/deactivate-account',
         name: 'DeactivateAccount',
         component: DeactivateAccount,
@@ -93,11 +97,6 @@ const routes = [
     path: '/login', // 登入頁面
     name: 'LoginForm',
     component: LoginForm,
-  },
-  {
-    path: '/orders', // 測試用
-    name: 'Orders',
-    component: MyOrders,
   },
   {
     path: '/adtype',

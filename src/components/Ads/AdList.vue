@@ -1,6 +1,7 @@
 <script setup>
-import { computed } from "vue";
+import { ref, computed } from "vue";
 import { useCart } from "@/stores/cartStore";
+import HouseView from "@/View/HouseView.vue";
 
 let token = localStorage.getItem("jwt");
 
@@ -26,6 +27,21 @@ const emit = defineEmits([
   "detail",
   "ad-delete-result",
 ]);
+
+// 顯示房屋的 modal
+const showHouseInfo = ref(false);
+const selectedHouseId = ref(null);
+
+const checkHouseInfo = (houseId) => {
+  selectedHouseId.value = houseId;
+  showHouseInfo.value = true;
+};
+
+// 關閉 HouseInfo 的方法
+const closeHouseInfo = () => {
+  showHouseInfo.value = false;
+  selectedHouseId.value = null;
+};
 
 // 處理過的廣告資料
 const processedAds = computed(() => {
@@ -205,7 +221,12 @@ const checkAd = async (adId) => {
             class="border-b hover:bg-gray-50"
           >
             <td class="px-4 py-3 text-sm text-gray-700 text-center">
+              <button
+                class="px-3 py-1 text-sm text-blue-600 bg-blue-100 rounded hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                @click="checkHouseInfo(ad.houseId)"
+              >
               {{ ad.houseTitle }}
+              </button>
             </td>
             <td class="px-4 py-3 text-sm text-center text-gray-700">
               {{ ad.paidDate }}
@@ -246,12 +267,17 @@ const checkAd = async (adId) => {
           </tr>
           <tr v-if="processedAds.length === 0">
             <td colspan="6" class="px-4 py-3 text-center text-gray-500">
-              目前沒有商品
+              目前沒有申請VIP服務
             </td>
           </tr>
         </tbody>
       </table>
     </div>
+
+    <div v-if="showHouseInfo">
+      <HouseView :houseId="selectedHouseId" @close="closeHouseInfo" />
+    </div>
+
   </div>
 </template>
 

@@ -1,4 +1,8 @@
 <script setup>
+import { ref } from "vue";
+import HouseView from "@/View/HouseView.vue";
+import Dialog from "primevue/dialog";
+
 let token = localStorage.getItem("jwt");
 
 const props = defineProps({
@@ -23,6 +27,17 @@ const emit = defineEmits([
   "detail",
   "order-cancel-result",
 ]);
+
+// 新增控制彈窗顯示的變數
+const showHouseView = ref(false);
+const selectedHouseId = ref(null);
+
+// 點擊查看房屋資訊的按鈕時，顯示房屋詳細資訊
+const checkHouseInfo = (houseId) => {
+  console.log("house id: ", houseId);
+  selectedHouseId.value = Number(houseId);
+  showHouseView.value = true;
+};
 
 const changePage = (page) => {
   if (page >= 1 && page <= props.totalPages) {
@@ -127,6 +142,7 @@ const cancel = async (merchantTradNo) => {
             class="border-b hover:bg-gray-50"
           >
             <td class="px-4 py-3 text-sm text-gray-700 text-center">
+              {{order}}
               {{ order.merchantTradNo }}
             </td>
             <td class="px-4 py-3 text-sm text-center text-gray-700">
@@ -155,7 +171,14 @@ const cancel = async (merchantTradNo) => {
             <td class="px-4 py-3 text-sm text-center text-gray-700">
               <ul>
                 <li v-for="(title, index) in order.houseTitles" :key="index">
-                  {{ title.length > 6 ? title.substring(0, 6) + "..." : title }}
+                  <button
+                    class="px-3 py-1 text-sm text-blue-600 bg-blue-100 rounded hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    @click="checkHouseInfo(order.houseIds[index])"
+                  >
+                    {{
+                      title.length > 6 ? title.substring(0, 6) + "..." : title
+                    }}
+                  </button>
                 </li>
               </ul>
             </td>
@@ -193,6 +216,19 @@ const cancel = async (merchantTradNo) => {
     </div>
   </div>
 
+  <!-- 房屋資訊彈窗 -->
+  <Dialog
+    v-model:visible="showHouseView"
+    :modal="true"
+    :dismissableMask="true"
+    header="查看房屋資訊"
+    class="dialog-theme"
+  >
+    <div class="dialog-container">
+      <HouseView :houseId="selectedHouseId" @close="showHouseView = false" />
+    </div>
+  </Dialog>
+
   <!-- 分頁 -->
   <div class="flex justify-center mt-4">
     <nav aria-label="Page navigation">
@@ -211,11 +247,11 @@ const cancel = async (merchantTradNo) => {
           v-for="page in totalPages"
           :key="page"
           class="px-3 py-1 border rounded cursor-pointer"
-          :class="
-            page === currentPage
+          :class="{
+            [page === currentPage
               ? 'bg-blue-500 text-white'
-              : 'text-blue-500 border-gray-300'
-          "
+              : 'text-blue-500 border-gray-300']: true,
+          }"
           :disabled="currentPage === page"
           @click="changePage(page)"
         >
@@ -239,12 +275,8 @@ const cancel = async (merchantTradNo) => {
 </template>
 
 <style scoped>
-.table-container {
-  max-height: 24rem;
-  overflow-y: auto;
-}
-.pagination button:disabled {
-  cursor: not-allowed;
-  opacity: 0.5;
+.dialog-theme .p-dialog {
+  width: 80%;
+  max-width: 800px;
 }
 </style>
