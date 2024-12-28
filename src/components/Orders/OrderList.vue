@@ -174,9 +174,7 @@ const cancel = async (merchantTradNo) => {
                     class="px-3 py-1 text-sm text-blue-600 bg-blue-100 rounded hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
                     @click="checkHouseInfo(order.houseIds[index])"
                   >
-                    {{
-                      title.length > 6 ? title.substring(0, 6) + "..." : title
-                    }}
+                    {{ title.length > 8 ? title.substring(0, 8) + "..." : title }}
                   </button>
                 </li>
               </ul>

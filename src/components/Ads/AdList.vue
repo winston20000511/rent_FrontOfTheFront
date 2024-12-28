@@ -2,6 +2,7 @@
 import { ref, computed } from "vue";
 import { useCart } from "@/stores/cartStore";
 import HouseView from "@/View/HouseView.vue";
+import Dialog from "primevue/dialog";
 
 let token = localStorage.getItem("jwt");
 
@@ -28,19 +29,13 @@ const emit = defineEmits([
   "ad-delete-result",
 ]);
 
-// 顯示房屋的 modal
-const showHouseInfo = ref(false);
+const showHouseView = ref(false);
 const selectedHouseId = ref(null);
 
 const checkHouseInfo = (houseId) => {
-  selectedHouseId.value = houseId;
-  showHouseInfo.value = true;
-};
-
-// 關閉 HouseInfo 的方法
-const closeHouseInfo = () => {
-  showHouseInfo.value = false;
-  selectedHouseId.value = null;
+  console.log("house id: ", houseId);
+  selectedHouseId.value = Number(houseId);
+  showHouseView.value = true;
 };
 
 // 處理過的廣告資料
@@ -279,11 +274,20 @@ const checkAd = async (adId) => {
       </table>
     </div>
 
-    <div v-if="showHouseInfo">
-      <HouseView :houseId="selectedHouseId" @close="closeHouseInfo" />
-    </div>
-
   </div>
+
+    <!-- 房屋資訊彈窗 -->
+    <Dialog
+    v-model:visible="showHouseView"
+    :modal="true"
+    :dismissableMask="true"
+    header="查看房屋資訊"
+    class="dialog-theme"
+  >
+    <div class="dialog-container">
+      <HouseView :houseId="selectedHouseId" @close="showHouseView = false" />
+    </div>
+  </Dialog>
 </template>
 
 <style scoped>
