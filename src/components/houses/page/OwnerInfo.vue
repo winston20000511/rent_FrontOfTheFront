@@ -103,10 +103,8 @@ export default {
           name: data.name || "",
           phone: data.phone || "",
           picture: data.picture
-            ? `data:image/jpeg;base64,${btoa(
-              String.fromCharCode(...new Uint8Array(data.picture))
-            )}`
-            : "/src/assets/no-photo.png",
+  ? `data:image/jpeg;base64,${data.picture}`
+  : "/src/assets/no-photo.png",
         };
 
         // 比對 TOKEN 中的 USERID 與 API 返回的 USERID
@@ -117,15 +115,16 @@ export default {
     },
 
     parseUserIdFromToken(token) {
-      try {
-        const payloadBase64 = token.split(".")[1]; // 提取 payload 部分
-        const decodedPayload = JSON.parse(atob(payloadBase64)); // Base64 解碼
-        return decodedPayload.userid || ""; // 假設 USERID 在 payload 的 userid 欄位
-      } catch (e) {
-        console.error("無法解析 TOKEN:", e);
-        return "";
-      }
-    },
+  try {
+    const payloadBase64 = token.split(".")[1]; // 提取 payload 部分
+    const decodedPayload = JSON.parse(atob(payloadBase64)); // Base64 解碼
+    console.log("JWT 解碼後的 payload:", decodedPayload);
+    return decodedPayload.userId || ""; // 提取 USERID，如果沒有則返回空字串
+  } catch (e) {
+    console.error("JWT 解碼失敗:", e);
+    return ""; // 解碼失敗返回空字串
+  }
+},
 
     openBookingView() {
       this.showBookingView = true;

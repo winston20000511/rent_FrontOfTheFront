@@ -17,7 +17,8 @@
     <!-- 房屋列表 -->
     <DataTable :value="filteredHouses" responsiveLayout="scroll" :paginator="true" :rows="5"
       class="custom-table teal-theme" :filters="filters" filterDisplay="row" :sortField="sortField"
-      :sortOrder="sortOrder" @sort="onSort">
+      :sortOrder="sortOrder" @sort="onSort" :loading="isLoading"
+      loadingIcon="pi pi-spinner">
       <!-- 房屋圖片 -->
       <Column header="圖片" style="width: 150px">
         <template #body="slotProps">
@@ -83,6 +84,7 @@ export default {
     Dialog,
     ConfirmDialog,
     HouseView,
+    
   },
   data() {
     return {
@@ -93,6 +95,7 @@ export default {
       baseUrl: "http://localhost:8080/api/houses",
       showHouseView: false,
       selectedHouseId: null,
+      isLoading: false,
     };
   },
   computed: {
@@ -113,6 +116,7 @@ export default {
 
     // 加载收藏房屋数据
     async loadHouses() {
+      this.isLoading = true;
       try {
         const response = await fetch(`${this.baseUrl}/collect`, {
           headers: this.getAuthHeaders(),
@@ -155,6 +159,7 @@ export default {
       } catch (error) {
         console.error("加载收藏房屋失败:", error);
       }
+      this.isLoading = false;
     },
 
     // 查看房屋信息

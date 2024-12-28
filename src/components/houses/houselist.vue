@@ -37,6 +37,8 @@
       filterDisplay="row"
       :sortField="sortField"
       :sortOrder="sortOrder"
+      :loading="isLoading"
+      loadingIcon="pi pi-spinner"
     >
       <!-- 房屋圖片 -->
       <Column header="圖片" style="width: 150px">
@@ -193,6 +195,7 @@ export default {
       showHouseView: false, // 控制「查看房屋」彈窗
       showCreateForm: false, // 控制「新增房屋」彈窗
       selectedHouseId: null, // 當前選擇的房屋ID
+      isLoading: false,
     };
   },
   methods: {
@@ -222,6 +225,7 @@ export default {
       }
     },
     async loadHouses() {
+      this.isLoading = true; 
       try {
         const response = await fetch(`${this.baseUrl}/houses`, {
           headers: this.getAuthHeaders(),
@@ -263,6 +267,7 @@ export default {
       } catch (error) {
         console.error("加載房屋列表失敗:", error);
       }
+      this.isLoading = false;
     },
 
     getAuthHeaders() {

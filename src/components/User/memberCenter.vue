@@ -181,8 +181,6 @@ export default {
           console.log(picture);
           this.memberPicture=`data:image/jpeg;base64,${picture}`;
           //this.memberPicture = atob(picture);
-          console.log(atob(picture));
-
           
         // 設定會員資料
         this.memberName = name;

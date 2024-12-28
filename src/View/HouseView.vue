@@ -5,6 +5,7 @@ import HouseInfo from "@/components/houses/page/HouseInfo.vue";
 import OwnerInfo from "@/components/houses/page/OwnerInfo.vue";
 import HouseDescription from "@/components/houses/page/HouseDescription.vue";
 import HousePhotos from "@/components/houses/housePhotos.vue";
+import HouseMap from "@/components/houses/page/HouseMap.vue";
 
 // 接收 props
 const props = defineProps({
@@ -96,7 +97,7 @@ async function removeFavorite() {
     <div class="header">
       <!-- 收藏按鈕 -->
       <button class="favorite-btn" @click="toggleFavorite">
-        <i :class="isFavorited ? 'bi bi-heart-fill' : 'bi bi-heart'"></i>
+        <i :class="isFavorited ? 'bi bi-heart-fill' : 'bi bi-heart'" ></i>
       </button>
     </div>
 
@@ -120,9 +121,10 @@ async function removeFavorite() {
     </div>
 
     <hr />
-
     <!-- 房屋描述 -->
     <HouseDescription :houseId="houseId" />
+    <hr />
+    <HouseMap :houseId="houseId" />
   </div>
 </template>
 
@@ -139,16 +141,29 @@ async function removeFavorite() {
   background: none;
   border: none;
   cursor: pointer;
+  font-size: 24px; /* 調整按鈕的大小 */
+  padding: 8px; /* 增加按鈕的內間距 */
+  line-height: 0; /* 確保按鈕大小與圖標一致 */
 }
 
+/* 實心愛心的樣式 */
 .favorite-btn .bi-heart-fill {
   color: red; /* 已收藏 → 實心愛心 */
+  font-size: 32px; /* 調整圖標的大小 */
 }
 
+/* 空心愛心的樣式 */
 .favorite-btn .bi-heart {
   color: gray; /* 未收藏 → 空心愛心 */
+  font-size: 32px; /* 調整圖標的大小 */
 }
 
+/* 可選：當鼠標懸停時增加放大效果 */
+.favorite-btn:hover .bi-heart-fill,
+.favorite-btn:hover .bi-heart {
+  transform: scale(1.2); /* 懸停時放大 20% */
+  transition: transform 0.2s ease; /* 添加過渡效果 */
+}
 
 .close-btn .bi-x-lg {
   font-size: 18px;
