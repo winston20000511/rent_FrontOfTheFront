@@ -39,15 +39,15 @@ watch(
 
 // 計算廣告資料，會根據是否處於編輯狀態來決定是否可編輯
 const adDetails = computed(() => [
-  { label: "廣告編號", value: props.detail.adId, editable: false },
+  { label: "VIP服務編號", value: props.detail.adId, editable: false },
   { label: "房屋標題", value: props.detail.houseTitle, editable: false },
   {
-    label: "廣告方案",
+    label: "服務方案",
     value: `${props.detail.adName}`,
     editable: editableDetails.isEditing,
   },
   {
-    label: "廣告金額",
+    label: "方案金額",
     value: `NTD ${props.detail.adPrice}`,
     editable: editableDetails.isEditing,
   },
@@ -198,7 +198,7 @@ function closeDetail(){
 
       <div>
         <h3 class="text-2xl font-semibold text-gray-900 text-center">
-          廣告內容
+          服務內容
         </h3>
         <div class="m-4 overflow-auto h-[calc(100%-6rem)]">
           <table class="border border-gray-400 w-full">
@@ -209,7 +209,7 @@ function closeDetail(){
                   <span v-if="!item.editable">{{ item.value }}</span>
                   <span v-else>
                     <select
-                      v-if="item.label === '廣告方案'"
+                      v-if="item.label === '服務方案'"
                       v-model="editableDetails.adName"
                       class="border border-gray-300 rounded px-2 py-1"
                     >
@@ -222,21 +222,21 @@ function closeDetail(){
                       </option>
                     </select>
                     <p
-                      v-if="item.label === '廣告金額'"
+                      v-if="item.label === '方案金額'"
                       v-bind="editableDetails.adPrice"
                     >
                       NTD {{ editableDetails.adPrice }}
                     </p>
 
                     <button
-                      v-if="editableDetails.isEditing && item.label === '廣告方案'"
+                      v-if="editableDetails.isEditing && item.label === '服務方案'"
                       @click="saveAdPlan"
                       class="px-2 py-1 bg-green-500 text-white rounded ml-2"
                     >
                       儲存
                     </button>
                     <button
-                      v-if="editableDetails.isEditing && item.label === '廣告方案'"
+                      v-if="editableDetails.isEditing && item.label === '服務方案'"
                       @click="cancelEdit"
                       class="px-2 py-1 bg-gray-500 text-white rounded ml-2"
                     >
