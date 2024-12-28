@@ -294,7 +294,7 @@ const handleSignInClick = () => {
 
 .fa-magnifying-glass {
   position: fixed;
-  top: 8.5%;
+  top: 7.5%;
   /* 固定於視窗頂部 60px */
   left: 62%;
   /* 基本定位 */

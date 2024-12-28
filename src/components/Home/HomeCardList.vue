@@ -84,9 +84,9 @@ function getCardClass(item){
   const targetDate = new Date(dateSpec);
 
   if (sourceDate > targetDate) {
-    return "col-12 col-md-6 py-4 bg-info bg-opacity-25 text-white p-3"
+    return "bg-info bg-opacity-25 text-white"
   } else {
-    return "col-12 col-md-6 py-4 "
+    return ""
   }
 
 }
@@ -99,10 +99,11 @@ function getCardClass(item){
       <div
         v-for="list in markers.searchList"
         :key="list.houseid"
-        class=""
-        :class="getCardClass(list.paidDate)"
+        class="col-12 col-md-6 py-4"
       >
-        <div class="card card-shadow clickable-card" style="width: 100%"
+        <div class="card card-shadow clickable-card" 
+          style="width: 100%"
+          :class="getCardClass(list.paidDate)"
           @click="openHouseView(list.houseid)"
         >
           <img
@@ -111,6 +112,7 @@ function getCardClass(item){
             alt="House Image"
           />
           <div class="card-body">
+            <p class="card-text" style="font-size: 20px; font-weight: bold;">{{ list.houseTitle }}</p>
             <p class="card-text">NT${{ list.price }}</p>
             <p class="card-text">{{ list.address }}</p>
             <!-- 顯示點擊數 -->
@@ -155,4 +157,5 @@ function getCardClass(item){
 .card-body {
   cursor: pointer;
 }
+
 </style>

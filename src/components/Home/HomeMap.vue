@@ -1,7 +1,8 @@
 <script setup>
-import { ref, onMounted, onUnmounted, watch, toRef, shallowRef } from 'vue';
+import { ref, onMounted, onUnmounted, watch, toRef, shallowRef, createApp } from 'vue';
 import { Loader } from '@googlemaps/js-api-loader';
 import { useHouseCard } from '@/stores/CardHouseStore';
+import HousePhotos from '../houses/housePhotos.vue';
 
 const map = shallowRef(null); // 地圖容器
 const mapMarkers = ref([]); //地圖標記
@@ -15,6 +16,7 @@ let isDrawing = false; //判斷是否正在繪圖
 let context = null;
 let points = []; //儲存 Canvas 路徑點
 let polygon = null;
+let activeInfoWindow = null; // 用來存儲當前開啟的 InfoWindow
 
 
 let token = localStorage.getItem('jwt');
@@ -99,6 +101,57 @@ onMounted(() => {
         title: marker.street,
         content: buttonElement,
       });
+
+      const contentContainer = document.createElement('div');
+      contentContainer.classList.add('show-picture');
+
+      const vueContainer = document.createElement('div');
+      contentContainer.appendChild(vueContainer);
+
+      // 使用 Vue 渲染 InfoWindowContent 組件
+      const app = createApp(HousePhotos, {
+        houseId: marker.houseid,
+      });
+      app.mount(vueContainer); // 將 Vue 組件掛載到子容器
+
+      const paragraph1 = document.createElement('p');
+      paragraph1.textContent = '這是第一個段落，顯示額外訊息。';
+      contentContainer.appendChild(paragraph1);
+
+      const paragraph2 = document.createElement('p');
+      paragraph2.textContent = '這是第二個段落，顯示更多訊息。';
+      contentContainer.appendChild(paragraph2);
+
+      
+      // 創建 InfoWindow 並嵌入渲染的 Vue 組件
+      const infoWindow = new google.maps.InfoWindow({
+        content: contentContainer,
+      });
+
+      // const infoWindow = new google.maps.InfoWindow({
+      //     content: `
+      //       <div style="text-align: center;">
+      //         <img src="${data.image}" alt="房屋圖片" style="max-width: 200px; margin-bottom: 10px;">
+      //         <p>${marker.houseTitle}</p>
+      //       </div>
+      //     `,
+      //   });
+
+        // 點擊標記顯示資訊窗口
+        mapMark.addListener('click', () => {
+          if (activeInfoWindow) {
+            activeInfoWindow.close(); // 關閉當前開啟的 InfoWindow
+            }
+            infoWindow.open(map.value, marker);
+            activeInfoWindow = infoWindow; // 記錄新打開的 InfoWindow
+        });
+        map.value.addListener('click', () => {
+          if (activeInfoWindow) {
+            activeInfoWindow.close();
+            activeInfoWindow = null; // 清除記錄
+          }
+        });
+
       mapMarkers.value.push(mapMark);
     });
 
@@ -331,6 +384,14 @@ onMounted(() => {
   width: 100%;
   height: 76vh;
   position: relative;
+}
+.show-picture{
+  position: relative;
+  width: 400px;
+  height: 400px;
+  border: 1px solid red;
+  background-color: red;
+  z-index: 3;
 }
 .drawing-canvas {
   width: 100%;
