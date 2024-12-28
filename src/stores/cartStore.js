@@ -69,6 +69,8 @@ export const useCart = defineStore("cart", {
     // 載入購物車
     async loadCart() {
 
+      console.log("pinia load 中的 token: ", this.token);
+
       try {
         let url = "http://localhost:8080/api/cart/list";
         const response = await fetch(url, {
@@ -124,7 +126,7 @@ export const useCart = defineStore("cart", {
           const url = "http://localhost:8080/api/cart/add/item";
           const response = await fetch(url, {
             method: "POST",
-            headers: { "Content-Type": "application/json", authorization: `${token}` },
+            headers: { "Content-Type": "application/json", authorization: `${this.token}` },
             body: JSON.stringify(adId),
           });
           const success = await response.json();
@@ -162,7 +164,7 @@ export const useCart = defineStore("cart", {
           const url = "http://localhost:8080/api/cart/delete/item";
           const response = await fetch(url, {
             method: "DELETE",
-            headers: { "Content-Type": "application/json", authorization: `${token}` },
+            headers: { "Content-Type": "application/json", authorization: `${this.token}` },
             body: JSON.stringify(adId),
           });
           const success = await response.json();
@@ -192,7 +194,7 @@ export const useCart = defineStore("cart", {
       // 前往資料庫撈資料
       const url = "http://localhost:8080/api/cart/coupon";
       const response = await fetch(url, {
-          headers: { "Content-Type": "application/json", authorization: `${token}` },
+          headers: { "Content-Type": "application/json", authorization: `${this.token}` },
       });
       const data = await response.json();
       console.log("coupon ", data);
@@ -240,7 +242,7 @@ export const useCart = defineStore("cart", {
         const url = "http://localhost:8080/api/orders/create";
         const response = await fetch(url, {
           method: "POST",
-          headers: { "Content-Type": "application/json", authorization: `${token}` },
+          headers: { "Content-Type": "application/json", authorization: `${this.token}` },
           body: JSON.stringify(orderData),
         });
 
