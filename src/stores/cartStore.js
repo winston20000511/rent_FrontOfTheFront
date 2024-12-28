@@ -34,7 +34,6 @@ export const useCart = defineStore("cart", {
         },
         { totalPrice: 0, discountAmount: 0 }
       );
-      console.log("discount: ", discountAmount);
       return { totalPrice, discountAmount };
     },
 
@@ -54,8 +53,8 @@ export const useCart = defineStore("cart", {
 
     updateToken(newToken){
       this.token = newToken;
-      localStorage.setItem("jwt", newToken);  // 更新 localStorage 中的 token
-      console.log("1. Token 已更新: ", newToken);
+      localStorage.setItem("jwt", newToken);
+      // console.log("token 已更新");
     },
 
     // 取得購物車畫面中的完整資料: 購物車內容 + 優惠券數量
@@ -80,7 +79,7 @@ export const useCart = defineStore("cart", {
         this.cartItems = data;
         if(!(data.length === 0)) this.cartId = this.cartItems[0].cartId;
 
-        console.log(" Pinia gets cart items: ", this.cartItems," cart id: ", this.cartId);
+        // console.log(" Pinia gets cart items: ", this.cartItems," cart id: ", this.cartId);
         
       } catch (error) {
         console.error("無法取得購物車內容: ", error);
@@ -110,15 +109,12 @@ export const useCart = defineStore("cart", {
 
     // 將商品加入購物車
     async addToCart(adId) {
-      console.log("CartStore add to cart: ", adId);
 
       let existingItem;
       if(this.cartItems.length !== 0){
         existingItem = this.cartItems.find((item) => item.adId === adId);
       }
       
-      console.log("existingItem: ", existingItem);
-
       if (!existingItem) {
         try {
           const url = "http://localhost:8080/api/cart/add/item";
@@ -128,9 +124,6 @@ export const useCart = defineStore("cart", {
             body: JSON.stringify(adId),
           });
           const success = await response.json();
-
-          console.log("加入購物車結果: ", success);
-
 
           if (success) {
             this.cartItems.push(adId);
@@ -189,13 +182,11 @@ export const useCart = defineStore("cart", {
     },
 
     async getCouponNumber() {
-      // 前往資料庫撈資料
       const url = "http://localhost:8080/api/cart/coupon";
       const response = await fetch(url, {
           headers: { "Content-Type": "application/json", authorization: `${this.token}` },
       });
       const data = await response.json();
-      console.log("coupon ", data);
       this.couponNumber = data;
     },
 
@@ -219,7 +210,6 @@ export const useCart = defineStore("cart", {
       const item = this.cartItems.find((item) => item.adId === adId);
       if (item) {
         item.couponApplied = couponDetails;
-        console.log("已使用優惠券的商品: ", adId);
       }
     },
 
@@ -233,8 +223,6 @@ export const useCart = defineStore("cart", {
         choosePayment: this.choosePayment,
         totalAmount: this.totalAmount,
       };
-
-      console.log("送出的訂單資料: ", orderData);
 
       try {
         const url = "http://localhost:8080/api/orders/create";

@@ -49,7 +49,7 @@ const updateInput = (input) => {
 };
 
 const filterOrders = async () => {
-  console.log("變更的篩選條件: ", filters);
+  // console.log("變更的篩選條件: ", filters);
 
   isLoading.value = true;
 
@@ -84,7 +84,7 @@ const onPageNumberChange = async (page) => {
 };
 
 const handleOrderCancelResult = (result) => {
-  console.log("取消結果: ", result);
+  // console.log("取消結果: ", result);
 
   showOverlay.value = true;
   messageTitle.value = result.messageTitle;

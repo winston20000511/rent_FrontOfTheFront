@@ -68,7 +68,7 @@ const changeFilter = (filterName, filterValue) => {
 
 // 篩選廣告
 const filterAds = async () => {
-  console.log("篩選條件: ", filters);
+  // console.log("篩選條件: ", filters);
 
   isLoading.value = true;
   try {
@@ -82,11 +82,9 @@ const filterAds = async () => {
       body: JSON.stringify(filters),
     });
     const data = await response.json();
-    console.log("篩選廣告結果: ", data);
+    // console.log("篩選廣告結果: ", data);
+    
     const { content, totalPages: total } = data;
-
-    console.log("篩選到的廣告: ", data);
-
     ads.value = content;
     totalPages.value = total;
 
@@ -102,11 +100,8 @@ const filterAds = async () => {
       currentPage.value = 1;
     }
 
-    // 等待 Vue 更新 DOM
-    // await nextTick();
     await delay(200);
     
-    console.log("Updated ads:", ads.value);
   } catch (error) {
     console.error("發送請求時發生錯誤: ", error);
   } finally {
@@ -133,7 +128,6 @@ const closeAdDetail = () => {
   showOverlay.value = false;
   showAdDetail.value = false;
   detail.value = {};
-  console.log("close ad detail showAdDeatil.value: ", showAdDetail.value);
 };
 
 // 顯示無廣告的物件
@@ -162,8 +156,6 @@ const getAdtypeAndId = async () => {
   });
   const data = await response.json();
 
-  console.log("adtypes ", data);
-
   adtypes.value = data;
 };
 
@@ -181,10 +173,8 @@ const filterNoAdHouses = async () => {
     });
     const data = await response.json();
 
-    console.log(data.content);
-
     noAdHouses.value = data.content;
-    console.log("no ad houses: ", noAdHouses.value);
+    // console.log("no ad houses: ", noAdHouses.value);
   } catch (error) {
     console.error("請求錯誤: ", error);
   }
@@ -203,7 +193,6 @@ const toggleCart = () => {
 
 // 刪除廣告結果處理
 const handleDeleteAdResult = (result) => {
-  console.log("delete result: ", result);
   messageTitle.value = result.messageTitle;
   messageContent.value = result.message;
   showMessage.value = true;
@@ -219,7 +208,6 @@ const closeMessage = () => {
 };
 
 const closeOnOverlayClick = () => {
-  console.log("close on overlay click: ", showAdDetail.value);
   showMessage.value = false;
   showCart.value = false;
   showAdDetail.value = false;

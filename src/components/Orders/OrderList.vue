@@ -34,7 +34,6 @@ const selectedHouseId = ref(null);
 
 // 點擊查看房屋資訊的按鈕時，顯示房屋詳細資訊
 const checkHouseInfo = (houseId) => {
-  console.log("house id: ", houseId);
   selectedHouseId.value = Number(houseId);
   showHouseView.value = true;
 };

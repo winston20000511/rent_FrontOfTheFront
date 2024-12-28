@@ -33,7 +33,6 @@ const showHouseView = ref(false);
 const selectedHouseId = ref(null);
 
 const checkHouseInfo = (houseId) => {
-  console.log("house id: ", houseId);
   selectedHouseId.value = Number(houseId);
   showHouseView.value = true;
 };
@@ -126,7 +125,6 @@ const deleteAd = async (adId) => {
         });
 
         cartStore.removeFromCart(adId);
-        console.log("刪除後的cart store items: ", cartStore.cartItems);
         cartStore.loadCart();
         
       } else {
@@ -225,7 +223,7 @@ const checkAd = async (adId) => {
                 class="px-3 py-1 text-sm text-gray-600 bg-transparent border-0 underline hover:bg-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
                 @click="checkHouseInfo(ad.houseId)"
               >
-              {{ ad.houseTitle > 8 ? title.substring(0, 8) + "..." : ad.houseTitle }}
+              {{ ad.houseTitle }}
               </button>
             </td>
             <td class="px-4 py-3 text-sm text-center text-gray-700">

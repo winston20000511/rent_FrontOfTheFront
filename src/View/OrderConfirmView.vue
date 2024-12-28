@@ -18,7 +18,7 @@ let token = localStorage.getItem("jwt");
 
 onMounted(async () => {
   // 載入時取得購物車內容
-  console.log("order confirm view cartId: ", cartId);
+  // console.log("order confirm view cartId: ", cartId);
 
   try {
     const url = "http://localhost:8080/api/orders/content/confirmation";
@@ -31,8 +31,6 @@ onMounted(async () => {
       body: cartId,
     });
     const data = await response.json();
-
-    console.log("order confirm page: ", data);
 
     cartItems.value = data;
     isLoading.value = false;
@@ -58,7 +56,6 @@ onMounted(async () => {
 async function processOrderCreation(){
 
   const result = await createOrder();
-  console.log("processOrderCreation result: ", result);
 
   if(result){
     handlePayment(result.merchantTradNo);
@@ -70,7 +67,7 @@ async function processOrderCreation(){
 };
 
 async function createOrder(){
-  console.log("cartStore 資料: ", cartStore);
+  // console.log("cartStore 資料: ", cartStore);
   const result = await cartStore.createOrder();
   return result;
 };
@@ -90,7 +87,6 @@ async function handlePayment(merchantTradNo){
   const body = merchantTradNo;
 
   if (cartStore.thirdParty === "linepay") {
-    console.log("呼叫LINEPAY");
 
     const linepayResponse = await processPayment(
       "linepay",
@@ -99,8 +95,6 @@ async function handlePayment(merchantTradNo){
       headers
     );
 
-    console.log("linepay response json: ", linepayResponse);
-
     if (linepayResponse && linepayResponse.paymentUrl) {
       cartStore.clearCart();
       window.location.href = linepayResponse.paymentUrl;
@@ -108,7 +102,6 @@ async function handlePayment(merchantTradNo){
   };
 
   if (cartStore.thirdParty === "ecpay") {
-    console.log("呼叫ECpay");
 
     const formHTMLResponse = await processPayment(
       "ecpay",
@@ -117,15 +110,12 @@ async function handlePayment(merchantTradNo){
       headers
     );
 
-    console.log("ECpay 回應 HTML: ", formHTMLResponse);
 
     if (formHTMLResponse) {
-      console.log("有得到綠界 HTML");
       cartStore.clearCart();
       const tempDiv = document.createElement("div");
       tempDiv.innerHTML = formHTMLResponse.trim();
       const formElement = tempDiv.firstChild;
-      console.log("formElement", formElement);
       formContainer.value.appendChild(formElement);
       formElement.submit();
     };

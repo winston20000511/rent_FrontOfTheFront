@@ -140,14 +140,13 @@ async function saveAdPlan(){
 
     if(response.ok){
       console.log("有收到通知");
-      console.log("updated ad: ", updatedAd);
       props.detail.adName = updatedAd.adName;
       props.detail.adPrice = updatedAd.adPrice;
 
       // 更新 editableDetails 中的資料
       editableDetails.adName = updatedAd.adName;
       editableDetails.adPrice = updatedAd.adPrice;
-      editableDetails.isEditing = false; // 儲存後關閉編輯
+      editableDetails.isEditing = false;
 
     }else{
 
