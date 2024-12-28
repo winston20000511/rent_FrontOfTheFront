@@ -2,7 +2,8 @@
 import { ref, onMounted, computed, nextTick } from 'vue';
 import Datepicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
-import BookingAgreement from './bookingAgreement.vue';
+import BookingAgreement from './BookingAgreement.vue';
+
 
 const BASE_URL = import.meta.env.VITE_APIURL
 
@@ -31,8 +32,15 @@ let startTime;
 let endTime;
 let duration;
 
+let token = localStorage.getItem('jwt');
+
 const load = async () => {
-    const response = await fetch(`${BASE_URL}/booking/list?houseId=${props.houseId}`);
+    const response = await fetch(`${BASE_URL}/booking/list?houseId=${props.houseId}`, {
+        headers: {
+            'Content-Type': 'application/json',
+            'authorization': `${token}`
+        },
+    });
     const data = await response.json();
     console.log(data);
 
@@ -54,7 +62,6 @@ const load = async () => {
 const sendBooking = async () => {
     const bookingData = {
         houseId: props.houseId,
-        userId: 20,
         bookingDate: selectedDate.value,
         bookingTime: selectedTime.value,
         message: message.value
@@ -65,7 +72,8 @@ const sendBooking = async () => {
         const response = await fetch(`${BASE_URL}/booking/host`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'authorization': `${token}`
             },
             body: JSON.stringify(bookingData)
         });
@@ -126,19 +134,20 @@ const generateTimeSlots = (startTime, endTime, duration) => {
 
 
 const disabledWeekDays = computed(() => {
+    // 重新排列 weekDays，讓禮拜天為第一位
+    const adjustedWeekDays = weekDays.value.charAt(6) + weekDays.value.slice(0, 6);
+
     const disabledDays = [];
     for (let i = 0; i < 7; i++) {
-        const date = new Date();
-        date.setDate(date.getDate() + i);
-        const day = date.getDay();
-        const convertedDay = (day === 0) ? 6 : (day - 1);
-
-        const isDateAllowed = weekDays.value.charAt(convertedDay) === '0';
+        // 直接檢查 adjustedWeekDays 的對應位是否為 '0'
+        const isDateAllowed = adjustedWeekDays.charAt(i) === '0';
 
         if (isDateAllowed) {
             disabledDays.push(i);
         }
     }
+
+    console.log("Disabled days:", disabledDays);
     return disabledDays;
 });
 
@@ -196,7 +205,7 @@ onMounted(() => {
     <div class="booking-slot container" style="width: 100%;">
         <!-- section 1 -->
         <section v-if="currentSection === 1">
-            <header class="header">
+            <header class="header h2">
                 <h2>選擇您想要看房的時間</h2>
             </header>
 
@@ -221,18 +230,18 @@ onMounted(() => {
                     </div>
                 </div>
             </div>
-
-            <footer class="row">
-                <hr class="w-100" />
+            <hr class="w-100" />
+            <footer class="row p-2">
                 <div class="col"></div>
                 <button :disabled="!selectedDate || !selectedTime" class="btn btn-primary col" @click="goNextSection"
-                    id="nextButton">下一步</button>
+                    id="nextButton">下一步
+                </button>
             </footer>
 
         </section>
         <!-- section 2 -->
         <section v-if="currentSection === 2">
-            <header class="header">
+            <header class="header h2">
                 <h2>確認您的看房時間</h2>
             </header>
             <hr class="w-100" />
@@ -264,17 +273,17 @@ onMounted(() => {
                 <BookingAgreement v-model:isAgreed="isAgreed" />
 
                 <!-- 發送預約按鈕 -->
-                <div class="d-flex justify-content-end">
-                    <button class="btn btn-info w-100" type="button" @click="sendBooking"
+                <div class="mb-3">
+                    <button class="btn btn-info w-100 align-items-center" type="button" @click="sendBooking"
                         :disabled="!isAgreed || loading">
-                        <span v-if="loading" class="spinner-grow spinner-border-sm" role="status"
-                            aria-hidden="true"></span>
-                        {{ loading ? '發送中...' : '發送預約' }}</button>
+                        <span v-if="loading" class="spinner-grow spinner-grow-sm" aria-hidden="true"></span>
+                        <span role="status">{{ loading ? '發送中...' : '發送預約' }}</span>
+                    </button>
                 </div>
             </div>
             <hr class="w-100" />
-            <footer class="footer row">
-                <button class="btn btn-primary col" @click="currentSection--">上一步</button>
+            <footer class="footer row p-2">
+                <button class="btn btn-primary col " @click="currentSection--">上一步</button>
                 <div class=" col"></div>
 
             </footer>

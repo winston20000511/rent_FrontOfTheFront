@@ -1,75 +1,127 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router';
-import { ref } from 'vue';
+import { RouterView } from 'vue-router';
+import { useRouter } from 'vue-router';
+import { ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import 'bootstrap-icons/font/bootstrap-icons.min.css';
-
-// chat room start
+import HomeNavbar from '@/components/Home/HomeNavbar.vue'; // 引入 HomeNavbar
 import ChatPopup from './components/ChatRoom/ChatRoom.vue';
+import LoginPage from './components/User/LoginPage.vue';
+import CollectHouseList from './components/houses/CollectHouseList.vue';
+import HouseCreate from './components/houses/HouseCreate.vue';
+import HouseUpdate from './components/houses/HouseUpdate.vue';
+import { useHouseCard } from './stores/CardHouseStore';
+
+const router = useRouter();
 const showChatPopup = ref(false);
 const toggleChatPopup = () => {
   showChatPopup.value = !showChatPopup.value;
 };
-// chat room end
 
+const showChatApp = ref(true);
+const route = useRoute();
+watch(
+  () => route.path,
+  (newPath) => {
+    if (newPath === '/order-confirm' || newPath === '/order-complete') {
+      showChatApp.value = false;
+    } else {
+      showChatApp.value = true;
+    }
+  },
+  { immediate: true }
+);
+
+const showLoginPage = ref(false); // 控制 LoginPage 的顯示
+const toggleLoginPage = () => {
+  showLoginPage.value = !showLoginPage.value;
+};
+
+const store = useHouseCard();
+const markers = ref({});
+
+const addMarker = (locations) => {
+  markers.value = locations;
+  store.updateData(markers.value.searchList);
+  router.push({
+    name: 'Home',
+    params: { markers: markers.value}
+  });
+};
 
 </script>
 
 <template>
-  <RouterView></RouterView>
+  <div class="app-container">
+  
+    <!-- 全局導航欄 -->
+    <header class="app-header">
+      <HomeNavbar @signInClicked="toggleLoginPage" @add-marker="addMarker"/>
+    </header>
 
-    <!-- chat popup start -->
-    <ChatPopup v-if="showChatPopup" @close="toggleChatPopup" />
-  <button class="chat-button" @click="toggleChatPopup">
-    <i class="bi bi-chat-dots-fill"></i>
-  </button>
-  <!-- chat popup end-->
+    <!-- 主內容 -->
+    <main class="app-main">
+      <RouterView :markers="markers" @add-marker="addMarker"></RouterView>
+    </main>
 
+    <!-- 聊天彈窗和按鈕 -->
+    <div>
+      <ChatPopup v-if="showChatPopup" @close="toggleChatPopup" />
+      <button v-if="showChatApp" class="chat-button" @click="toggleChatPopup">
+        <i class="bi bi-chat-dots-fill"></i>
+      </button>
+    </div>
+
+    <!-- 登錄頁面 -->
+    <LoginPage v-if="showLoginPage" @closeLoginPage="toggleLoginPage" />
+  </div>
 </template>
 
-
-<style>
-/* 這裡可以添加你自定義的樣式 */
-
-/* * {
-  border: 1px solid red; 
-} */
-
-/* chat room start */
-#app {
-  background-color: #f4f4f4;
-  height: 100vh;
+<style scoped>
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
-body {
-  margin: 0;
-  padding: 0;
-  /* background-color: #f4f4f4; */
+.app-header {
+  width: 100%;
+  height: 15vh;
+  border-bottom: 1px solid lightgray;
+  display: flex;
+  justify-content: space-between;
+}
+
+.app-main {
+  width: 100%;
+  height: 85vh;
+  /* flex: 1; */
+  /* 填滿剩餘空間 */
+  /* display: flex;
+  flex-direction: column; */
 }
 
 .chat-button {
-  padding: 3%;
-
   position: fixed;
-  bottom: 0%;
-  right: 1%;
-  /* background-color: #ff226c; */
-  color: rgba(14, 9, 9, 0.822);
-  border: none;
-  border-radius: 20%;
+  bottom: 20px;
+  right: 90px;
   width: 50px;
   height: 50px;
+  border-radius: 50%;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  font-size: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   cursor: pointer;
-
-  font-weight: bold;
   z-index: 9999;
 }
 
-/* chat room end*/
-</style>
-
-<style scoped>
-/* 這裡可以添加你自定義的樣式 */
-
+.chat-button:hover {
+  background-color: #0056b3;
+}
 </style>

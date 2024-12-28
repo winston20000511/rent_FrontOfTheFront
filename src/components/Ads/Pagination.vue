@@ -1,22 +1,22 @@
 <script setup>
-const props = defineProps({
-  currentPage: {
-    type: Number,
-    required: true,
-  },
-  totalPages: {
-    type: Number,
-    required: true,
-  },
-});
+  const props = defineProps({
+    currentPage: {
+      type: Number,
+      required: true,
+    },
+    totalPages: {
+      type: Number,
+      required: true,
+    },
+  });
 
-const emit = defineEmits(["pageChange"]);
+  const emit = (["pageChange"]);
 
-const changePage = (page) => {
-  if (page >= 1 && page <= props.totalPages) {
-    emit("pageChange", page);
-  }
-};
+  const changePage = (page) => {
+    if (page >= 1 && page <= props.totalPages) {
+      emit("pageChange", page);
+    }
+  };
 </script>
 
 <template>

@@ -2,9 +2,9 @@
     export {};
 </script>
 
-<template lang="">
+<template>
 
-    <div id="modal-background" class="overlay"></div>
+    <div class="overlay"></div>
 
 </template>
 

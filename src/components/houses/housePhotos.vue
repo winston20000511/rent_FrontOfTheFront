@@ -1,42 +1,64 @@
 <template>
   <div>
-    <!-- 加載狀態 -->
     <div v-if="loading" class="loading">加載中...</div>
-
-    <!-- 錯誤提示 -->
-    <div v-if="error" class="error">
+    <div v-else-if="error" class="error">
       {{ error.message }}
       <button @click="fetchHousePhotos" class="retry-button">重試</button>
     </div>
+    <div v-else>
+      <!-- 如果有圖片 -->
+      <div v-if="photos.length > 0">
+        <Splide :options="splideOptions" class="splide-container">
+          <template #arrows>
+            <button class="splide__arrow splide__arrow--prev">
 
-    <!-- 當有照片數據且未加載中或錯誤時顯示 -->
-    <div v-if="!loading && !error && photos.length > 0">
-      <!-- 主照片顯示 -->
-      <img :src="currentPhoto" alt="房屋圖片" class="main-photo" />
+              <svg viewBox="0 0 24 24">
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
+            </button>
+            <button class="splide__arrow splide__arrow--next">
 
-      <!-- 照片控制按鈕 -->
-      <div class="photo-controls">
-        <button @click="previousPhoto" :disabled="photos.length <= 1">上一張</button>
-        <button @click="nextPhoto" :disabled="photos.length <= 1">下一張</button>
+              <svg viewBox="0 0 24 24">
+                <path d="M9 6l6 6-6 6" />
+              </svg>
+            </button>
+          </template>
+          <SplideSlide v-for="(photo, index) in photos" :key="photo.id">
+            <img
+              :src="`data:image/jpeg;base64,${photo.base64}`"
+              alt="房屋圖片"
+              class="main-photo"
+              @click="openImageModal(photo)"
+            />
+          </SplideSlide>
+        </Splide>
       </div>
 
-      <!-- 照片縮略圖 -->
-      <div class="photo-thumbnails">
-        <img v-for="(photo, index) in photos" :key="index" :src="photo" :alt="'縮略圖 ' + (index + 1)"
-          :class="{ active: index === currentPhotoIndex }" @click="selectPhoto(index)" />
+      <!-- 如果沒圖片 -->
+      <div v-else class="no-photos">
+        <img src="../../assets/no-image.png" alt="暫時無照片展示" />
       </div>
     </div>
 
-    <!-- 沒有照片的提示 -->
-    <div v-if="!loading && !error && photos.length === 0" class="no-photos">
-      暫無可顯示的照片。
-    </div>
+    <!-- 圖片模態框 -->
+    <Dialog v-model:visible="isModalVisible" header="圖片查看" :modal="true" :style="{ width: '80vw' }">
+      <img :src="selectedPhotoSrc" alt="選中圖片" style="width: 100%;" />
+    </Dialog>
   </div>
 </template>
 
 <script>
+import { Splide, SplideSlide } from '@splidejs/vue-splide';
+import '@splidejs/splide/dist/css/splide.min.css';
+import Dialog from 'primevue/dialog'; // 引入 Dialog 组件
+
 export default {
   name: "HousePhotos",
+  components: {
+    Splide,
+    SplideSlide,
+    Dialog,
+  },
   props: {
     houseId: {
       type: [String, Number],
@@ -44,64 +66,58 @@ export default {
     },
     baseUrl: {
       type: String,
-      default: 'http://localhost:8080/api/houses/getPhotos',
+      default: "http://localhost:8080/api/houses/getPhotos",
     },
   },
   data() {
     return {
-      photos: [], // 照片列表
-      currentPhotoIndex: 0, // 當前顯示的照片索引
-      loading: true, // 是否加載中
-      error: null, // 加載過程中的錯誤信息
+      photos: [],   // 改成 [{ id: "101", base64: "xxx"}, ...]
+      loading: true,
+      error: null,
+      splideOptions: {
+        type: "fade-loop",
+        perPage: 1,
+        focus: "start", 
+        gap: "1em",
+        padding: { left: "50px", right: "50px" },
+        pagination: true,
+        arrows: true,
+        start: 0, // 確保從第一張開始
+      },
+      isModalVisible: false, 
+      selectedPhotoSrc: '', 
     };
-  },
-  computed: {
-    currentPhoto() {
-      return `data:image/jpeg;base64,${this.photos[this.currentPhotoIndex]}` || '';
-    },
   },
   methods: {
     async fetchHousePhotos() {
       this.loading = true;
       this.error = null;
       try {
-        const response = await fetch(`${this.baseUrl}/${this.houseId}`);
-        console.log("Response status:", response.status);
-        console.log("Response headers:", response.headers);
-
+        const token = localStorage.getItem("jwt");
+        const response = await fetch(`${this.baseUrl}/${this.houseId}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: token,
+          },
+        });
         if (!response.ok) {
           throw new Error(`HTTP 錯誤！狀態碼：${response.status}`);
         }
-
-        const responseBody = await response.text();
-        console.log("Response body:", responseBody);
-
-        if (responseBody) {
-          const data = JSON.parse(responseBody);
-          this.photos = data || [];
-        } else {
-          this.photos = [];
-        }
-
-        this.currentPhotoIndex = 0;
+        const responseBody = await response.json(); 
+        // 假設後端回傳: [ { id:"101", base64:"..." }, ... ]
+        this.photos = Array.isArray(responseBody) ? responseBody : [];
       } catch (err) {
-        console.error('獲取房屋照片時發生錯誤：', err);
+        console.error("獲取房屋照片時發生錯誤：", err);
         this.error = err;
         this.photos = [];
       } finally {
         this.loading = false;
       }
     },
-    nextPhoto() {
-      this.currentPhotoIndex =
-        (this.currentPhotoIndex + 1) % this.photos.length;
-    },
-    previousPhoto() {
-      this.currentPhotoIndex =
-        (this.currentPhotoIndex - 1 + this.photos.length) % this.photos.length;
-    },
-    selectPhoto(index) {
-      this.currentPhotoIndex = index;
+    openImageModal(photo) {
+      this.selectedPhotoSrc = `data:image/jpeg;base64,${photo.base64}`;
+      this.isModalVisible = true;
     },
   },
   watch: {
@@ -119,13 +135,11 @@ export default {
   font-size: 1.2rem;
   color: #555;
 }
-
 .error {
   text-align: center;
   color: red;
   font-size: 1.2rem;
 }
-
 .retry-button {
   background-color: #007bff;
   color: white;
@@ -135,75 +149,89 @@ export default {
   border-radius: 4px;
   margin-top: 10px;
 }
-
 .retry-button:hover {
   background-color: #0056b3;
 }
-
 .no-photos {
   text-align: center;
   color: #777;
   font-size: 1.2rem;
 }
-
 .main-photo {
   display: block;
   margin: 0 auto;
-  max-width: 100%;
-  height: auto;
+  max-width: 100%; /* 調整為 100% 以適應容器 */
+  max-height: 500px;
+  object-fit: contain;
   border: 1px solid #ddd;
   border-radius: 8px;
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+.main-photo:hover {
+  transform: scale(1.05);
 }
 
-.photo-controls {
-  display: flex;
-  justify-content: space-between;
-  margin: 10px 0;
+.splide-container {
+  width: 100%; /* 確保容器佔滿父元素的寬度 */
+  padding: 1rem;
 }
 
-.photo-controls button {
-  background-color: #007bff;
-  color: #fff;
+.splide__arrow {
+  background: none;
   border: none;
-  padding: 8px 16px;
-  border-radius: 4px;
   cursor: pointer;
-  transition: background-color 0.3s;
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
 }
 
-.photo-controls button:hover {
-  background-color: #0056b3;
+.splide__arrow svg {
+  fill: #ff9800; /* 箭頭颜色 */
+  width: 100%;
+  height: 100%;
 }
 
-.photo-controls button:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
+.splide__arrow--prev {
+  left: 10px;
 }
 
-.photo-thumbnails {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 10px;
+.splide__arrow--next {
+  right: 10px;
 }
 
-.photo-thumbnails img {
-  width: 50px;
-  height: 50px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  cursor: pointer;
-  opacity: 0.7;
-  transition: opacity 0.3s, transform 0.3s;
+.splide__arrow:hover svg {
+  fill: #e68900;
 }
 
-.photo-thumbnails img.active {
-  opacity: 1;
-  border-color: #007bff;
-  transform: scale(1.1);
+.splide__pagination {
+  bottom: -1.5rem;
 }
 
-.photo-thumbnails img:hover {
-  opacity: 1;
+.splide__pagination__page {
+  background-color: gray;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.splide__pagination__page.is-active {
+  background-color: red;
+}
+
+/* 响应式样式 */
+@media (max-width: 1200px) {
+  .main-photo {
+    max-width: 80%;
+  }
+}
+@media (max-width: 768px) {
+  .main-photo {
+    max-width: 70%;
+    max-height: 300px;
+  }
 }
 </style>
