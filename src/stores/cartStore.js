@@ -69,8 +69,6 @@ export const useCart = defineStore("cart", {
     // 載入購物車
     async loadCart() {
 
-      console.log("pinia load 中的 token: ", this.token);
-
       try {
         let url = "http://localhost:8080/api/cart/list";
         const response = await fetch(url, {

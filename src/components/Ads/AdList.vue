@@ -129,6 +129,11 @@ const deleteAd = async (adId) => {
           messageTitle: "已刪除VIP推播申請",
           message: "",
         });
+
+        cartStore.removeFromCart(adId);
+        console.log("刪除後的cart store items: ", cartStore.cartItems);
+        cartStore.loadCart();
+        
       } else {
         emit("ad-delete-result", {
           success: false,
