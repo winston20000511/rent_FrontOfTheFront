@@ -16,7 +16,7 @@
         label="傳送訊息" 
         icon="pi pi-comments" 
         class="p-button-outlined p-button-warning" 
-        @click="sendMessage" 
+        @click="SendMsgDialog=true" 
       />
       <Button 
         v-if="!isOwner" 
@@ -29,6 +29,15 @@
 
     <!-- BookingView 彈窗 -->
     <BookingView v-if="showBookingView" :isVisible="showBookingView" @closeView="closeBookingView" :houseId="houseId" />
+
+
+    <Dialog :visible="SendMsgDialog" :modal="true" :dismissableMask="false" header="編輯房屋資訊" class="dialog-theme">
+      <div class="dialog-theme">
+        <input :value="message" type="text">
+        <button @click="SendMsgDialog=false">發送</button>
+      </div>
+    </Dialog>
+
   </div>
 </template>
 
@@ -36,12 +45,15 @@
 import Button from "primevue/button";
 import Avatar from "primevue/avatar";
 import BookingView from "@/View/BookingView.vue";
+import axios from "axios";
+import Dialog from 'primevue/dialog';
 
 export default {
   components: {
     BookingView,
     Button,
     Avatar,
+    Dialog,
   },
   props: {
     houseId: {
@@ -53,6 +65,7 @@ export default {
     return {
       ownerInfo: null,
       showBookingView: false,
+      SendMsgDialog:false,
       isOwner: false, // 新增狀態用於判斷是否為屋主
     };
   },
@@ -122,9 +135,61 @@ export default {
       this.showBookingView = false;
     },
 
-    sendMessage() {
-      alert(`已發送訊息給 ${this.ownerInfo.name}`);
-    },
+    parseJwt(token) {
+  try {
+    const base64Url = token.split('.')[1];
+    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+    const jsonPayload = decodeURIComponent(
+      atob(base64)
+        .split('')
+        .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+        .join('')
+    );
+    return JSON.parse(jsonPayload);
+  } catch (error) {
+    console.error("JWT 解析失敗:", error);
+    return null;
+  }
+},
+    async sendMessage() {
+  console.log("[ownerInfo]arrival send function");
+
+  const token = localStorage.getItem("jwt");
+  console.log(localStorage.getItem("jwt"));
+
+  if (!token) {
+    return alert("未登入");
+  }
+  const decodedToken = this.parseJwt(token);
+  if (!decodedToken) {
+    return alert("JWT 解析錯誤，請重新登入");
+  }
+
+  console.log("current login userId:", decodedToken.userId);
+  console.log("owner userId:", this.ownerInfo.userId);
+
+  const messagePayload = {
+    senderId: decodedToken.userId,
+    receiverId: this.ownerInfo.userId,
+    message: "你好!",
+  };
+
+  try {
+    const response = await axios.post(
+      `${import.meta.env.VITE_APIURL}/messages/send`,
+      messagePayload,
+      {
+        headers: {
+          authorization: `${token}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    alert("訊息 已發送!");
+  } catch (error) {
+    console.error(`[Chat] Failed to send message:`, error.message);
+  }
+},
 
     handleImageError(event) {
       event.target.src = '/src/assets/no-photo.png';
@@ -184,5 +249,12 @@ export default {
 .loading-owner {
   text-align: center;
   color: #757575;
+}
+
+/* 對話框樣式 */
+.dialog-theme {
+  border-radius: 10px;
+  background-color: #e3f2fd;
+  padding: 10px;
 }
 </style>

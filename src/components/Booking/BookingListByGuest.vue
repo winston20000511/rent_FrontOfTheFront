@@ -31,7 +31,19 @@
             </template>
 
             <Column v-for="col of columns" :key="col.field" :field="col.field" :header="col.header"
-                class="text-center text-gray-500" :headerStyle="col.headerStyle" :sortable="col.sortable">
+                class="text-center" :headerStyle="col.headerStyle" :sortable="col.sortable">
+
+                <!-- 自定義 'houseAddress' 列的內容 -->
+                <template v-if="col.field === 'houseAddress'" #body="slotProps">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <!-- 調整按鈕圖示和樣式 -->
+                        <Button icon="pi pi-search" class="p-button-rounded p-button-text p-button-info action-button"
+                            @click=" showHouseView = true; selectedHouseId = slotProps.data.houseId;"
+                            style="width: 2.5rem; height: 2.5rem;" />
+                        <!-- 顯示地址內容 -->
+                        <div>{{ slotProps.data.houseAddress }}</div>
+                    </div>
+                </template>
 
                 <!-- 自定義 'photos' 列的內容 -->
                 <template v-if="col.field === 'photos'" #body="slotProps">
@@ -66,6 +78,7 @@
             </template>
         </DataTable>
 
+        <!-- 取消預約彈窗 -->
         <Dialog v-model:visible="cancelBookingDialog" :style="{ width: '450px' }" header="確認" :modal="true"
             :contentStyle="{ fontSize: '18px' }">
 
@@ -88,6 +101,14 @@
             </template>
         </Dialog>
 
+        <!-- 查看房屋表單彈窗 -->
+        <Dialog v-model:visible="showHouseView" :modal="true" :dismissableMask="true" header="查看房屋資訊"
+            class="dialog-theme">
+            <div class="dialog-container">
+                <HouseView :houseId="selectedHouseId" @close="showHouseView = false" />
+            </div>
+        </Dialog>
+
 
         <Toast />
 
@@ -108,7 +129,7 @@ import placeholderImage from "@/assets/no-image.png";
 import 'primeicons/primeicons.css'
 import { Tag } from 'primevue';
 import { useToast } from "primevue/usetoast";
-
+import HouseView from "@/View/HouseView.vue";
 
 const BASE_URL = import.meta.env.VITE_APIURL
 const TOKEN = localStorage.getItem('jwt');
@@ -120,6 +141,8 @@ const toast = useToast();
 const selectedBooking = ref({});
 const cancelBookingDialog = ref(false);
 const loading = ref(false); // 轉圈圈
+const showHouseView = ref(false)
+const selectedHouseId = ref(null);
 
 // 搜尋功能
 const filters = ref({
@@ -246,10 +269,7 @@ const confirmcancelBooking = (prod) => {
 const cancelBooking = async (selectedBooking) => {
     loading.value = true;
     try {
-        const bookingDate = selectedBooking.bookingDate;  // 'yyyy-MM-dd HH:mm:ss'
-        const [datePart, timePart] = bookingDate.split(' ');
-        selectedBooking.bookingDate = datePart;  // 'yyyy-MM-dd'
-        selectedBooking.bookingTime = timePart;  // 'HH:mm:ss'
+        selectedBooking = convertFormat(selectedBooking);   // 將 bookingDate 拆成 bookingDate bookingTime
 
         const response = await fetch(`${BASE_URL}/booking/guest`, {
             method: 'put',
@@ -296,7 +316,7 @@ const getSeverity = (status) => {
         case 5:
             return 'warn';
         case 6:
-            return 'contrast';
+            return 'secondary';
     }
 }
 
@@ -304,6 +324,15 @@ const getSeverity = (status) => {
 const getPhoto = (photos) => {
     return (Array.isArray(photos) && photos.length > 0)
         ? `data:image/jpeg;base64,${photos[0].base64}` : placeholderImage;
+};
+
+const convertFormat = (selectedBooking) => {
+    const [datePart, timePart] = selectedBooking.bookingDate.split(' ');
+    return {
+        ...selectedBooking,
+        bookingDate: datePart,  // 'yyyy-MM-dd'
+        bookingTime: timePart   // 'HH:mm:ss'
+    };
 };
 
 onMounted(() => {
@@ -319,6 +348,12 @@ onMounted(() => {
 // watch(filters, () => {
 //     console.log("這是測試 搜尋: " + filters.value.global.value)
 // }, { deep: true });
+
+// // // 測試選擇目標
+// watch(selectedBooking, () => {
+//     console.log(selectedBooking)
+// }, { deep: true });
+
 
 </script>
 

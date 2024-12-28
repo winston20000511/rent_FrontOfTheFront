@@ -1,43 +1,44 @@
-import { createRouter, createWebHistory } from 'vue-router';
-import HomeView from '@/View/HomeView.vue';
-import MemberCenter from '@/components/User/memberCenter.vue'; // 更新了相對路徑
-import EditUserPage from '@/components/User/EditUserPage.vue';
-import ForgotPassword from '@/components/User/ForgotPassword.vue';
-import LoginForm from '@/components/User/LoginForm.vue';
-import MyOrders from '@/components/Orders/MyOrders.vue';
-import OrderConfirmView from '@/View/OrderConfirmView.vue';
-import AdtypeView from '@/View/AdtypeView.vue';
-import OrderCompleteView from '@/View/OrderCompleteView.vue';
-import EditProfile from '@/components/User/EditProfile.vue';
-import Houselist from '@/components/houses/houselist.vue';
-import CollectHouseList from '@/components/houses/CollectHouseList.vue';
-import BookingListByGuest from '@/components/Booking/BookingListByGuest.vue';
-import BookingListByHost from '@/components/Booking/BookingListByHost.vue';
-import MyAdvertisements from '@/components/Ads/MyAdvertisements.vue';
-import ResetPassword from '@/components/User/ResetPassword.vue'; // 新增 ResetPassword 匯入
+import { createRouter, createWebHistory } from "vue-router";
+import HomeView from "@/View/HomeView.vue";
+import MemberCenter from "@/components/User/memberCenter.vue"; // 更新了相對路徑
+import EditUserPage from "@/components/User/EditUserPage.vue";
+import ForgotPassword from "@/components/User/ForgotPassword.vue";
+import LoginForm from "@/components/User/LoginForm.vue";
+import MyOrders from "@/components/Orders/MyOrders.vue";
+import OrderConfirmView from "@/View/OrderConfirmView.vue";
+import AdtypeView from "@/View/AdtypeView.vue";
+import OrderCompleteView from "@/View/OrderCompleteView.vue";
+import EditProfile from "@/components/User/EditProfile.vue";
+import Houselist from "@/components/houses/houselist.vue";
+import CollectHouseList from "@/components/houses/CollectHouseList.vue";
+import BookingListByGuest from "@/components/Booking/BookingListByGuest.vue";
+import BookingListByHost from "@/components/Booking/BookingListByHost.vue";
+import ComplaintForm from "@/View/comp.vue";
+import MyAdvertisements from "@/components/Ads/MyAdvertisements.vue";
+import ResetPassword from "@/components/User/ResetPassword.vue"; // 新增 ResetPassword 匯入
 
-import DeactivateAccount from '@/components/User/DeactivateAccount.vue';
+import DeactivateAccount from "@/components/User/DeactivateAccount.vue";
 
 const routes = [
   {
-    path: '/', // 主框架頁面
-    name: 'home',
+    path: "/", // 主框架頁面
+    name: "home",
     component: HomeView,
     props: (route) => ({ markers: route.params.markers || {} }),
   },
   {
-    path: '/forgot-password', // 忘記密碼頁面
-    name: 'ForgotPassword',
+    path: "/forgot-password", // 忘記密碼頁面
+    name: "ForgotPassword",
     component: ForgotPassword,
   },
   {
-    path: '/reset-password', // 重設密碼頁面路徑
-    name: 'ResetPassword',
+    path: "/reset-password", // 重設密碼頁面路徑
+    name: "ResetPassword",
     component: ResetPassword, // 顯示 ResetPassword
   },
   {
-    path: '/edit-user', // 編輯用戶頁面路徑
-    name: 'EditUser',
+    path: "/edit-user", // 編輯用戶頁面路徑
+    name: "EditUser",
     component: EditUserPage,
   },
   {
@@ -47,33 +48,33 @@ const routes = [
     component: MemberCenter, // 顯示 MemberCenter
     children: [
       {
-        path: 'edit-profile', // 子路由，顯示 EditProfile
-        name: 'EditProfile',
+        path: "edit-profile", // 子路由，顯示 EditProfile
+        name: "EditProfile",
         component: EditProfile,
       },
       {
-        path: 'my-houses', // 我的房屋
-        name: 'MyHouses',
+        path: "my-houses", // 我的房屋
+        name: "MyHouses",
         component: Houselist,
       },
       {
-        path: 'my-collections', // 我的收藏
-        name: 'MyCollections',
+        path: "my-collections", // 我的收藏
+        name: "MyCollections",
         component: CollectHouseList,
       },
       {
-        path: 'edit-user', // 編輯用戶
-        name: 'EditUserChild',
+        path: "edit-user", // 編輯用戶
+        name: "EditUserChild",
         component: EditUserPage,
       },
       {
-        path: 'my-booking', // 用戶預約
-        name: 'BookingGuest',
+        path: "my-booking", // 用戶預約
+        name: "BookingGuest",
         component: BookingListByGuest,
       },
       {
-        path: 'homeowner', // 房屋預約
-        name: 'BookingHost',
+        path: "homeowner", // 房屋預約
+        name: "BookingHost",
         component: BookingListByHost,
       },
       {
@@ -82,8 +83,8 @@ const routes = [
         component: MyAdvertisements,
       },
       {
-        path: 'my-orders', // 編輯用戶
-        name: 'MyOrders',
+        path: "my-orders", // 編輯用戶
+        name: "MyOrders",
         component: MyOrders,
       },
       {
@@ -94,8 +95,8 @@ const routes = [
     ],
   },
   {
-    path: '/login', // 登入頁面
-    name: 'LoginForm',
+    path: "/login", // 登入頁面
+    name: "LoginForm",
     component: LoginForm,
   },
   {
@@ -104,13 +105,13 @@ const routes = [
     component: AdtypeView,
   },
   {
-    path: '/order-confirm',
-    name: 'OrderConfirm',
+    path: "/order-confirm",
+    name: "OrderConfirm",
     component: OrderConfirmView,
   },
   {
-    path: '/order-complete',
-    name: 'OrderComplete',
+    path: "/order-complete",
+    name: "OrderComplete",
     component: OrderCompleteView,
   },
   {
@@ -122,6 +123,11 @@ const routes = [
     path: "/booking/guest", // 開發用，不一定刪掉
     name: "bookingbyguest",
     component: BookingListByGuest,
+  },
+  {
+    path: "/suggest",
+    name: "ComplaintForm",
+    component: ComplaintForm,
   },
 ];
 

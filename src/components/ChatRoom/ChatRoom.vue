@@ -4,13 +4,18 @@
     <div class="sidebar">
 
       <div class="chat-list">
-        <div v-for="user in chatUsers" :key="user.userId" class="user-item"
+        <a href="/suggest" class="user-item fake-button">提交您的建議
+        </a>
+        <div v-for="user in chatUsers" :key="user.userId" class="user-item" 
           :class="{ 'selected-user': user.userName === selectedUserName }" @click="selectChat(user)">
 
           <div class="chatpic">
             <img src="./a.jpg" style="width: auto;">
           </div>
-          {{ user.name }}
+          <div class="user-info">
+                <p>{{ user.name }}</p>
+                <span v-if="user.userId === 3" class="official-badge">官方</span>
+            </div>
         </div>
       </div>
     </div>
@@ -37,28 +42,28 @@
         <div v-if="searchBarVisible" class="search-buttons">
           <button @click="prevMatch" class="toggle-prev">⬆</button>
           <button @click="nextMatch" class="toggle-next">⬇</button>
+        </div>
       </div>
-    </div>
 
-    <!-- message bar -->
-    <div class="messages" ref="messageContainer">
-      <div v-for="(message, index) in messages" :key="index" :class="[
-        { 'message-right': message.isSender, 'message-left': message.isReceiver },
-        { highlight: index === highlightedIndex }
-      ]" :data-index="index">
-        <div class="message-text" v-html="highlightText(message.text)"></div>
-        <div class="message-timestamp">{{ formatTimestamp(message.timestamp) }}</div>
+      <!-- message bar -->
+      <div class="messages" ref="messageContainer">
+        <div v-for="(message, index) in messages" :key="index" :class="[
+          { 'message-right': message.isSender, 'message-left': message.isReceiver },
+          { highlight: index === highlightedIndex }
+        ]" :data-index="index">
+          <div class="message-text" v-html="highlightText(message.text)"></div>
+          <div class="message-timestamp">{{ formatTimestamp(message.timestamp) }}</div>
+        </div>
       </div>
-    </div>
 
-    <!-- input MSG -->
-    <div class="input">
-      <textarea v-model="newMessage" placeholder="Type your message..."></textarea>
-      <button @click="sendMessage" class="send-button"><i class="bi bi-send"></i></button>
-    </div>
+      <!-- input MSG -->
+      <div class="input">
+        <textarea v-model="newMessage" placeholder="Type your message..."></textarea>
+        <button @click="sendMessage" class="send-button"><i class="bi bi-send"></i></button>
+      </div>
 
-    <slot></slot>
-  </div>
+      <slot></slot>
+    </div>
   </div>
 </template>
 
@@ -101,7 +106,7 @@ function initializeCurrentUser() {
     console.log("JWT 解碼結果:", decoded);
 
     currentUser.value.userId = decoded.userId || decoded.sub || '';
-    currentUser.value.userName = decoded.userName || decoded.name || '';
+    currentUser.value.userName = decoded.username || decoded.name || '';
     console.log("當前用戶信息:",
       'userId:', currentUser.value.userId,
       'name:', currentUser.value.userName);
@@ -409,4 +414,66 @@ onUnmounted(() => {
 } */
 
 /* input end ???? */
+.fake-button {
+  text-decoration: none;
+  color: rgb(238, 30, 30);
+  font-size: large;
+  background-color: white;
+  width: 100%;
+  height: 50px;
+}
+
+
+/** test ***********************/
+/* 預設的使用者樣式 */
+.user-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+/* 選中的使用者樣式 */
+.user-item.selected-user {
+    background-color: #f0f8ff;
+}
+
+/* 官方人員樣式 */
+.user-item.official-user {
+    background-color: #fff5f5;
+    border-left: 4px solid red;
+}
+
+/* 官方標籤樣式 */
+.official-badge {
+    font-size: 12px;
+    color: white;
+    background-color: red;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 8px;
+}
+
+/* 滑鼠懸停效果 */
+.user-item:hover {
+    background-color: #f9f9f9;
+}
+
+/* 圖片容器 */
+.chatpic img {
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+}
+
+/* 使用者資訊容器 */
+.user-info {
+    display: flex;
+    align-items: center;
+    margin-left: 10px;
+}
+
 </style>
