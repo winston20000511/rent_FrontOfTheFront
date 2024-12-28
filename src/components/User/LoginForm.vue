@@ -138,16 +138,16 @@ export default {
     script.defer = true;
     document.head.appendChild(script);
   },
-
-  mounted() {
-    // 初始化 Google 登入
-    window.gapi.load("auth2", () => {
-      window.gapi.auth2.init({
-        client_id: "879387381790-9fi9opa5shllb5f4gd40i7h0tccshqau.apps.googleusercontent.com", // 替換為你的 Google Client ID
-      });
-    });
-  },
+  // mounted() {
+  //   // 初始化 Google 登入
+  //   window.gapi.load("auth2", () => {
+  //     window.gapi.auth2.init({
+  //       client_id: "YOUR_GOOGLE_CLIENT_ID", // 替換為你的 Google Client ID
+  //     });
+  //   });
+  // },
 };
+
 </script>
 
 <style scoped>
