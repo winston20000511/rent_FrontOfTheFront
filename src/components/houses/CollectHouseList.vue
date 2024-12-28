@@ -13,6 +13,7 @@
       />
     </div>
 
+    
     <!-- easy-data-table 顯示資料 -->
     <easy-data-table
       :headers="headers"

@@ -7,6 +7,7 @@ import router from './router'
 import LoginPage from './components/User/LoginPage.vue';
 import axios from 'axios';
 
+
 const app = createApp(App)
 app.config.globalProperties.$axios = axios;
 app.use(LoginPage)

@@ -12,6 +12,7 @@ const props = defineProps({
   },
 });
 
+
 const selectedPaymentMethod = ref("linepay");
 
 // 關閉購物車

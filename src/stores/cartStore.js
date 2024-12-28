@@ -9,6 +9,7 @@ export const useCart = defineStore("cart", {
     paymentMethod: null,
   }),
 
+  
   actions: {
 
     // 載入購物車

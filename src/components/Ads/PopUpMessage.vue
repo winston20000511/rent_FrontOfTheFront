@@ -8,6 +8,7 @@ const props = defineProps({
     required: true,
     default: '',
   },
+  
   message: {
     type: String,
     required: true,

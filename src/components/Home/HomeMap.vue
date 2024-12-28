@@ -28,6 +28,7 @@ onMounted(() => {
       libraries: ['marker'], // 加載 'marker' 庫
     });
 
+    
     loader.load().then((google) => {
       // 初始化地圖
       map.value = new google.maps.Map(document.querySelector('.map-container'), {

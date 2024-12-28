@@ -11,6 +11,7 @@
       <!-- 主照片顯示 -->
       <img :src="currentPhoto" alt="房屋圖片" class="main-photo" />
       
+      
       <!-- 照片控制按鈕 -->
       <div class="photo-controls">
         <button @click="previousPhoto" :disabled="photos.length <= 1">上一張</button>

@@ -3,7 +3,7 @@ import HomeView from '@/View/HomeView.vue';
 import MemberCenter from '@/components/User/memberCenter.vue';
 import EditUserPage from '@/components/User/EditUserPage.vue';
 import ForgotPassword from '@/components/User/ForgotPassword.vue';
-import MemberCenter from '@/components/User/MemberCenter.vue';
+import MemberCenter from '@/components/User/memberCenter.vue';
 import EditProfile from '@/components/User/EditProfile.vue';
 
 const routes = [

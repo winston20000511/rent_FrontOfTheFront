@@ -8,7 +8,6 @@ import OwnerInfo from './components/houses/OwnerInfo.vue';
 
 
 
-
 </script>
 
 <template>

@@ -70,7 +70,6 @@
           // 處理文件上傳邏輯（例如，預覽圖像或上傳到伺服器）
         }
       };
-  
       const submitForm = () => {
         // 提交表單邏輯，例如，發送請求到伺服器
         console.log('提交的資料:', props.userData);

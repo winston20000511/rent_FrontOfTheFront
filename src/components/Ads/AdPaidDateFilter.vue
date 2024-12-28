@@ -8,6 +8,7 @@ export default {
         const onDateFilterChange = () => {
             emit('filter-change', 'daterange', selectedDateRange.value);
         };
+        
 
         return {
             selectedDateRange,

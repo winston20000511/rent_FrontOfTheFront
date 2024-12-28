@@ -13,6 +13,7 @@ function addAdToCart(adId) {
   console.log("廣告已加入購物車", adId);
 }
 
+
 const props = defineProps({
   ads: {
     type: Array,

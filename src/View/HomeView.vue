@@ -6,6 +6,7 @@ import HomeMap from '@/components/Home/HomeMap.vue';
 import HomeNavbar from '@/components/Home/HomeNavbar.vue';
 import LoginPage from '@/components/User/LoginPage.vue'; // 新增 LoginPage 引入
 
+
 // 控制 LoginPage 的顯示狀態
 const showLoginPage = ref(false);
 

@@ -6,6 +6,7 @@
                     @change="emitAgreement">
                 <label for="agreement" class="form-check-label">我已閱讀並同意預約同意條款</label>
             </div>
+            
 
             <button class="btn btn-link" @click="showTerms = !showTerms">
                 {{ showTerms ? '隱藏條款' : '查看條款' }}

@@ -13,6 +13,7 @@ const isLoading = ref(true);
 const loadError = ref(null);
 
 
+
 onMounted(async () => {
   // 載入時取得購物車內容
     console.log("order confirm view cartId: ", cartId);

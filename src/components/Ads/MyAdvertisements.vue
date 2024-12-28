@@ -17,6 +17,7 @@ import Overlay from '@/components/Ads/Overlay.vue';
 import AdDetailModal from '@/components/Ads/AdDetailModal.vue';
 import CartList from '@/components/Ads/CartList.vue';
 
+
 const filters = reactive({
     page: 1,
     daterange: "all",

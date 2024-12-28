@@ -14,6 +14,7 @@
   };
 </script>
 
+
 <template>
   <div class="fixed inset-0 z-20 bg-gray-500/75 flex items-center justify-center">
     <div class="bg-white rounded-lg shadow-lg w-4/5 h-4/5 p-8">

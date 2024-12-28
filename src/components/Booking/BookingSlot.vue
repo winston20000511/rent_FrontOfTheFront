@@ -9,6 +9,7 @@ import BookingAgreement from './bookingAgreement.vue';
 const BASE_URL = import.meta.env.VITE_APIURL
 
 
+
 const props = defineProps({
     houseId: {
         type: Number,

@@ -11,6 +11,7 @@ const closeView = () => {
   emit('closeView');
 };
 
+
 const props = defineProps({
   isVisible: {
     type: Boolean,

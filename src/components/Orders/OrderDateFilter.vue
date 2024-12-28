@@ -11,6 +11,7 @@
     };
 </script>
 
+
 <template>
   <div class="flex items-center">
     <label for="date-filter" class="text-sm font-medium text-gray-600">
