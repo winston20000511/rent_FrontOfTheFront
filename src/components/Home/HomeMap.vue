@@ -4,9 +4,13 @@ import { Loader } from '@googlemaps/js-api-loader';
 import HousePhotos from '../houses/housePhotos.vue';
 import HouseView from '@/View/HouseView.vue';
 import Dialog from "primevue/dialog";
+import { useHouseCard } from '@/stores/CardHouseStore';
 
 const map = shallowRef(null); // 地圖容器
 const mapMarkers = ref([]); //地圖標記
+const pbtns = ref([]); //儲存 按鈕
+const ibtns = ref([]); //儲存 按鈕
+const activeBtn = ref() //儲存目前按鈕
 const canvas = shallowRef(null); //繪筆
 const refbtnDraw = ref(null) //繪圖按鈕
 const refbtnConfig = ref(null) //地圖設定
@@ -24,7 +28,7 @@ let activeInfoWindow = null; // 用來存儲當前開啟的 InfoWindow
 
 
 let token = localStorage.getItem('jwt');
-
+const store = useHouseCard()
 const emits = defineEmits(['update-marker' , 'update-flipped'])
 const props = defineProps({
   markers: Object
@@ -37,7 +41,7 @@ onMounted(() => {
     const loader = new Loader({
       apiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY, 
       version: 'weekly', // 使用 beta 或更新版本
-      libraries: ['marker'], // 加載 'marker' 庫
+      libraries: ['marker','geometry'], // 加載 'marker' 庫
     });
 
     loader.load().then((google) => {
@@ -87,6 +91,7 @@ onMounted(() => {
     mapMarkers.value.forEach((marker) => marker.map = null);
     mapMarkers.value = [];
 
+    
     list.forEach((marker) => {
 
       const dateSpec = '1999-01-01T00:00:00';
@@ -94,11 +99,13 @@ onMounted(() => {
       const targetDate = new Date(dateSpec);
 
       const buttonElement = document.createElement("button");
-      // buttonElement.className="btn-purple"
+
       if (sourceDate > targetDate) {
         buttonElement.className ="btn-info"
+        ibtns.value.push(buttonElement);
       } else {
         buttonElement.className="btn-purple"
+        pbtns.value.push(buttonElement);
       }
       buttonElement.innerHTML=`${(Number(marker.price)/1000).toFixed(1)}K`
       buttonElement.style.pointerEvents = "auto";
@@ -111,6 +118,7 @@ onMounted(() => {
         content: buttonElement,
       });
 
+      
       
       const contentContainer = document.createElement('div');
       contentContainer.classList.add('card','custom-shadow','card-shadow');
@@ -161,6 +169,10 @@ onMounted(() => {
             }
             infoWindow.open(map.value, mapMark);
             activeInfoWindow = infoWindow; // 記錄新打開的 InfoWindow
+            // store.updateSeleted(marker);
+            clearAllButtons(buttonElement)
+            // activeBtn.value = buttonElement
+            buttonElement.className ="btn-red"
         });
         
         map.value.addListener('click', () => {
@@ -186,9 +198,24 @@ onMounted(() => {
     //   });
 
       map.value.panTo(latlng);
-      map.value.setZoom(14);
+      // map.value.setZoom(14);
       // mapMarkers.value.push(mapMark);
   });
+
+  function clearAllButtons(sourceBtn) {
+    pbtns.value.forEach((btn) => {
+      if (btn != sourceBtn) {
+        btn.className='btn-purple'
+      }
+    });
+    ibtns.value.forEach((btn) => {
+      if (btn != sourceBtn) {
+        btn.className='btn-info'
+      }
+    });
+
+    // btns.value = []; // 清空按鈕陣列
+  }
 
   // =========================================繪圖功能=================================================================
   // 開始繪圖
@@ -238,8 +265,6 @@ onMounted(() => {
       draggable: true,
       gestureHandling: 'auto',
     });
-
-
   }
 
   //清除畫筆
@@ -350,6 +375,14 @@ onMounted(() => {
     drawLatLngFetch(latLngPoints)
     const canvasElement = canvas.value;
     clearCanvas(canvasElement);
+    google.maps.event.addListener(polygon, "click", (event) => {
+      const latLng = event.latLng;
+      // alert(`你點擊了多邊形，座標：${latLng.lat()}, ${latLng.lng()}`);
+      if (activeInfoWindow) {
+        activeInfoWindow.close();
+        activeInfoWindow = null; // 清除記錄
+      }
+    });
   }
 
   async function drawLatLngFetch(latLngPoints){
@@ -501,7 +534,7 @@ onMounted(() => {
   z-index: 2;
 }
 .btn-purple {
-    background-color: #9333EA; /* purple-500 */
+    background-color: #9333EA;
     color: white;
     border-radius: 0.5rem; /* 圓角效果 */
     padding: 3px; /* 增加按鈕內邊距 */
@@ -510,7 +543,16 @@ onMounted(() => {
     width: 40px;
 }
 .btn-info{
-  background-color: #358bd5; /* purple-500 */
+  background-color: #358bd5;
+    color: white;
+    border-radius: 0.5rem; /* 圓角效果 */
+    padding: 3px; /* 增加按鈕內邊距 */
+    border: none; /* 去掉邊框 */
+    transition: background-color 0.3s ease;
+    width: 40px;
+}
+.btn-red{
+  background-color: #c64633;
     color: white;
     border-radius: 0.5rem; /* 圓角效果 */
     padding: 3px; /* 增加按鈕內邊距 */
@@ -523,6 +565,9 @@ onMounted(() => {
 }
 .btn-info:hover {
     background-color: #1749d1; /* purple-700 */
+}
+.btn-red:hover {
+    background-color: #f02d0a; /* purple-700 */
 }
 
 .btn-yellow {

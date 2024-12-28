@@ -52,10 +52,12 @@ const addMarker = (locations,status) => {
       params: { markers: markers.value}
     });
   }else{
-    markers.value = locations;
-    store.updateData(locations);
-  }
+    setTimeout(()=>{
+      markers.value = locations;
+      store.updateData(markers.value.searchList);
+    },500)
 
+  }
 };
 
 </script>
