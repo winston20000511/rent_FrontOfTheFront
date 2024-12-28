@@ -1,7 +1,5 @@
 <script setup>
 import { onMounted, onUnmounted, ref } from 'vue';
-import { Offcanvas } from 'bootstrap';
-
 import { useRouter } from 'vue-router'; // 引入 useRouter
 import { useAuthStore } from '@/stores/auth';
 import { useOption } from '@/stores/optionStore';
@@ -147,7 +145,7 @@ const showMapFetch = async (address) => {
 
   const data = await response.json();
   console.log(data);
-  emits('add-marker', data)
+  emits('add-marker', data,1)
 }
 
 const handleListClick = (item) => {

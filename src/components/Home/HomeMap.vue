@@ -66,8 +66,6 @@ onMounted(() => {
       canvasElement.addEventListener('mousemove', draw);
       canvasElement.addEventListener('mouseup', stopDrawing);
       canvasElement.addEventListener('mouseout', stopDrawing);
-
-
     });
   });
   onUnmounted(()=>{
@@ -175,21 +173,21 @@ onMounted(() => {
       mapMarkers.value.push(mapMark);
     });
 
-    const buttonOrigin = document.createElement("button");
-    buttonOrigin.className="btn-yellow"
-    buttonOrigin.innerHTML=`${(Number(avgPrice)/1000).toFixed(1)}K`
-    buttonOrigin.style.pointerEvents = "auto";
+    // const buttonOrigin = document.createElement("button");
+    // buttonOrigin.className="btn-yellow"
+    // buttonOrigin.innerHTML=`${(Number(avgPrice)/1000).toFixed(1)}K`
+    // buttonOrigin.style.pointerEvents = "auto";
     var latlng = new google.maps.LatLng(origin.lat, origin.lng);
-    var mapMark = new google.maps.marker.AdvancedMarkerElement({
-        position: latlng,
-        map: map.value,
-        title: origin.street,
-        content: buttonOrigin,
-      });
+    // var mapMark = new google.maps.marker.AdvancedMarkerElement({
+    //     position: latlng,
+    //     map: map.value,
+    //     title: origin.street,
+    //     content: buttonOrigin,
+    //   });
 
       map.value.panTo(latlng);
       map.value.setZoom(14);
-      mapMarkers.value.push(mapMark);
+      // mapMarkers.value.push(mapMark);
   });
 
   // =========================================繪圖功能=================================================================
@@ -368,7 +366,7 @@ onMounted(() => {
     }
 
     const data = await response.json();
-    emits('update-marker',data)
+    emits('update-marker',data,1)
 
   }
 

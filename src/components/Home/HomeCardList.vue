@@ -2,13 +2,19 @@
 import { ref, watch } from "vue";
 import Dialog from "primevue/dialog";
 import HouseView from "@/View/HouseView.vue";
+import { useHouseCard } from "@/stores/CardHouseStore";
 
 const props = defineProps({
   markers: {
     type: Object,
     required: true,
   },
+  ads: {
+    type: Object,
+    required: true,
+  }
 });
+const store = useHouseCard();
 
 const showView = ref(false);
 const selectedHouseId = ref(null);
@@ -112,9 +118,9 @@ function getCardClass(item){
             alt="House Image"
           />
           <div class="card-body">
-            <p class="card-text" style="font-size: 20px; font-weight: bold;">{{ list.houseTitle }}</p>
-            <p class="card-text">NT${{ list.price }}</p>
-            <p class="card-text">{{ list.address }}</p>
+            <p class="card-text" style="font-size: 20px; font-weight: bold; color: black;">{{ list.houseTitle }}</p>
+            <p class="card-text;" style="color: black;">NT${{ list.price }}</p>
+            <p class="card-text" style="color: black;">{{ list.address }}</p>
             <!-- 顯示點擊數 -->
             <div class="d-flex justify-content-end align-items-center">
               <i class="pi pi-eye" style="margin-right: 5px;"></i>

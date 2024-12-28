@@ -16,12 +16,15 @@ import { useHouseCard } from './stores/CardHouseStore';
 
 const router = useRouter();
 const showChatPopup = ref(false);
+const showChatApp = ref(true);
+const route = useRoute();
+const store = useHouseCard();
+const markers = ref({});
+
 const toggleChatPopup = () => {
   showChatPopup.value = !showChatPopup.value;
 };
 
-const showChatApp = ref(true);
-const route = useRoute();
 watch(
   () => route.path,
   (newPath) => {
@@ -39,16 +42,20 @@ const toggleLoginPage = () => {
   showLoginPage.value = !showLoginPage.value;
 };
 
-const store = useHouseCard();
-const markers = ref({});
+const addMarker = (locations,status) => {
+  console.log(status)
+  if (status == 1){
+    markers.value = locations;
+    store.updateData(markers.value.searchList);
+    router.push({
+      name: 'Home',
+      params: { markers: markers.value}
+    });
+  }else{
+    markers.value = locations;
+    store.updateData(locations);
+  }
 
-const addMarker = (locations) => {
-  markers.value = locations;
-  store.updateData(markers.value.searchList);
-  router.push({
-    name: 'Home',
-    params: { markers: markers.value}
-  });
 };
 
 </script>
