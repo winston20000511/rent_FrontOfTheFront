@@ -142,7 +142,6 @@ const cancel = async (merchantTradNo) => {
             class="border-b hover:bg-gray-50"
           >
             <td class="px-4 py-3 text-sm text-gray-700 text-center">
-              {{order}}
               {{ order.merchantTradNo }}
             </td>
             <td class="px-4 py-3 text-sm text-center text-gray-700">
@@ -278,5 +277,10 @@ const cancel = async (merchantTradNo) => {
 .dialog-theme .p-dialog {
   width: 80%;
   max-width: 800px;
+}
+
+.table-container {
+  max-height: 24rem;
+  overflow-y: auto;
 }
 </style>
