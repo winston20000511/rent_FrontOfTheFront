@@ -1,8 +1,9 @@
 <script setup>
 import { ref, onMounted, onUnmounted, watch, toRef, shallowRef, createApp } from 'vue';
 import { Loader } from '@googlemaps/js-api-loader';
-import { useHouseCard } from '@/stores/CardHouseStore';
 import HousePhotos from '../houses/housePhotos.vue';
+import HouseView from '@/View/HouseView.vue';
+import Dialog from "primevue/dialog";
 
 const map = shallowRef(null); // 地圖容器
 const mapMarkers = ref([]); //地圖標記
@@ -10,6 +11,9 @@ const canvas = shallowRef(null); //繪筆
 const refbtnDraw = ref(null) //繪圖按鈕
 const refbtnConfig = ref(null) //地圖設定
 const isDrawingMode = ref(false); //按鈕切換繪圖模式
+
+const showView = ref(false);
+const selectedHouseId = ref(null);
 
 let drawUrl='http://localhost:8080/api/draw';
 let isDrawing = false; //判斷是否正在繪圖
@@ -21,7 +25,6 @@ let activeInfoWindow = null; // 用來存儲當前開啟的 InfoWindow
 
 let token = localStorage.getItem('jwt');
 
-const store = useHouseCard()
 const emits = defineEmits(['update-marker' , 'update-flipped'])
 const props = defineProps({
   markers: Object
@@ -88,9 +91,17 @@ onMounted(() => {
 
     list.forEach((marker) => {
 
+      const dateSpec = '1999-01-01T00:00:00';
+      const sourceDate = new Date(marker.paidDate);
+      const targetDate = new Date(dateSpec);
 
       const buttonElement = document.createElement("button");
-      buttonElement.className="btn-purple"
+      // buttonElement.className="btn-purple"
+      if (sourceDate > targetDate) {
+        buttonElement.className ="btn-info"
+      } else {
+        buttonElement.className="btn-purple"
+      }
       buttonElement.innerHTML=`${(Number(marker.price)/1000).toFixed(1)}K`
       buttonElement.style.pointerEvents = "auto";
 
@@ -102,36 +113,44 @@ onMounted(() => {
         content: buttonElement,
       });
 
+      
       const contentContainer = document.createElement('div');
-      contentContainer.classList.add('show-picture');
-
-      const vueContainer = document.createElement('div');
-      contentContainer.appendChild(vueContainer);
+      contentContainer.classList.add('card','custom-shadow','card-shadow');
+      contentContainer.style.width='36em'
+      
+      contentContainer.addEventListener('click',()=>{
+        openHouseView(Number(marker.houseid))
+      })
 
       // 使用 Vue 渲染 InfoWindowContent 組件
       const app = createApp(HousePhotos, {
         houseId: marker.houseid,
       });
-      app.mount(vueContainer); // 將 Vue 組件掛載到子容器
+      app.mount(contentContainer);
 
-      const paragraph1 = document.createElement('p');
-      paragraph1.textContent = '這是第一個段落，顯示額外訊息。';
-      contentContainer.appendChild(paragraph1);
-
-      const paragraph2 = document.createElement('p');
-      paragraph2.textContent = '這是第二個段落，顯示更多訊息。';
-      contentContainer.appendChild(paragraph2);
-
-      
       // 創建 InfoWindow 並嵌入渲染的 Vue 組件
       const infoWindow = new google.maps.InfoWindow({
         content: contentContainer,
       });
 
+      const paragraph1 = document.createElement('p');
+      paragraph1.textContent = `NT$ ${marker.price}`;
+      paragraph1.style.fontSize='24px'
+      paragraph1.style.fontWeight='bold'
+      paragraph1.style.margin = '10px 0 0 20px'
+      contentContainer.appendChild(paragraph1);
+
+      const paragraph2 = document.createElement('p');
+      paragraph2.textContent = marker.address;
+      paragraph2.style.fontSize='18px'
+      paragraph2.style.margin = '10px 0 10px 20px'
+      contentContainer.appendChild(paragraph2);
+
+      //<img src="${data.image}" alt="房屋圖片" style="max-width: 200px; margin-bottom: 10px;">
       // const infoWindow = new google.maps.InfoWindow({
       //     content: `
       //       <div style="text-align: center;">
-      //         <img src="${data.image}" alt="房屋圖片" style="max-width: 200px; margin-bottom: 10px;">
+              
       //         <p>${marker.houseTitle}</p>
       //       </div>
       //     `,
@@ -142,9 +161,10 @@ onMounted(() => {
           if (activeInfoWindow) {
             activeInfoWindow.close(); // 關閉當前開啟的 InfoWindow
             }
-            infoWindow.open(map.value, marker);
+            infoWindow.open(map.value, mapMark);
             activeInfoWindow = infoWindow; // 記錄新打開的 InfoWindow
         });
+        
         map.value.addListener('click', () => {
           if (activeInfoWindow) {
             activeInfoWindow.close();
@@ -157,7 +177,7 @@ onMounted(() => {
 
     const buttonOrigin = document.createElement("button");
     buttonOrigin.className="btn-yellow"
-    buttonOrigin.innerHTML=`${(Number(origin.price)/1000).toFixed(1)}K`
+    buttonOrigin.innerHTML=`${(Number(avgPrice)/1000).toFixed(1)}K`
     buttonOrigin.style.pointerEvents = "auto";
     var latlng = new google.maps.LatLng(origin.lat, origin.lng);
     var mapMark = new google.maps.marker.AdvancedMarkerElement({
@@ -168,7 +188,7 @@ onMounted(() => {
       });
 
       map.value.panTo(latlng);
-      // map.value.setZoom(14);
+      map.value.setZoom(14);
       mapMarkers.value.push(mapMark);
   });
 
@@ -364,6 +384,41 @@ onMounted(() => {
     mapInstance.setCenter(center); // 回到原中心
   }
 
+  async function openHouseView(houseId) {
+      selectedHouseId.value = Number(houseId);
+      showView.value = true;
+      
+      try {
+        // 增加點擊數
+        await incrementClickCount(houseId);
+
+        // 獲取最新點擊數
+
+      } catch (error) {
+        console.error("Error handling house view:", error);
+      }
+  }
+  function closeHouseView() {
+    showView.value = false;
+  }
+
+  async function incrementClickCount(houseId) {
+    try {
+      const response = await fetch(`http://localhost:8080/api/houses/${houseId}/incrementClick`, {
+        method: "PUT",
+        headers: {
+          Authorization: localStorage.getItem("jwt"),
+        },
+      });
+      if (!response.ok) {
+        console.error(`Failed to increment click count for houseId: ${houseId}`);
+      }
+    } catch (error) {
+      console.error("Error incrementing click count:", error);
+    }
+  }
+
+
 </script>
 
 <template>
@@ -377,6 +432,19 @@ onMounted(() => {
     <div ref="map" class="map-container" v-once></div>
     <canvas ref="canvas" class="drawing-canvas"></canvas>
   </div>
+
+  <Dialog
+    v-model:visible="showView"
+    modal
+    appendTo="body"
+    :style="{ width: '80vw', maxWidth: '900px', height: '80vh', maxHeight: '90vh' }"
+    :breakpoints="{ '960px': '75vw', '640px': '90vw' }"
+    header="房屋資訊"
+    :closable="true"
+    @hide="closeHouseView"
+  >
+    <HouseView :houseId="selectedHouseId" @close="closeHouseView" />
+  </Dialog>
 </template>
 
 <style>
@@ -385,13 +453,25 @@ onMounted(() => {
   height: 76vh;
   position: relative;
 }
-.show-picture{
-  position: relative;
-  width: 400px;
-  height: 400px;
-  border: 1px solid red;
-  background-color: red;
-  z-index: 3;
+.custom-shadow {
+  margin: 0 0 2px 2px;
+  box-shadow: -5px 5px 5px -3px rgba(0, 0, 0, 0.4);
+}
+.card-shadow {
+  box-shadow: -5px 5px 5px -3px rgba(0, 0, 0, 0.4);
+}
+.gm-style-iw-ch {
+    padding: 0px;
+}
+.gm-style .gm-style-iw-c{
+    padding: 0px;
+}
+.gm-style-iw-d{
+    overflow: hidden !important; /* 關閉滾動條 */
+    max-height: none !important; /* 確保內容高度無限制 */
+}
+.gm-style-iw button.gm-ui-hover-effect {
+  display: none !important;
 }
 .drawing-canvas {
   width: 100%;
@@ -431,10 +511,22 @@ onMounted(() => {
     transition: background-color 0.3s ease;
     width: 40px;
 }
-
+.btn-info{
+  background-color: #358bd5; /* purple-500 */
+    color: white;
+    border-radius: 0.5rem; /* 圓角效果 */
+    padding: 3px; /* 增加按鈕內邊距 */
+    border: none; /* 去掉邊框 */
+    transition: background-color 0.3s ease;
+    width: 40px;
+}
 .btn-purple:hover {
     background-color: #5A189A; /* purple-700 */
 }
+.btn-info:hover {
+    background-color: #1749d1; /* purple-700 */
+}
+
 .btn-yellow {
     background-color: #c2cf09; /* purple-500 */
     color: white;

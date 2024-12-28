@@ -101,7 +101,7 @@ function getCardClass(item){
         :key="list.houseid"
         class="col-12 col-md-6 py-4"
       >
-        <div class="card card-shadow clickable-card" 
+        <div class="card card-shadow clickable-card px-2 py-2" 
           style="width: 100%"
           :class="getCardClass(list.paidDate)"
           @click="openHouseView(list.houseid)"

@@ -6,7 +6,6 @@ export const useHouseCard = defineStore('houseCard', {
     actions: {
       updateData(newData) {
         this.shareMarkers = newData; // 更新狀態
-        console.log(JSON.stringify(newData))
       },
     },
   });

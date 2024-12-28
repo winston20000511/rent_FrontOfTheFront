@@ -29,6 +29,7 @@ const emits = defineEmits(['add-marker', 'signInClicked'])
 onMounted(() => {
   document.addEventListener('click', closeSearchList);
   optionStore.initializeData();
+  authStore.isLoggedIn;
   // if (myOffcanvasRef.value) {
   //     offcanvasInstance.value = new Offcanvas(myOffcanvasRef.value);
   // }

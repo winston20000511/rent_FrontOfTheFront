@@ -23,7 +23,7 @@
 export default {
   props: {
     houseId: {
-      type: String,
+      type: Number,
       required: true, // 從父組件傳入的 houseId，確保必填
     },
   },
