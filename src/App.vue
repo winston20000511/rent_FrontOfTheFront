@@ -47,7 +47,7 @@ const addMarker = (locations) => {
   store.updateData(markers.value.searchList);
   router.push({
     name: 'Home',
-    params: { markers: markers.value }
+    params: { markers: markers.value}
   });
 };
 
@@ -83,7 +83,7 @@ const addMarker = (locations) => {
 .app-container {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100%;
 }
 
 .app-header {
@@ -95,11 +95,12 @@ const addMarker = (locations) => {
 }
 
 .app-main {
+  width: 100%;
+  height: 85vh;
   /* flex: 1; */
   /* 填滿剩餘空間 */
-  height: 85vh;
-  display: flex;
-  flex-direction: column;
+  /* display: flex;
+  flex-direction: column; */
 }
 
 .chat-button {
