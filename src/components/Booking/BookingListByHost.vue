@@ -53,7 +53,7 @@
                     <div class="relative inline-block">
 
                         <!-- 主要顯示的姓名 -->
-                        <div v-if="slotProps.data.userStatus === 1" class=" clickable-name "
+                        <div v-if="slotProps.data.userStatus === 1" class="clickable-name "
                             :class="{ 'active': isPopoverVisible(slotProps.data.bookingId) }"
                             @click="togglePopover(slotProps.data.bookingId)">
                             {{ slotProps.data.userName }}
@@ -179,8 +179,7 @@
             </div>
             <template #footer>
 
-                <Button label="關閉" icon="pi pi-times" severity="contrast" @click="processBookingDialog = false"
-                    :loading="loading" />
+                <Button label="關閉" icon="pi pi-times" severity="contrast" @click="processBookingDialog = false" />
             </template>
         </Dialog>
 
@@ -387,14 +386,13 @@ const cancelBooking = async (selectedBooking) => {
             throw new Error(`狀態碼: ${response.status} ; ${response.statusText}`);
         }
         const data = await response.json();
-
         toast.add({ severity: data.status, summary: data.message, life: 4000 });
+
         load();
     }
     catch (error) {
         console.error('載入失敗，原因:', error.message);
     } finally {
-        selectedBooking.value = {}; // 清空所選預約
         cancelBookingDialog.value = false;
         loading.value = false;
     }
@@ -424,23 +422,22 @@ const processBooking = async (selectedBooking, isAgreed) => {
         }
 
         const data = await response.json();
-
         toast.add({ severity: data.status, summary: data.message, life: 4000 });
+
         load();
     }
     catch (error) {
         console.error('載入失敗，原因:', error.message);
     }
     finally {
-        selectedBooking.value = {}; // 清空所選預約
         processBookingDialog.value = false;
         loading.value = false;
     };
 }
 
-const refresh = () => {
-    load();
-    toast.add({ severity: 'success', summary: '資料更新', life: 2000 });
+const refresh = async () => {
+    await load();
+    toast.add({ severity: 'success', summary: '資料已更新', life: 2000 });
 }
 
 // 將預約狀態轉成文字
@@ -559,7 +556,12 @@ watch(selectedHouseId, (newValue) => {
     z-index: 10;
     white-space: nowrap;
     /* 防止文字換行 */
+
+
+    text-align: center !important;
 }
+
+
 
 /** 用戶姓名 CSS */
 .clickable-name {

@@ -16,7 +16,7 @@
         label="傳送訊息" 
         icon="pi pi-comments" 
         class="p-button-outlined p-button-warning" 
-        @click="SendMsgDialog=true" 
+        @click="sendMessage" 
       />
       <Button 
         v-if="!isOwner" 

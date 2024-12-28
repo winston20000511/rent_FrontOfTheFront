@@ -42,15 +42,17 @@ h2 {
 .modal-overlay {
   position: fixed;
   top: 0;
+  bottom: 0;
   left: 0;
   right: 0;
-  bottom: 0;
   background-color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 1200;
+  pointer-events: all;
 }
+
 
 .modal-content {
   background-color: white;
@@ -74,7 +76,7 @@ h2 {
   top: 10px;
   right: 10px;
   font-size: 20px;
-  z-index: 1001;
+  z-index: 1201;
   text-align: start
 }
 </style>
