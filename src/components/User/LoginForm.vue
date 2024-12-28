@@ -56,6 +56,7 @@
 import api from "../../api/api"; // 引入自訂的 Axios API 模組
 import ForgotPassword from "../../components/User/ForgotPassword.vue"; // 引入 ForgotPassword 組件
 import { useAuthStore } from "@/stores/auth"; // 引入 Pinia 的 authStore
+import { useCart } from "@/stores/cartStore";
 
 export default {
   components: {
@@ -85,6 +86,10 @@ export default {
 
         // 後端回傳 JWT token
         const token = response.data.token;
+
+        // 更新 pinia store 中的 token
+        const cartStore = useCart();
+        cartStore.updateToken(token);
 
         // 儲存 token 到 localStorage
         localStorage.setItem("jwt", token);

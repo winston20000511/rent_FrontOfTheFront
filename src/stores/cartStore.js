@@ -2,10 +2,10 @@ import { defineStore } from "pinia";
 
 let token = localStorage.getItem('jwt');
 
-
 export const useCart = defineStore("cart", {
 
   state: () => ({
+    token: localStorage.getItem('jwt'),
     cartId: null,
     cartItems: [],
     couponUsage: [],
@@ -51,6 +51,13 @@ export const useCart = defineStore("cart", {
   },
 
   actions: {
+
+    updateToken(newToken){
+      this.token = newToken;
+      localStorage.setItem("jwt", newToken);  // 更新 localStorage 中的 token
+      console.log("1. Token 已更新: ", newToken);
+    },
+
     // 取得購物車畫面中的完整資料: 購物車內容 + 優惠券數量
     async initializeCart() {
       await this.loadCart();
@@ -61,11 +68,12 @@ export const useCart = defineStore("cart", {
 
     // 載入購物車
     async loadCart() {
+
       try {
         let url = "http://localhost:8080/api/cart/list";
         const response = await fetch(url, {
           method: "POST",
-          headers: { "Content-Type": "application/json", authorization: `${token}` },
+          headers: { "Content-Type": "application/json", authorization: `${this.token}` },
         });
         const data = await response.json();
 
@@ -116,7 +124,7 @@ export const useCart = defineStore("cart", {
           const url = "http://localhost:8080/api/cart/add/item";
           const response = await fetch(url, {
             method: "POST",
-            headers: { "Content-Type": "application/json", authorization: `${token}` },
+            headers: { "Content-Type": "application/json", authorization: `${this.token}` },
             body: JSON.stringify(adId),
           });
           const success = await response.json();
@@ -154,7 +162,7 @@ export const useCart = defineStore("cart", {
           const url = "http://localhost:8080/api/cart/delete/item";
           const response = await fetch(url, {
             method: "DELETE",
-            headers: { "Content-Type": "application/json", authorization: `${token}` },
+            headers: { "Content-Type": "application/json", authorization: `${this.token}` },
             body: JSON.stringify(adId),
           });
           const success = await response.json();
@@ -177,13 +185,14 @@ export const useCart = defineStore("cart", {
     clearCart() {
       this.cartItems = [];
       this.thirdPartry = null;
+      this.cartId = null;
     },
 
     async getCouponNumber() {
       // 前往資料庫撈資料
       const url = "http://localhost:8080/api/cart/coupon";
       const response = await fetch(url, {
-          headers: { "Content-Type": "application/json", authorization: `${token}` },
+          headers: { "Content-Type": "application/json", authorization: `${this.token}` },
       });
       const data = await response.json();
       console.log("coupon ", data);
@@ -231,7 +240,7 @@ export const useCart = defineStore("cart", {
         const url = "http://localhost:8080/api/orders/create";
         const response = await fetch(url, {
           method: "POST",
-          headers: { "Content-Type": "application/json", authorization: `${token}` },
+          headers: { "Content-Type": "application/json", authorization: `${this.token}` },
           body: JSON.stringify(orderData),
         });
 

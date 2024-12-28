@@ -51,6 +51,7 @@ onMounted(async () => {
   cartStore.initializeCart();
   await getAdtypeAndId();
   isLoading.value = false;
+  cartStore.loadCart();
 });
 
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));

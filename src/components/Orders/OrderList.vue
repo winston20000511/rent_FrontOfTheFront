@@ -142,7 +142,6 @@ const cancel = async (merchantTradNo) => {
             class="border-b hover:bg-gray-50"
           >
             <td class="px-4 py-3 text-sm text-gray-700 text-center">
-              {{order}}
               {{ order.merchantTradNo }}
             </td>
             <td class="px-4 py-3 text-sm text-center text-gray-700">
@@ -172,12 +171,10 @@ const cancel = async (merchantTradNo) => {
               <ul>
                 <li v-for="(title, index) in order.houseTitles" :key="index">
                   <button
-                    class="px-3 py-1 text-sm text-blue-600 bg-blue-100 rounded hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                    class="px-3 py-1 text-sm text-gray-600 bg-transparent border-0 underline hover:bg-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
                     @click="checkHouseInfo(order.houseIds[index])"
                   >
-                    {{
-                      title.length > 6 ? title.substring(0, 6) + "..." : title
-                    }}
+                    {{ title.length > 8 ? title.substring(0, 8) + "..." : title }}
                   </button>
                 </li>
               </ul>
@@ -278,5 +275,10 @@ const cancel = async (merchantTradNo) => {
 .dialog-theme .p-dialog {
   width: 80%;
   max-width: 800px;
+}
+
+.table-container {
+  max-height: 24rem;
+  overflow-y: auto;
 }
 </style>

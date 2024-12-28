@@ -2,6 +2,7 @@
 import { ref, computed } from "vue";
 import { useCart } from "@/stores/cartStore";
 import HouseView from "@/View/HouseView.vue";
+import Dialog from "primevue/dialog";
 
 let token = localStorage.getItem("jwt");
 
@@ -28,19 +29,13 @@ const emit = defineEmits([
   "ad-delete-result",
 ]);
 
-// 顯示房屋的 modal
-const showHouseInfo = ref(false);
+const showHouseView = ref(false);
 const selectedHouseId = ref(null);
 
 const checkHouseInfo = (houseId) => {
-  selectedHouseId.value = houseId;
-  showHouseInfo.value = true;
-};
-
-// 關閉 HouseInfo 的方法
-const closeHouseInfo = () => {
-  showHouseInfo.value = false;
-  selectedHouseId.value = null;
+  console.log("house id: ", houseId);
+  selectedHouseId.value = Number(houseId);
+  showHouseView.value = true;
 };
 
 // 處理過的廣告資料
@@ -129,6 +124,11 @@ const deleteAd = async (adId) => {
           messageTitle: "已刪除VIP推播申請",
           message: "",
         });
+
+        cartStore.removeFromCart(adId);
+        console.log("刪除後的cart store items: ", cartStore.cartItems);
+        cartStore.loadCart();
+        
       } else {
         emit("ad-delete-result", {
           success: false,
@@ -222,10 +222,10 @@ const checkAd = async (adId) => {
           >
             <td class="px-4 py-3 text-sm text-gray-700 text-center">
               <button
-                class="px-3 py-1 text-sm text-blue-600 bg-blue-100 rounded hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                class="px-3 py-1 text-sm text-gray-600 bg-transparent border-0 underline hover:bg-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
                 @click="checkHouseInfo(ad.houseId)"
               >
-              {{ ad.houseTitle }}
+              {{ ad.houseTitle > 8 ? title.substring(0, 8) + "..." : ad.houseTitle }}
               </button>
             </td>
             <td class="px-4 py-3 text-sm text-center text-gray-700">
@@ -274,11 +274,20 @@ const checkAd = async (adId) => {
       </table>
     </div>
 
-    <div v-if="showHouseInfo">
-      <HouseView :houseId="selectedHouseId" @close="closeHouseInfo" />
-    </div>
-
   </div>
+
+    <!-- 房屋資訊彈窗 -->
+    <Dialog
+    v-model:visible="showHouseView"
+    :modal="true"
+    :dismissableMask="true"
+    header="查看房屋資訊"
+    class="dialog-theme"
+  >
+    <div class="dialog-container">
+      <HouseView :houseId="selectedHouseId" @close="showHouseView = false" />
+    </div>
+  </Dialog>
 </template>
 
 <style scoped>
