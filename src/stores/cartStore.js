@@ -2,10 +2,10 @@ import { defineStore } from "pinia";
 
 let token = localStorage.getItem('jwt');
 
-
 export const useCart = defineStore("cart", {
 
   state: () => ({
+    token: localStorage.getItem('jwt'),
     cartId: null,
     cartItems: [],
     couponUsage: [],
@@ -51,6 +51,22 @@ export const useCart = defineStore("cart", {
   },
 
   actions: {
+
+    updateToken(newToken){
+      this.token = newToken;
+      localStorage.setItem("jwt", newToken);  // 更新 localStorage 中的 token
+      console.log("Token 已更新: ", newToken);
+    },
+
+    initStorageListener(){
+      window.addEventListener("storage", (event) => {
+        if (event.key === "jwt") {
+          this.token = localStorage.getItem("jwt");
+          console.log("Token 已更新: ", this.token);
+        }
+      });
+    },
+
     // 取得購物車畫面中的完整資料: 購物車內容 + 優惠券數量
     async initializeCart() {
       await this.loadCart();
@@ -61,11 +77,14 @@ export const useCart = defineStore("cart", {
 
     // 載入購物車
     async loadCart() {
+
+      console.log("pinia loadCart中的token: ", this.token)
+
       try {
         let url = "http://localhost:8080/api/cart/list";
         const response = await fetch(url, {
           method: "POST",
-          headers: { "Content-Type": "application/json", authorization: `${token}` },
+          headers: { "Content-Type": "application/json", authorization: `${this.token}` },
         });
         const data = await response.json();
 
