@@ -38,14 +38,14 @@
       </div>
       <div class="mb-3">
         <label for="registerPhone" class="form-label">手機號碼</label><div></div>
-        <small class="form-text">手機格式須為09xx-xxx-xxx</small>
+        <small class="form-text">手機格式須為0912345678</small>
         <input
           type="tel"
           class="form-control"
           id="registerPhone"
           v-model="phone"
           placeholder="請輸入手機號碼"
-          pattern="^09\d{2}-\d{3}-\d{3}$"
+          pattern="^09\d{8}$"
           required
            @input="validatePhone"
         />
@@ -96,9 +96,14 @@
 </template>
 
 <script>
+import { useRouter } from "vue-router";
 import api from "../../api/api"; // 引入包含請求攔截器的 Axios API 模組
 
+
 export default {
+  setup() {
+    const router = useRouter();
+    return { router };},
   data() {
     return {
       name: "",
@@ -114,7 +119,7 @@ export default {
   methods: {
     // 手機號碼格式驗證方法
     validatePhone() {
-      const phonePattern = /^09\d{2}-\d{3}-\d{3}$/; // 手機格式正規表達式
+      const phonePattern = /^09\d{8}$/; // 手機格式正規表達式
       this.isPhoneValid = phonePattern.test(this.phone); // 驗證結果
     },
 
@@ -140,7 +145,6 @@ export default {
           gender: this.gender,
         });
 
-        debugger;
         // 註冊成功後，發送驗證信
         await this.sendVerificationEmail();
 
@@ -163,10 +167,17 @@ export default {
 
         console.log("驗證信已發送至您的電子信箱！");
       } catch (error) {
-        console.error("發送驗證信失敗", error);
-        this.errorMessage =
-          error.response?.data?.message || "發送驗證信失敗，請稍後再試。";
-      }
+  console.error("完整的錯誤對象：", error);
+  if (error.response) {
+    // 處理後端返回的錯誤
+    console.error("後端響應：", error.response.data);
+    this.errorMessage = error.response.data.message || "發生未知錯誤，請稍後再試。";
+  } else {
+    // 處理其他錯誤（如網路問題）
+    this.errorMessage = "無法連接到伺服器，請稍後再試。";
+  }
+}
+
     },
   },
 };

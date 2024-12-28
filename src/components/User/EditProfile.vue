@@ -54,7 +54,7 @@
 
                 <div class="mb-3">
                   <label for="phone" class="form-label">手機</label><div></div>
-                  <small class="form-text">手機格式須為09xx-xxx-xxx</small>
+                  <small class="form-text">手機格式須為0912345678</small>
                   <input
                     type="text"
                     class="form-control"
@@ -216,6 +216,7 @@ export default {
       api
         .put("http://localhost:8080/api/user/update", this.user) // 更新會員資料的 API
         .then(() => {
+        console.log(this.user) 
           alert("會員資料更新成功！");
         })
         .catch((error) => {
