@@ -115,9 +115,9 @@ async function addAd(houseId, adtypeId) {
           <tr class="bg-green-400 text-white text-center">
             <th class="px-4 py-3 font-semibold">房屋標題</th>
             <th class="px-4 py-3 font-semibold">查看房屋</th>
-            <th class="px-4 py-3 font-semibold">廣告方案</th>
-            <th class="px-4 py-3 font-semibold">廣告價格</th>
-            <th class="px-4 py-3 font-semibold">新增廣告</th>
+            <th class="px-4 py-3 font-semibold">VIP方案</th>
+            <th class="px-4 py-3 font-semibold">方案價格</th>
+            <th class="px-4 py-3 font-semibold">申請新增服務</th>
           </tr>
         </thead>
         <tbody>

@@ -84,7 +84,7 @@ const onPageNumberChange = async (page) => {
 };
 
 const handleOrderCancelResult = (result) => {
-  console.log("取消結果: ", result);
+  // console.log("取消結果: ", result);
 
   showOverlay.value = true;
   messageTitle.value = result.messageTitle;

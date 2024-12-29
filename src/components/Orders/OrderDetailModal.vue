@@ -13,7 +13,6 @@ const closeDetail = () => {
 };
 
 function checkIfCouponUsed(ad, price){
-  console.log("ad: ", ad, " price: ", price);
   if(ad){
     const discount = Math.floor(price*0.1);
     return discount;

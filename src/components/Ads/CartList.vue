@@ -7,6 +7,7 @@ const emit = defineEmits(["toggle-cart"]);
 
 const selectedThirdParty = ref("linepay");
 const cartStore = useCart();
+
 cartStore.choosePayment = "linepay"; // 預設linepay
 
 // 優惠券
@@ -43,7 +44,6 @@ function removeFromCart(adId) {
 
 function handlePaymentMethodSelection(event){
   cartStore.choosePayment = event.target.dataset.value;
-  console.log("cartStore.choosePayment:", cartStore.choosePayment);
 }
 
 // 前往結帳
@@ -117,7 +117,7 @@ const discountAmount = computed(() => {
             <div>
               <p class="text-sm font-bold">編號：{{ cartItem.adId }}</p>
               <p class="text-sm">
-                方案：{{ cartItem.adtypeId }} &nbsp; X &nbsp; NTD
+                方案：{{ cartItem.adName }} &nbsp; X &nbsp; NTD
                 {{ cartItem.adPrice }}
               </p>
 
@@ -155,8 +155,8 @@ const discountAmount = computed(() => {
             v-show="expandedIndex === index"
             class="mt-2 bg-gray-50 p-3 border-t text-sm text-gray-600"
           >
-            <p>房屋編號：{{ "天數" }}</p>
-            <p>推播時長：{{ "天數" }}</p>
+            <p>房屋標題：{{ cartItem.houseTitle }}</p>
+            <p>推播時長：{{ cartItem.adName }}</p>
           </div>
         </div>
       </div>

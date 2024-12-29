@@ -20,7 +20,6 @@
     methods: {
         addAd(){
             this.$emit("click-create-btn");
-            console.log("addAd 方法被觸發");
             this.$router.push({ path: '/member-center/my-advertisements' })
             .catch(err => {
                 console.error("導航錯誤: ", err);
