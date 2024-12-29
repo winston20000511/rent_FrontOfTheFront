@@ -6,7 +6,7 @@ import ForgotPassword from "@/components/User/ForgotPassword.vue";
 import LoginForm from "@/components/User/LoginForm.vue";
 import MyOrders from "@/components/Orders/MyOrders.vue";
 import OrderConfirmView from "@/View/OrderConfirmView.vue";
-import AdtypeView from "@/View/AdtypeView.vue";
+
 import OrderCompleteView from "@/View/OrderCompleteView.vue";
 import EditProfile from "@/components/User/EditProfile.vue";
 import Houselist from "@/components/houses/houselist.vue";
@@ -98,11 +98,6 @@ const routes = [
     path: "/login", // 登入頁面
     name: "LoginForm",
     component: LoginForm,
-  },
-  {
-    path: '/adtype',
-    name: 'AdTypes',
-    component: AdtypeView,
   },
   {
     path: "/order-confirm",

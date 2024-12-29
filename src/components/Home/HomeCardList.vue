@@ -4,13 +4,18 @@ import Dialog from "primevue/dialog";
 import HouseView from "@/View/HouseView.vue";
 import HousePhotos from "../houses/housePhotos.vue";
 import { onMounted } from "vue";
+import { useHouseCard } from "@/stores/CardHouseStore";
 
 const props = defineProps({
   markers: {
     type: Object,
     required: true,
   },
-});
+  ads: {
+    type: Object,
+    required: true,
+  }
+  },);
 onMounted(() => {
   if (props.markers?.searchList?.length > 0) {
     const houseIds = props.markers.searchList.map((house) => house.houseid); // 提取所有 houseId
@@ -19,6 +24,7 @@ onMounted(() => {
     console.error("No markers or searchList provided");
   }
 });
+const store = useHouseCard();
 const showView = ref(false);
 const selectedHouseId = ref(null);
 const clickCounts = ref({}); // 儲存每個房屋的點擊數
@@ -106,10 +112,11 @@ function getCardClass(item) {
   const targetDate = new Date(dateSpec);
 
   if (sourceDate > targetDate) {
-    return "col-12 col-md-6 py-4 bg-info bg-opacity-25 text-white p-3";
+    return "bg-info bg-opacity-25 text-white"
   } else {
-    return "col-12 col-md-6 py-4 ";
+    return ""
   }
+
 }
 </script>
 
@@ -120,16 +127,18 @@ function getCardClass(item) {
       <div
         v-for="list in markers.searchList"
         :key="list.houseid"
-        :class="getCardClass(list.paidDate)"
+        class="col-12 col-md-6 py-4"
       >
         <div
-          class="card card-shadow clickable-card"
+          class="card card-shadow clickable-card px-2 py-2"
           style="width: 100%"
+          :class="getCardClass(list.paidDate)"
           @click="openHouseView(list.houseid)"
         >
           <!-- 房屋照片 -->
           <HousePhotos :houseId="list.houseid" @click.stop />
           <div class="card-body">
+            <p class="card-text" style="font-size: 20px; font-weight: bold; color: black;">{{ list.houseTitle }}</p>
             <p class="card-text">NT${{ list.price }}</p>
             <p class="card-text">{{ list.address }}</p>
             <!-- 點擊數顯示 -->
