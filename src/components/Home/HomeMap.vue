@@ -198,7 +198,7 @@ onMounted(() => {
     //   });
 
       map.value.panTo(latlng);
-      // map.value.setZoom(14);
+      map.value.setZoom(14);
       // mapMarkers.value.push(mapMark);
   });
 
