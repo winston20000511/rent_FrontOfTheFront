@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from "vue";
+import { computed } from "vue";
 import { useCart } from "@/stores/cartStore";
 import HouseView from "@/View/HouseView.vue";
 import Dialog from "primevue/dialog";
@@ -271,7 +271,6 @@ const checkAd = async (adId) => {
         </tbody>
       </table>
     </div>
-
   </div>
 
     <!-- 房屋資訊彈窗 -->

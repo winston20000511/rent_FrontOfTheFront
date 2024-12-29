@@ -55,10 +55,10 @@ const addMarker = (locations) => {
 
 <template>
   <div class="app-container">
-
+  
     <!-- 全局導航欄 -->
     <header class="app-header">
-      <HomeNavbar @signInClicked="toggleLoginPage" @add-marker="addMarker" />
+      <HomeNavbar @signInClicked="toggleLoginPage" @add-marker="addMarker"/>
     </header>
 
     <!-- 主內容 -->
@@ -68,7 +68,7 @@ const addMarker = (locations) => {
 
     <!-- 聊天彈窗和按鈕 -->
     <div>
-      <ChatPopup v-if="showChatPopup" class="chat-popup" @close="toggleChatPopup" />
+      <ChatPopup v-if="showChatPopup" @close="toggleChatPopup" />
       <button v-if="showChatApp" class="chat-button" @click="toggleChatPopup">
         <i class="bi bi-chat-dots-fill"></i>
       </button>
