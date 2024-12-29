@@ -84,10 +84,9 @@ const enterSearchBtn = (event) => {
 const showKeyWordFetch = async () => {
 
   const input = {
-    origin: searchInputRef.value.value,
-    priority: optionStore.shareOptions.priority,
-    sort: optionStore.shareOptions.sort,
+    address: searchInputRef.value.value,
   };
+  const merge = Object.assign({},input,optionStore.shareOptions)
 
   const response = await fetch(keywordUrl, {
     method: 'POST',
@@ -95,7 +94,7 @@ const showKeyWordFetch = async () => {
       'Content-Type': 'application/json',
       authorization: `${token}`,
     },
-    body: JSON.stringify(input),
+    body: JSON.stringify(merge),
   });
 
   if (!response.ok) {
@@ -103,7 +102,12 @@ const showKeyWordFetch = async () => {
   }
 
   const data = await response.json();
+  if (data.length == 1){
+    searchInputRef.value.value = data[0].address
+  }
+  
   showLKeyWrodList(data);
+
 };
 
 const showLKeyWrodList = (data) => {
@@ -331,7 +335,7 @@ const handleSignInClick = () => {
 
 .searchList {
   background-color: red;
-  /* display: block; */
+  display: none;
   z-index: 100;
   list-style-type: none;
   padding: 0;
