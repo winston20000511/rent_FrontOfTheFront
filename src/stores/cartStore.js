@@ -34,8 +34,10 @@ export const useCart = defineStore("cart", {
         },
         { totalPrice: 0, discountAmount: 0 }
       );
+      console.log("discount: ", discountAmount);
       return { totalPrice, discountAmount };
     },
+
 
     generateProductNames(state) {
       return state.cartItems.map((item) => item.adName).join(",");

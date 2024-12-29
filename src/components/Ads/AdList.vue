@@ -199,7 +199,7 @@ const checkAd = async (adId) => {
               發布時間
             </th>
             <th class="px-4 py-2 text-center text-sm font-medium text-gray-600">
-              廣告狀態
+              VIP服務狀態
             </th>
             <th class="px-4 py-2 text-center text-sm font-medium text-gray-600">
               付款狀態
