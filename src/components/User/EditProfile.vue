@@ -54,7 +54,7 @@
 
                 <div class="mb-3">
                   <label for="phone" class="form-label">手機</label><div></div>
-                  <small class="form-text">手機格式須為09xx-xxx-xxx</small>
+                  <small class="form-text">手機格式須為0912345678</small>
                   <input
                     type="text"
                     class="form-control"
@@ -64,7 +64,7 @@
                 </div>
 
                 <div class="mb-3">
-                  <label for="picture" class="form-label">大頭貼</label>
+                  <!-- <label for="picture" class="form-label">大頭貼</label>
                   <input
                     type="file"
                     class="form-control"
@@ -77,7 +77,13 @@
                     alt="Profile Picture"
                     class="img-thumbnail mt-3"
                     width="100"
-                  />
+                  /> -->
+                  <label for="profileImage">頭像圖片:</label>
+                  <input type="file" id="profileImage" @change="handleImageUpload" accept="image/*" />
+                  <div v-if="previewImage">
+                    <p>預覽圖片:</p>
+                    <img :src="previewImage" alt="Profile Preview" style="max-width: 200px;" />
+                  </div>
                 </div>
 
                 <div class="mb-3">
@@ -184,12 +190,13 @@ export default {
         email: "",
         password: "",
         phone: "",
-        picture: "",
+        imageBase64: "",
         createTime: "",
         gender: null,
         coupon: 3,
         status: null,
       },
+      previewImage : null,
     };
   },
   created() {
@@ -212,20 +219,45 @@ export default {
   },
   methods: {
     // 2. 使用 PUT 請求更新會員資料
-    updateUser() {
-      api
-        .put("http://localhost:8080/api/user/update", this.user) // 更新會員資料的 API
-        .then(() => {
-          alert("會員資料更新成功！");
-        })
-        .catch((error) => {
-          console.error("更新會員資料失敗", error);
-          alert("更新失敗，請檢查輸入內容！");
-        });
+    async submitForm() {
+      try {
+        const response = await api.put("http://localhost:8080/api/user/update", this.user);
+        if (!response || response.status !== 200) {
+          throw new Error("資料更新失敗");
+        }
+        alert("資料已成功更新！");
+        console.log(response.data);
+      } catch (error) {
+        console.error("資料更新錯誤", error);
+        alert("發生錯誤，請稍後再試！");
+      }
     },
+    // updateUser() {
+    //   api
+    //     .put("http://localhost:8080/api/user/update", this.user) // 更新會員資料的 API
+    //     .then(() => {
+    //     console.log(this.user) 
+    //       alert("會員資料更新成功！");
+    //     })
+    //     .catch((error) => {
+    //       console.error("更新會員資料失敗", error);
+    //       alert("更新失敗，請檢查輸入內容！");
+    //     });
+    // },
    // 3. 提交表單
-   submitForm() {
-      this.updateUser();
+  //  submitForm() {
+  //     this.updateUser();
+  //   },
+    handleImageUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          this.user.imageBase64 = e.target.result; // 將圖片 Base64 賦值到 user
+          this.previewImage = e.target.result; // 更新圖片預覽
+        };
+        reader.readAsDataURL(file); // 將文件讀取為 Base64
+      }
     },
   },
 };
