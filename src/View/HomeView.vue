@@ -1,13 +1,11 @@
 <script setup>
-import { ref, toRef } from 'vue';
+import { onMounted, ref, toRef } from 'vue';
 import HomeCardList from '@/components/Home/HomeCardList.vue';
-import HomeFilter from '@/components/Home/HomeFilter.vue';
 import HomeMap from '@/components/Home/HomeMap.vue';
-import { useHouseCard } from '@/stores/CardHouseStore';
 import HomeOption from '@/components/Home/HomeOption.vue';
 
-
-const store = useHouseCard();
+let adsUrl = 'http://localhost:8080/api/ads'
+let token = localStorage.getItem('jwt');
 const props = defineProps({
   markers: Object
 });
@@ -18,10 +16,13 @@ const cardFrontRef = ref(null)
 const cardBackRef = ref(null)
 const options = ref({})
 
-const updateMarker = (locations) => {
-  // markers.value = locations;
-  // store.updateData(markers.value.searchList);
-  emits('add-marker',locations)
+onMounted(()=>{
+  showAdsMarker();
+})
+
+
+const updateMarker = (locations,status) => {
+  emits('add-marker',locations,status)
 };
 
 const updateFlipped = () =>{
@@ -36,6 +37,25 @@ const updateFlipped = () =>{
 }
 const updateOption = (userOptions)=>{
   options.value = userOptions
+}
+
+const showAdsMarker = async () => {
+  const response = await fetch(adsUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'authorization': `${token}`
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error('Network response was not ok')
+  }
+
+  const data = await response.json();
+  console.log(data);
+  updateMarker(data,0);
+
 }
 
 </script>
