@@ -26,11 +26,11 @@
                 this.showInputBox = this.selectedFilterType !== "none";
                 this.$emit("filter-change", "inputcondition", this.selectedFilterType);
             },
-        },
-        watch: {
-            userInput(newInput) {
-                this.$emit("input-update", newInput); // 傳遞輸入的值到父組件
-            },
+
+            onInputEnterClick(){
+                console.log("輸入的值: ", this.userInput);
+                this.$emit("input-update", this.userInput);
+            }
         },
     };
 </script>
@@ -57,9 +57,9 @@
                     class="ml-2 px-3 py-2 text-sm border border-gray-300 rounded-lg" 
                     v-model="userInput" 
                     :placeholder="placeholder" 
+                    @keypress.enter="onInputEnterClick"
                 />
             </label>
         </div>
     </div>
 </template>
-

@@ -54,7 +54,7 @@ onMounted(async () => {
   cartStore.loadCart();
 });
 
-const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // 篩選條件變更
 const changeFilter = (filterName, filterValue) => {
@@ -83,7 +83,7 @@ const filterAds = async () => {
     });
     const data = await response.json();
     // console.log("篩選廣告結果: ", data);
-    
+
     const { content, totalPages: total } = data;
     ads.value = content;
     totalPages.value = total;
@@ -101,13 +101,18 @@ const filterAds = async () => {
     }
 
     await delay(200);
-    
   } catch (error) {
     console.error("發送請求時發生錯誤: ", error);
   } finally {
     isLoading.value = false;
   }
 };
+
+async function searchByTitle() {
+  filters.value.page = 1;
+  currentPage.value = 1;
+  await filterAds();
+}
 
 // 換頁
 const onPageNumberChange = async (page) => {
@@ -254,7 +259,7 @@ watch(
 
   <div class="flex flex-wrap items-center space-x-6 mt-4 mb-6 px-6">
     <div class="flex items-center space-x-6 flex-grow">
-      <AdUserInputFilter v-model="filters.housetitle" />
+      <AdUserInputFilter v-model="filters.housetitle" @search="searchByTitle" />
     </div>
 
     <div class="flex items-center justify-end w-full sm:w-auto">
