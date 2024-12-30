@@ -12,14 +12,23 @@ const closeDetail = () => {
   emit("close-detail");
 };
 
-function checkIfCouponUsed(ad, price){
+function calculateDiscount(ad, price){
   if(ad){
-    const discount = Math.floor(price*0.1);
+    const discount =  price - Math.floor(price*0.9);
     return discount;
   }else{
     return "";
   };
 };
+
+function calculateDiscountedPrice(ad, price){
+  if(ad){
+    const discountedPrice = Math.floor(price*0.9);
+    return discountedPrice;
+  }else{
+    return price;
+  }
+}
 
 </script>
 
@@ -83,14 +92,14 @@ function checkIfCouponUsed(ad, price){
                   {{ detail.adtypes[index].substring(0,2) }}天
                 </td>
                 <td class="px-4 py-2 text-center">
-                  {{ detail.adtypesPrices[index] }}
+                  {{ detail.adPrices[index] }}
                 </td>
                 <td class="px-4 py-2 text-center">
                   {{ detail.houseTitles[index] }}
                 </td>
-                <td class="px-4 py-2 text-center"> {{checkIfCouponUsed(detail.coupons[index], detail.adtypesPrices[index])}} </td>
+                <td class="px-4 py-2 text-center"> {{calculateDiscount(detail.coupons[index], detail.adPrices[index])}} </td>
                 <td class="px-4 py-2 text-center">
-                  {{ detail.prices[index] }}
+                  {{ calculateDiscountedPrice(detail.coupons[index], detail.adPrices[index]) }}
                 </td>
               </tr>
               <tr>
