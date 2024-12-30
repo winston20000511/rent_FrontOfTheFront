@@ -1,59 +1,63 @@
 <template>
   <div>
-    <!-- 加載狀態 -->
     <div v-if="loading" class="loading">加載中...</div>
-
-    <!-- 錯誤提示 -->
-    <div v-if="error" class="error">
+    <div v-else-if="error" class="error">
       {{ error.message }}
       <button @click="fetchHousePhotos" class="retry-button">重試</button>
     </div>
+    <div v-else>
+      <!-- 如果有圖片 -->
+      <div v-if="photos.length > 0">
+        <Splide :options="splideOptions" class="splide-container">
+          <template #arrows>
+            <button class="splide__arrow splide__arrow--prev">
 
-    <!-- 照片輪播 -->
-    <div v-if="!loading && !error && photos.length > 0">
-      <Splide
-        :options="splideOptions"
-        class="splide-container"
-        @arrows-mounted="addLoopArrows"
-      >
-        <SplideSlide v-for="(photo, index) in photos" :key="index">
-          <img
-            :src="`data:image/jpeg;base64,${photo}`"
-            alt="房屋圖片"
-            class="main-photo"
-            @click="openPhoto(photo)"
-          />
-        </SplideSlide>
-      </Splide>
-    </div>
+              <svg viewBox="0 0 24 24">
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
+            </button>
+            <button class="splide__arrow splide__arrow--next">
 
-    <!-- 沒有照片的提示 -->
-    <div v-if="!loading && !error && photos.length === 0" class="no-photos">
-      <img src="../../assets/no-image.png" alt="暫時無照片展示" />
-    </div>
+              <svg viewBox="0 0 24 24">
+                <path d="M9 6l6 6-6 6" />
+              </svg>
+            </button>
+          </template>
+          <SplideSlide v-for="(photo, index) in photos" :key="photo.id">
+            <img
+              :src="`data:image/jpeg;base64,${photo.base64}`"
+              alt="房屋圖片"
+              class="main-photo"
+              @click="openImageModal(photo)"
+            />
+          </SplideSlide>
+        </Splide>
+      </div>
 
-    <!-- 模態框：放大顯示圖片 -->
-    <div v-if="showModal" class="modal" @click="closeModal">
-      <div class="modal-content">
-        <img
-          :src="`data:image/jpeg;base64,${selectedPhoto}`"
-          alt="放大圖片"
-          class="enlarged-photo"
-        />
+      <!-- 如果沒圖片 -->
+      <div v-else class="no-photos">
+        <img src="../../assets/no-image.png" alt="暫時無照片展示" />
       </div>
     </div>
+
+    <!-- 圖片模態框 -->
+    <Dialog v-model:visible="isModalVisible" header="圖片查看" :modal="true" :style="{ width: '80vw' }">
+      <img :src="selectedPhotoSrc" alt="選中圖片" style="width: 100%;" />
+    </Dialog>
   </div>
 </template>
 
 <script>
 import { Splide, SplideSlide } from '@splidejs/vue-splide';
 import '@splidejs/splide/dist/css/splide.min.css';
+import Dialog from 'primevue/dialog'; // 引入 Dialog 组件
 
 export default {
   name: "HousePhotos",
   components: {
     Splide,
     SplideSlide,
+    Dialog,
   },
   props: {
     houseId: {
@@ -67,19 +71,21 @@ export default {
   },
   data() {
     return {
-      photos: [], // 照片列表
-      loading: true, // 是否加載中
-      error: null, // 錯誤信息
-      showModal: false, // 是否顯示模態框
-      selectedPhoto: null, // 當前選擇的照片
+      photos: [],   // 改成 [{ id: "101", base64: "xxx"}, ...]
+      loading: true,
+      error: null,
       splideOptions: {
-        type: "loop", // 啟用循環播放
+        type: "fade-loop",
         perPage: 1,
-        focus: "center",
-        gap: "1rem",
-        padding: { left: "5rem", right: "5rem" },
+        focus: "start", 
+        gap: "1em",
+        padding: { left: "50px", right: "50px" },
         pagination: true,
+        arrows: true,
+        start: 0, // 確保從第一張開始
       },
+      isModalVisible: false, 
+      selectedPhotoSrc: '', 
     };
   },
   methods: {
@@ -92,20 +98,15 @@ export default {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `${token}`,
+            Authorization: token,
           },
         });
-
         if (!response.ok) {
           throw new Error(`HTTP 錯誤！狀態碼：${response.status}`);
         }
-
-        const responseBody = await response.text();
-        if (responseBody) {
-          this.photos = JSON.parse(responseBody) || [];
-        } else {
-          this.photos = [];
-        }
+        const responseBody = await response.json(); 
+        // 假設後端回傳: [ { id:"101", base64:"..." }, ... ]
+        this.photos = Array.isArray(responseBody) ? responseBody : [];
       } catch (err) {
         console.error("獲取房屋照片時發生錯誤：", err);
         this.error = err;
@@ -114,13 +115,9 @@ export default {
         this.loading = false;
       }
     },
-    openPhoto(photo) {
-      this.selectedPhoto = photo;
-      this.showModal = true;
-    },
-    closeModal() {
-      this.showModal = false;
-      this.selectedPhoto = null;
+    openImageModal(photo) {
+      this.selectedPhotoSrc = `data:image/jpeg;base64,${photo.base64}`;
+      this.isModalVisible = true;
     },
   },
   watch: {
@@ -138,13 +135,11 @@ export default {
   font-size: 1.2rem;
   color: #555;
 }
-
 .error {
   text-align: center;
   color: red;
   font-size: 1.2rem;
 }
-
 .retry-button {
   background-color: #007bff;
   color: white;
@@ -154,30 +149,62 @@ export default {
   border-radius: 4px;
   margin-top: 10px;
 }
-
 .retry-button:hover {
   background-color: #0056b3;
 }
-
 .no-photos {
   text-align: center;
   color: #777;
   font-size: 1.2rem;
 }
-
 .main-photo {
   display: block;
   margin: 0 auto;
-  width: auto;
-  height: 300px; /* 恢復圖片原高度 */
+  max-width: 100%; /* 調整為 100% 以適應容器 */
+  max-height: 500px;
+  object-fit: contain;
   border: 1px solid #ddd;
   border-radius: 8px;
+  transition: transform 0.3s ease;
   cursor: pointer;
+}
+.main-photo:hover {
+  transform: scale(1.05);
 }
 
 .splide-container {
-  background-color: #f5deb3;
+  width: 100%; /* 確保容器佔滿父元素的寬度 */
   padding: 1rem;
+}
+
+.splide__arrow {
+  background: none;
+  border: none;
+  cursor: pointer;
+  width: 40px;
+  height: 40px;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+}
+
+.splide__arrow svg {
+  fill: #ff9800; /* 箭頭颜色 */
+  width: 100%;
+  height: 100%;
+}
+
+.splide__arrow--prev {
+  left: 10px;
+}
+
+.splide__arrow--next {
+  right: 10px;
+}
+
+.splide__arrow:hover svg {
+  fill: #e68900;
 }
 
 .splide__pagination {
@@ -195,28 +222,16 @@ export default {
   background-color: red;
 }
 
-.modal {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.9);
-  z-index: 1000;
-  cursor: pointer;
+/* 响应式样式 */
+@media (max-width: 1200px) {
+  .main-photo {
+    max-width: 80%;
+  }
 }
-
-.modal-content {
-  max-width: 90%;
-  max-height: 90%;
-}
-
-.enlarged-photo {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+@media (max-width: 768px) {
+  .main-photo {
+    max-width: 70%;
+    max-height: 300px;
+  }
 }
 </style>

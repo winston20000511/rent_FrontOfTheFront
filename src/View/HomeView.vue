@@ -1,71 +1,98 @@
 <script setup>
-import { ref } from 'vue';
+import { onMounted, ref, toRef } from 'vue';
 import HomeCardList from '@/components/Home/HomeCardList.vue';
-import HomeFilter from '@/components/Home/HomeFilter.vue';
 import HomeMap from '@/components/Home/HomeMap.vue';
-import HomeNavbar from '@/components/Home/HomeNavbar.vue';
-import LoginPage from '@/components/User/LoginPage.vue'; // 新增 LoginPage 引入
-import { useHouseCard } from '@/stores/CardHouseStore';
+import HomeOption from '@/components/Home/HomeOption.vue';
 
-  const store = useHouseCard();
-  const markers = ref({});
+let adsUrl = 'http://localhost:8080/api/ads'
+let token = localStorage.getItem('jwt');
+const props = defineProps({
+  markers: Object
+});
+const emits = defineEmits(['add-marker'])
+const markers = toRef(props,'markers')
+const flipped = ref(false);
+const cardFrontRef = ref(null)
+const cardBackRef = ref(null)
+const options = ref({})
 
-  const addMarker = (locations)=>{
-    markers.value = locations
-    store.updateData(markers.value.searchList)
+onMounted(()=>{
+  showAdsMarker();
+})
+
+
+const updateMarker = (locations,status) => {
+  emits('add-marker',locations,status)
+};
+
+const updateFlipped = () =>{
+  flipped.value = !flipped.value;
+  if (flipped.value){
+    cardFrontRef.value.style.backfaceVisibility='hidden';
+    cardBackRef.value.style.backfaceVisibility='visible'
+  }else{
+    cardFrontRef.value.style.backfaceVisibility='visible';
+    cardBackRef.value.style.backfaceVisibility='hidden'
+  }
+}
+const updateOption = (userOptions)=>{
+  options.value = userOptions
+}
+
+const showAdsMarker = async () => {
+  const response = await fetch(adsUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'authorization': `${token}`
+    },
+  });
+
+  if (!response.ok) {
+    throw new Error('Network response was not ok')
   }
 
-// 控制 LoginPage 的顯示狀態
-const showLoginPage = ref(false);
+  const data = await response.json();
+  console.log(data);
+  updateMarker(data,0);
 
-// 切換 LoginPage 的顯示狀態
-const toggleLoginPage = () => {
-  showLoginPage.value = !showLoginPage.value;
-};
+}
+
 </script>
 
 <template>
-  <header>
-    <!-- 傳遞 signInClicked 事件給 HomeNavbar -->
-    <HomeNavbar @signInClicked="toggleLoginPage"></HomeNavbar>
-  </header>
-
-  <div class="filter">
+  <!-- <div class="filter">
     <HomeFilter @add-marker="addMarker"></HomeFilter>
-  </div>
+  </div> -->
 
-    <main>
-      <div class="main-left">
-        <!-- <HomeMap :markers="markers"></HomeMap> -->
-        <HomeMap @add-marker="addMarker" :markers="markers"></HomeMap>
+  <main>
+    <!-- <button @click="flipped = !flipped">翻轉卡片</button> -->
+    <div class="main-left" :class="{ flipped: flipped }">
+      <div class="card">
+        <div class="card-front" ref="cardFrontRef">
+          <HomeMap @update-marker="updateMarker" @update-flipped="updateFlipped" :markers="markers"></HomeMap>
+        </div>
+        <div class="card-back" ref="cardBackRef">
+          <HomeOption @update-flipped="updateFlipped" @update-option="updateOption"></HomeOption>
+        </div>
       </div>
-      <div class="main-right">
-        <HomeCardList :markers="markers"></HomeCardList>
-      </div>
-    </main>
+    </div>
+    <div class="main-right">
+      <HomeCardList :markers="markers"></HomeCardList>
+    </div>
+  </main>
 
-  <!-- 控制 LoginPage 的顯示 -->
-  <LoginPage v-if="showLoginPage" @closeLoginPage="toggleLoginPage" />
-
-  <!-- 子路由內容 -->
-  <!-- <router-view></router-view> -->
 
 </template>
 
 <style scoped>
-header {
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-  height: 14vh;
-  border-bottom: 1px solid lightgray;
-}
-.filter {
+/* .filter {
   display: flex;
   width: 100%;
   height: 10vh;
   border-bottom: 1px solid lightgray;
-}
+} */
+
 main {
   position: relative;
   width: 100%;
@@ -73,15 +100,62 @@ main {
   display: flex;
   background-color: rgb(235, 235, 235);
 }
+
 .main-left {
   position: relative;
   width: 45%;
   z-index: 1;
 }
+.card {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.6s;
+}
+
+.main-left.flipped .card {
+  transform: rotateY(180deg);
+}
+
+.card-front{
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  /* display: flex;
+  justify-content: center;
+  align-items: center; */
+  /* font-size: 20px; */
+  /* color: #fff; */
+  border-radius: 8px;
+}
+
+.card-front {
+  /* background-color: #007bff; */
+}
+
+.card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+  /* display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 20px; */
+  /* color: #fff; */
+  border-radius: 8px;
+  /* background-color: white; */
+  transform: rotateY(180deg);
+}
+
+
 .main-right {
   width: 55%;
   overflow-y: auto;
   overflow-x: hidden;
   z-index: 2;
 }
+
 </style>

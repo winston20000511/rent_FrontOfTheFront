@@ -17,7 +17,7 @@ export default {
 };
 </script>
 
-<template lang="">
+<template>
 
     <div class="flex items-center">
         <label for="payment-date-filter" class="text-sm font-medium text-gray-600">

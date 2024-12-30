@@ -1,6 +1,7 @@
 <script setup>
-import axios from "axios";
-import { ref, watch } from "vue";
+import { ref, watch, defineComponent } from "vue";
+
+defineComponent({ name: "noadhouselist" });
 
 const emit = defineEmits(["filter-no-ad-houses"]);
 
@@ -15,6 +16,8 @@ const props = defineProps({
   },
 });
 
+let token = localStorage.getItem("jwt");
+
 const isDataLoaded = ref(false);
 const selectedAdtypes = ref([]);
 
@@ -22,43 +25,39 @@ const selectedAdtypes = ref([]);
 const selectedHouseId = ref("");
 const selectedAdtype = ref("");
 
-const initializeData = () => {
+// 初始化資料
+function initializeData(){
   if (props.noAdHouses.length > 0 && props.adtypes.length > 0) {
+    console.log("初始化載入");
     selectedAdtypes.value = props.noAdHouses.map(
       () => props.adtypes[0] || null
     );
-    isDataLoaded.value = true;
-  }
+  } else {
+    console.log("沒有符合資料");
+  };
+
+  isDataLoaded.value = true;
 };
 
 watch(
   [() => props.noAdHouses, () => props.adtypes],
   () => {
-    isDataLoaded.value = false;
     initializeData();
   },
   { immediate: true }
 );
 
-// 取得用戶選擇的房屋和廣告方案資訊
-const getHouseAndAdtypeInfo = (index) => {
+function getHouseAndAdtypeInfo(index) {
   selectedAdtype.value = selectedAdtypes.value[index];
   selectedHouseId.value = props.noAdHouses[index].houseId;
-
-  console.log(
-    "House ID: ", selectedHouseId.value,
-    "Adtype Price: ", selectedAdtype.value?.adPrice,
-    "Index: ", index,
-    "selectedAdtypeId: ", selectedAdtype.value?.adtypeId
-  );
-};
+}
 
 // 插入廣告資料表
 async function addAd(houseId, adtypeId) {
   if (!houseId || !adtypeId) {
-    console.error("House ID: ", houseId, " or Adtype ID is missing: ", adtypeId);
+    console.error( "House ID: ", houseId, " or Adtype ID is missing: ", adtypeId );
     return;
-  }
+  };
 
   const selectedInfo = {
     houseId,
@@ -66,22 +65,41 @@ async function addAd(houseId, adtypeId) {
   };
 
   try {
-    const response = await axios.post("/advertisements", selectedInfo, {
+    const url = "http://localhost:8080/api/advertisements";
+    const response = await fetch(url, {
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
+        authorization: `${token}`,
       },
+      body: JSON.stringify(selectedInfo),
     });
-    console.log("Ad added successfully:", response.data);
+
+    const success = await response.json();
+
+    if (success) {
+      alert("新增成功");
+      emit("filter-no-ad-houses");
+    } else {
+      alert("新增失敗");
+    };
+
   } catch (error) {
     console.error("Error adding ad:", error);
-  }
+    
+  };
+};
+
+function checkHouseInfo(){
+  console.log("check house info");
 }
+
 </script>
 
 <template>
   <div>
     <div v-if="!isDataLoaded" class="text-center py-6 text-gray-500">
-      數據加載中...
+      資料載入中...
     </div>
 
     <div v-else>
@@ -105,6 +123,13 @@ async function addAd(houseId, adtypeId) {
         </thead>
         <tbody>
           <tr
+            v-if="props.noAdHouses.length === 0"
+            class="text-center py-6 text-gray-500"
+          >
+            <td class="px-4 py-3" colspan="5">沒有符合資料</td>
+          </tr>
+          <tr
+            v-else
             v-for="(noAdHouse, index) in props.noAdHouses"
             :key="index"
             class="text-center"
@@ -113,6 +138,7 @@ async function addAd(houseId, adtypeId) {
             <td class="px-4 py-3">
               <button
                 class="px-3 py-1 text-sm text-blue-600 bg-blue-100 rounded hover:bg-blue-200 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                @click="checkHouseInfo"
               >
                 查看
               </button>
@@ -135,7 +161,9 @@ async function addAd(houseId, adtypeId) {
             <td class="px-4 py-3 text-center">
               <button
                 class="px-4 py-2 text-white bg-green-500 rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400"
-                @click="addAd(noAdHouse.houseId, selectedAdtypes[index]?.adtypeId)"
+                @click="
+                  addAd(noAdHouse.houseId, selectedAdtypes[index]?.adtypeId)
+                "
               >
                 新增
               </button>

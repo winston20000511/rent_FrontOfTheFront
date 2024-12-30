@@ -1,0 +1,36 @@
+
+1216
+add components
+(chatRoom)
+
+modify 
+app.vue
+add chatRoom components
+.env
+VITE_WS_URL=http://localhost:8080/chat
+
+
+
+1217
+add: 
+UserAuth{
+ForgotPassword.vue
+Login.vue
+Register.vue
+}
+
+modify: 
+.env
+add path
+VITE_APIAUTHURL=http://localhost:8080/api/auth
+
+src\router\index.js
+modify path
+register, login, forgotPassword
+
+src\components\Home\HomeNavbar.vue
+modify sign in path
+other forgot...
+
+src\views\HomeView.vue
+modify forgot...

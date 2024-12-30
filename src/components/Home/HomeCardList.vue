@@ -1,87 +1,167 @@
 <script setup>
-import { ref, toRef, watch } from 'vue';
-import HousePhotos from '../houses/housePhotos.vue';
-import HouseView from '@/View/HouseView.vue';
+import { ref, watch } from "vue";
+import Dialog from "primevue/dialog";
+import HouseView from "@/View/HouseView.vue";
+import { useHouseCard } from "@/stores/CardHouseStore";
 
-// 接收 props 傳遞的 markers
 const props = defineProps({
   markers: {
     type: Object,
     required: true,
   },
+  ads: {
+    type: Object,
+    required: true,
+  }
 });
+const store = useHouseCard();
 
-// 創建響應式引用
-const showView = ref(false); // 控制彈窗顯示
-const selectedHouseId = ref(null); // 選中的房屋 ID
+const showView = ref(false);
+const selectedHouseId = ref(null);
+const clickCounts = ref({}); // 儲存每個房屋的點擊數
 
-// 監控 markers 的變化
-watch(() => props.markers, (newMarkers) => {
-  console.log('Markers updated:', newMarkers);
-});
+watch(
+  () => props.markers,
+  (newVal) => {
+    if (newVal?.searchList?.length) {
+      // 初始化 clickCounts
+      newVal.searchList.forEach((house) => {
+        if (!clickCounts.value[house.houseid]) {
+          fetchClickCount(house.houseid);
+        }
+      });
+    }
+  },
+  { immediate: true }
+);
 
-// 打開房屋詳情頁面，僅傳遞 houseId
-const openHouseView = (houseId) => {
-  console.log('openHouseView triggered');
-  console.log('House ID:', houseId);
-  
-  selectedHouseId.value = houseId;
+async function openHouseView(houseId) {
+  selectedHouseId.value = Number(houseId);
   showView.value = true;
-};
 
-// 關閉彈窗
-const closeHouseView = () => {
-  showView.value = false; // 隱藏彈窗
-};
+  // 增加點擊數
+  try {
+    await incrementClickCount(houseId);
+    clickCounts.value[houseId] += 1; // 更新本地點擊數
+  } catch (error) {
+    console.error("Failed to increment click count:", error);
+  }
+}
+
+async function incrementClickCount(houseId) {
+  const response = await fetch(`/api/houses/${houseId}/incrementClick`, {
+    method: "PUT",
+    headers: {
+      Authorization: localStorage.getItem("jwt"),
+    },
+  });
+  if (!response.ok) {
+    throw new Error(`Failed to increment click count for houseId: ${houseId}`);
+  }
+}
+
+async function fetchClickCount(houseId) {
+  try {
+    const response = await fetch(`/api/houses/${houseId}/clickCount`, {
+      method: "GET",
+      headers: {
+        Authorization: localStorage.getItem("jwt"),
+      },
+    });
+    if (response.ok) {
+      const count = await response.json();
+      clickCounts.value[houseId] = count;
+    } else {
+      console.error(`Failed to fetch click count for houseId: ${houseId}`);
+    }
+  } catch (error) {
+    console.error("Error fetching click count:", error);
+  }
+}
+
+function closeHouseView() {
+  showView.value = false;
+}
+
+function getCardClass(item){
+
+  const dateSpec = '1999-01-01T00:00:00';
+  const sourceDate = new Date(item);
+  const targetDate = new Date(dateSpec);
+
+  if (sourceDate > targetDate) {
+    return "bg-info bg-opacity-25 text-white"
+  } else {
+    return ""
+  }
+
+}
+
 </script>
 
 <template>
-    <div class="container py-4 px-4 bg-body custom-shadow">
-        <div v-if="props.markers.searchList && props.markers.searchList.length" class="row">
-            <div v-for="list in props.markers.searchList" :key="list.houseid" class="col-12 col-md-6 py-4">
-                <div 
-                    class="card card-shadow clickable-card" 
-                    style="width: 100%;" 
-                    @click="openHouseView(list.houseid)">  <!-- 只傳遞 houseId -->
-                    <img src="/src/assets/img/view1.jpg" class="card-img-top" alt="...">
-                    <div class="card-body">
-                        <p class="card-text">{{ "NT$" + list.price }}</p>
-                        <p class="card-text">{{ list.address }}</p>
-                    </div>
-                </div>
+  <div class="container py-4 px-4 bg-body custom-shadow">
+    <div v-if="markers.searchList && markers.searchList.length" class="row">
+      <div
+        v-for="list in markers.searchList"
+        :key="list.houseid"
+        class="col-12 col-md-6 py-4"
+      >
+        <div class="card card-shadow clickable-card px-2 py-2" 
+          style="width: 100%"
+          :class="getCardClass(list.paidDate)"
+          @click="openHouseView(list.houseid)"
+        >
+          <img
+            :src="list.image || '/src/assets/img/view1.jpg'"
+            class="card-img-top"
+            alt="House Image"
+          />
+          <div class="card-body">
+            <p class="card-text" style="font-size: 20px; font-weight: bold; color: black;">{{ list.houseTitle }}</p>
+            <p class="card-text;" style="color: black;">NT${{ list.price }}</p>
+            <p class="card-text" style="color: black;">{{ list.address }}</p>
+            <!-- 顯示點擊數 -->
+            <div class="d-flex justify-content-end align-items-center">
+              <i class="pi pi-eye" style="margin-right: 5px;"></i>
+              <span class="text-muted">{{ clickCounts[list.houseid] || 0 }}</span>
             </div>
+          </div>
         </div>
+      </div>
     </div>
-    <!-- 房屋詳細頁面 (彈窗) -->
-    <HouseView
-    v-if="showView" 
-    :houseId="selectedHouseId"
-    :visible="showView" 
-    @onClose="closeHouseView"  
-    />
+  </div>
+
+  <Dialog
+    v-model:visible="showView"
+    modal
+    appendTo="body"
+    :style="{ width: '80vw', maxWidth: '900px', height: '80vh', maxHeight: '90vh' }"
+    :breakpoints="{ '960px': '75vw', '640px': '90vw' }"
+    header="房屋資訊"
+    :closable="true"
+    @hide="showView = false"
+  >
+    <HouseView :houseId="selectedHouseId" @close="closeHouseView" />
+  </Dialog>
 </template>
 
 <style scoped>
+.container {
+  margin: 0;
+  padding: 0;
+}
 .custom-shadow {
-    position: relative;
-    margin: 0px 0px 0px 5px;
-    box-shadow: -5px 0px 5px -3px rgba(0, 0, 0, 0.4);
+  margin: 0 0 0 5px;
+  box-shadow: -5px 0px 5px -3px rgba(0, 0, 0, 0.4);
 }
-
 .card-shadow {
-    position: relative;
-    box-shadow: -5px 5px 5px -3px rgba(0, 0, 0, 0.4);
+  box-shadow: -5px 5px 5px -3px rgba(0, 0, 0, 0.4);
 }
-
+.clickable-card,
+.card-img-top,
 .card-body {
-    cursor: pointer;  /* 確保卡片可以被點擊 */
+  cursor: pointer;
 }
 
-.clickable-card {
-    cursor: pointer; /* 改變鼠標樣式，表示該區域可點擊 */
-}
-
-.card-img-top {
-    cursor: pointer; /* 使圖片區域也可點擊 */
-}
 </style>
