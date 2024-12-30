@@ -193,7 +193,7 @@ const handleSignInClick = () => {
         v-on:click="showSearchList"
         v-on:keyup="enterSearchBtn"
       />
-      <button class="btn btn-primary">
+      <button class="btn btn-outline-secondary">
         <i class="fa-solid fa-magnifying-glass" ref="iconBtnRef" v-on:click="clickSearchBtn" style="font-size: 28px;"></i>
       </button>
       <ul

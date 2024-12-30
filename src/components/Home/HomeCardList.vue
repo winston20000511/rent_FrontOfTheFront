@@ -28,6 +28,7 @@ const store = useHouseCard();
 const showView = ref(false);
 const selectedHouseId = ref(null);
 const clickCounts = ref({}); // 儲存每個房屋的點擊數
+const hotMark = ref('');
 
 async function fetchAllClickCounts(houseIds) {
   try {
@@ -112,8 +113,10 @@ function getShowGood(item) {
   const targetDate = new Date(dateSpec);
 
   if (sourceDate > targetDate) {
+    hotMark.value='推薦'
     return true
   } else {
+    hotMark.value=''
     return false
   }
 
@@ -134,9 +137,11 @@ function getShowGood(item) {
           style="width: 100%"
           @click="openHouseView(list.houseid)"
         >
-          <div class="card-header card-header-custom">
-            <span v-if="getShowGood(list.paidDate)" class="badge bg-warning" style="font-size: 20px; float: left;">推薦</span>
-            <div class="d-flex justify-content-end align-items-center">
+          <div class="card-header">
+            <div style="float: left;">
+              <span v-if="getShowGood(list.paidDate)" class="badge bg-warning" style="font-size: 20px;">{{ hotMark }}</span>
+            </div>
+            <div style="float: right;" class="d-flex justify-content-end align-items-center">
               <i class="pi pi-eye" style="margin-right: 5px;"></i>
               <span class="text-muted">{{ clickCounts[list.houseid] || 0 }}</span>
             </div>
@@ -190,11 +195,14 @@ function getShowGood(item) {
 .card-body {
   cursor: pointer;
 }
-.card-header-custom{
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
+
+.card {
+  overflow: hidden; 
 }
 
+.card .card-img-top img {
+  max-height: 200px; 
+  max-width: 100%; 
+  object-fit: cover; 
+}
 </style>
