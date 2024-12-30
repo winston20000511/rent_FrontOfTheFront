@@ -134,7 +134,7 @@
         </label>
         <label class="icon-label">
           <input type="checkbox" v-model="form.bedstead" :true-value="true" :false-value="false" />
-          <img src="../../assets/icon/house-on/bedstead.ico" alt="床架" class="icon-image" />
+          <img src="../../assets/icon/house-on/bedsteck.ico" alt="床架" class="icon-image" />
           床架
         </label>
         <label class="icon-label">
@@ -154,12 +154,12 @@
         </label>
         <label class="icon-label">
           <input type="checkbox" v-model="form.gwaterHeater" :true-value="true" :false-value="false" />
-          <img src="../../assets/icon/house-on/gwaterHeater.ico" alt="瓦斯熱水器" class="icon-image" />
+          <img src="../../assets/icon/house-on/gas.ico" alt="瓦斯熱水器" class="icon-image" />
           瓦斯熱水器
         </label>
         <label class="icon-label">
           <input type="checkbox" v-model="form.television" :true-value="true" :false-value="false" />
-          <img src="../../assets/icon/house-on/television.ico" alt="電視" class="icon-image" />
+          <img src="../../assets/icon/house-on/TV.ico" alt="電視" class="icon-image" />
           電視
         </label>
         <label class="icon-label">
@@ -174,7 +174,7 @@
         </label>
         <label class="icon-label">
           <input type="checkbox" v-model="form.tables" :true-value="true" :false-value="false" />
-          <img src="../../assets/icon/house-on/tables.ico" alt="桌椅" class="icon-image" />
+          <img src="../../assets/icon/house-on/desk.ico" alt="桌椅" class="icon-image" />
           桌椅
         </label>
       </div>
