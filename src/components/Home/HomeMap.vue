@@ -118,8 +118,6 @@ onMounted(() => {
         content: buttonElement,
       });
 
-      
-      
       const contentContainer = document.createElement('div');
       contentContainer.classList.add('card','custom-shadow','card-shadow');
       contentContainer.style.width='36em'
@@ -151,16 +149,6 @@ onMounted(() => {
       paragraph2.style.fontSize='18px'
       paragraph2.style.margin = '10px 0 10px 20px'
       contentContainer.appendChild(paragraph2);
-
-      //<img src="${data.image}" alt="房屋圖片" style="max-width: 200px; margin-bottom: 10px;">
-      // const infoWindow = new google.maps.InfoWindow({
-      //     content: `
-      //       <div style="text-align: center;">
-              
-      //         <p>${marker.houseTitle}</p>
-      //       </div>
-      //     `,
-      //   });
 
         // 點擊標記顯示資訊窗口
         mapMark.addListener('click', () => {
@@ -295,6 +283,7 @@ onMounted(() => {
     } else {
       // 關閉繪圖模式
       canvasElement.style.pointerEvents = 'none';
+      clearPoint();
       map.value.setOptions({
         draggable: true,
         gestureHandling: 'auto',

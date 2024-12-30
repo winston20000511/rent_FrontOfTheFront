@@ -185,7 +185,7 @@ const handleSignInClick = () => {
         type="text"
         placeholder="Address, neighborhood, city, ZIP"
         id="search"
-        class="form-control me-4"
+        class="form-control"
         ref="searchInputRef"
         v-on:input="showSearchList"
         v-on:compositionstart="compositionStart"
@@ -193,7 +193,9 @@ const handleSignInClick = () => {
         v-on:click="showSearchList"
         v-on:keyup="enterSearchBtn"
       />
-      <i class="fa-solid fa-magnifying-glass" ref="iconBtnRef" v-on:click="clickSearchBtn"></i>
+      <button class="btn btn-primary">
+        <i class="fa-solid fa-magnifying-glass" ref="iconBtnRef" v-on:click="clickSearchBtn" style="font-size: 28px;"></i>
+      </button>
       <ul
         class="searchList position-absolute mt-1 bg-white border rounded shadow"
         ref="searchListRef"
@@ -305,13 +307,10 @@ const handleSignInClick = () => {
 }
 
 .fa-magnifying-glass {
-  position: fixed;
-  top: 7.5%;
-  /* 固定於視窗頂部 60px */
+  /* position: fixed;
+  top: 8.5%;
   left: 62%;
-  /* 基本定位 */
-  transform: translate(-50%, -50%)
-    /* 調整位置 */
+  transform: translate(-50%, -50%) */
 }
 
 .fa-magnifying-glass:hover {

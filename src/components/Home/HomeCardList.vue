@@ -105,16 +105,16 @@ function closeHouseView() {
   showView.value = false;
 }
 
-// 根據日期條件設置卡片樣式
-function getCardClass(item) {
+// 根據日期條件顯示推薦
+function getShowGood(item) {
   const dateSpec = "1999-01-01T00:00:00";
   const sourceDate = new Date(item);
   const targetDate = new Date(dateSpec);
 
   if (sourceDate > targetDate) {
-    return "bg-info bg-opacity-25 text-white"
+    return true
   } else {
-    return ""
+    return false
   }
 
 }
@@ -130,22 +130,28 @@ function getCardClass(item) {
         class="col-12 col-md-6 py-4"
       >
         <div
-          class="card card-shadow clickable-card px-2 py-2"
+          class="card card-shadow clickable-card"
           style="width: 100%"
-          :class="getCardClass(list.paidDate)"
           @click="openHouseView(list.houseid)"
         >
-          <!-- 房屋照片 -->
-          <HousePhotos :houseId="list.houseid" @click.stop />
-          <div class="card-body">
-            <p class="card-text" style="font-size: 20px; font-weight: bold; color: black;">{{ list.houseTitle }}</p>
-            <p class="card-text" style="color: black;">NT${{ list.price }}</p>
-            <p class="card-text" style="color: black;">{{ list.address }}</p>
-            <!-- 點擊數顯示 -->
+          <div class="card-header card-header-custom">
+            <span v-if="getShowGood(list.paidDate)" class="badge bg-warning" style="font-size: 20px; float: left;">推薦</span>
             <div class="d-flex justify-content-end align-items-center">
               <i class="pi pi-eye" style="margin-right: 5px;"></i>
               <span class="text-muted">{{ clickCounts[list.houseid] || 0 }}</span>
             </div>
+          </div>
+          <!-- 房屋照片 -->
+          <HousePhotos :houseId="list.houseid" @click.stop />
+          <div class="card-body">
+            <p class="card-text" style="font-size: 20px; font-weight: bold;">{{ list.houseTitle }}</p>
+            <p class="card-text">NT${{ list.price }}</p>
+            <p class="card-text">{{ list.address }}</p>
+            <!-- 點擊數顯示 -->
+            <!-- <div class="d-flex justify-content-end align-items-center">
+              <i class="pi pi-eye" style="margin-right: 5px;"></i>
+              <span class="text-muted">{{ clickCounts[list.houseid] || 0 }}</span>
+            </div> -->
           </div>
         </div>
       </div>
@@ -184,4 +190,11 @@ function getCardClass(item) {
 .card-body {
   cursor: pointer;
 }
+.card-header-custom{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
 </style>
