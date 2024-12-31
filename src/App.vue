@@ -97,7 +97,7 @@ const addMarker = (locations,status) => {
 
 .app-header {
   width: 100%;
-  height: 15vh;
+  height: 20vh;
   border-bottom: 1px solid lightgray;
   display: flex;
   justify-content: space-between;
@@ -105,7 +105,7 @@ const addMarker = (locations,status) => {
 
 .app-main {
   width: 100%;
-  height: 85vh;
+  height: 80vh;
   /* flex: 1; */
   /* 填滿剩餘空間 */
   /* display: flex;

@@ -1,16 +1,19 @@
 <script setup>
-import { onMounted, onUnmounted, ref } from 'vue';
+import { onMounted, onUnmounted, ref, toRef, watch } from 'vue';
 import { useRouter } from 'vue-router'; // 引入 useRouter
 import { useAuthStore } from '@/stores/auth';
 import { useOption } from '@/stores/optionStore';
+import { useHouseCard } from '@/stores/CardHouseStore';
 
 const authStore = useAuthStore();
 const optionStore = useOption();
+const houseCardStore = useHouseCard();
 const searchInputRef = ref(null);
 const searchListRef = ref(null);
 const searchListPosRef = ref({ top: 0, left: 0, width: 0 });
 const searchListReuslt = ref([]);
 const iconBtnRef = ref(null);
+
 
 let isComposing = false;
 let keywordUrl = 'http://localhost:8080/api/keyword';
@@ -18,6 +21,7 @@ let mapUrl = 'http://localhost:8080/api/map';
 let token = localStorage.getItem('jwt');
 
 const emits = defineEmits(['add-marker', 'signInClicked']);
+
 
 onMounted(() => {
   document.addEventListener('click', handleClickOutside);
@@ -31,6 +35,14 @@ onMounted(() => {
 onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside);
 });
+
+watch(
+    () => optionStore.shareOptions,
+    (newOptions) => {
+      showMapFetch();
+    },
+    { deep: true }
+);
 
 const compositionStart = () => {
   isComposing = true;
@@ -82,7 +94,7 @@ const enterSearchBtn = (event) => {
 };
 
 const showKeyWordFetch = async () => {
-
+  
   const input = {
     address: searchInputRef.value.value,
   };

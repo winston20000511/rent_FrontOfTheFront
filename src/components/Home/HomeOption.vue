@@ -79,7 +79,7 @@ import { onMounted, ref } from 'vue';
         errRef.value='';
         optionStore.updateData(options);
         emits('update-flipped');
-        console.log(JSON.stringify(options));
+        // console.log(JSON.stringify(options));
     }
     
 </script>
