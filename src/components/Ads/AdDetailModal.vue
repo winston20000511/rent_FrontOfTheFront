@@ -51,6 +51,11 @@ const adDetails = computed(() => [
     value: `NTD ${props.detail.adPrice}`,
     editable: editableDetails.isEditing,
   },
+  {
+    label: "折扣優惠",
+    value: `${props.detail.isCounponApplied? "NTD " + calculateDiscountedPrice(props.detail.adPrice) + "（已使用優惠券）" : "無"}`,
+    editable: false,
+  },
   { label: "付款狀態", value: props.detail.isPaid, editable: false },
   {
     label: "訂單號碼",
@@ -86,6 +91,12 @@ function getAdValidation(startDateStr, adtype) {
       : `${formattedStartDate} ~ ${formattedEndDate}`;
 
   return validation;
+}
+
+// 計算廣告價格
+function calculateDiscountedPrice(adPrice){
+  const discountedPrice = Math.floor(adPrice*0.9);
+  return discountedPrice;
 }
 
 // 啟用編輯
