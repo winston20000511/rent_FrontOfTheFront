@@ -49,14 +49,18 @@
     }
   
     try {
-      const response = await api.put("http://localhost:8080/api/user/resetPassword", {
-        token,
+      const response = await api.put("http://localhost:8080/api/forgot/resetPassword", {
+        token:token,
         newPassword: password.value,
       });
+      const data  =response.data;
+      console.log(data);
       alert("密碼重設成功！");
     } catch (error) {
+      console.log(error);
       alert("密碼重設失敗，請稍後再試。");
     }
+    
   }
   </script>
   
