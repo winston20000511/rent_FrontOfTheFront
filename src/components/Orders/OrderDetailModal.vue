@@ -13,7 +13,6 @@ const closeDetail = () => {
 };
 
 function checkIfCouponUsed(ad, price){
-  console.log("ad: ", ad, " price: ", price);
   if(ad){
     const discount = Math.floor(price*0.1);
     return discount;
@@ -81,7 +80,7 @@ function checkIfCouponUsed(ad, price){
               <tr v-for="(item, index) in detail.adIds" :key="index">
                 <td class="px-4 py-2 text-center">{{ item }}</td>
                 <td class="px-4 py-2 text-center">
-                  {{ detail.adtypes[index] }}
+                  {{ detail.adtypes[index].substring(0,2) }}天
                 </td>
                 <td class="px-4 py-2 text-center">
                   {{ detail.adtypesPrices[index] }}
@@ -89,7 +88,7 @@ function checkIfCouponUsed(ad, price){
                 <td class="px-4 py-2 text-center">
                   {{ detail.houseTitles[index] }}
                 </td>
-                <td class="px-4 py-2 text-center"> {{checkIfCouponUsed(detail.coupons[index], detail.prices[index])}} </td>
+                <td class="px-4 py-2 text-center"> {{checkIfCouponUsed(detail.coupons[index], detail.adtypesPrices[index])}} </td>
                 <td class="px-4 py-2 text-center">
                   {{ detail.prices[index] }}
                 </td>

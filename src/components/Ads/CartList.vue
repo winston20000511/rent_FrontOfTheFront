@@ -7,6 +7,7 @@ const emit = defineEmits(["toggle-cart"]);
 
 const selectedThirdParty = ref("linepay");
 const cartStore = useCart();
+
 cartStore.choosePayment = "linepay"; // 預設linepay
 
 // 優惠券
@@ -43,13 +44,12 @@ function removeFromCart(adId) {
 
 function handlePaymentMethodSelection(event){
   cartStore.choosePayment = event.target.dataset.value;
-  console.log("cartStore.choosePayment:", cartStore.choosePayment);
 }
 
 // 前往結帳
 function checkOut() {
   cartStore.thirdParty = selectedThirdParty.value;
-  router.push({ name: "orderConfirm" });
+  router.push({ name: "OrderConfirm" });
 }
 
 function toggleCoupon(index) {
@@ -98,7 +98,7 @@ const discountAmount = computed(() => {
       style="width: 360px"
     >
       <div class="flex justify-between px-4 py-3 border-b">
-        <h2 class="text-xl font-semibold">選購清單</h2>
+        <h2 class="text-xl font-semibold">申請清單</h2>
         <button
           class="text-xl font-bold text-gray-600 hover:text-gray-800 focus:outline-none"
           @click="toggleCart"
@@ -117,7 +117,7 @@ const discountAmount = computed(() => {
             <div>
               <p class="text-sm font-bold">編號：{{ cartItem.adId }}</p>
               <p class="text-sm">
-                方案：{{ cartItem.adtypeId }} &nbsp; X &nbsp; NTD
+                方案：{{ cartItem.adName }} &nbsp; X &nbsp; NTD
                 {{ cartItem.adPrice }}
               </p>
 
@@ -155,8 +155,8 @@ const discountAmount = computed(() => {
             v-show="expandedIndex === index"
             class="mt-2 bg-gray-50 p-3 border-t text-sm text-gray-600"
           >
-            <p>房屋編號：{{ "天數" }}</p>
-            <p>推播時長：{{ "天數" }}</p>
+            <p>房屋標題：{{ cartItem.houseTitle }}</p>
+            <p>推播時長：{{ cartItem.adName }}</p>
           </div>
         </div>
       </div>

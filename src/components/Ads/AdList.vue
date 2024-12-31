@@ -1,6 +1,8 @@
 <script setup>
 import { computed } from "vue";
 import { useCart } from "@/stores/cartStore";
+import HouseView from "@/View/HouseView.vue";
+import Dialog from "primevue/dialog";
 
 let token = localStorage.getItem("jwt");
 
@@ -26,6 +28,14 @@ const emit = defineEmits([
   "detail",
   "ad-delete-result",
 ]);
+
+const showHouseView = ref(false);
+const selectedHouseId = ref(null);
+
+const checkHouseInfo = (houseId) => {
+  selectedHouseId.value = Number(houseId);
+  showHouseView.value = true;
+};
 
 // 處理過的廣告資料
 const processedAds = computed(() => {
@@ -113,6 +123,10 @@ const deleteAd = async (adId) => {
           messageTitle: "已刪除VIP推播申請",
           message: "",
         });
+
+        cartStore.removeFromCart(adId);
+        cartStore.loadCart();
+        
       } else {
         emit("ad-delete-result", {
           success: false,
@@ -185,7 +199,7 @@ const checkAd = async (adId) => {
               發布時間
             </th>
             <th class="px-4 py-2 text-center text-sm font-medium text-gray-600">
-              廣告狀態
+              VIP服務狀態
             </th>
             <th class="px-4 py-2 text-center text-sm font-medium text-gray-600">
               付款狀態
@@ -205,7 +219,12 @@ const checkAd = async (adId) => {
             class="border-b hover:bg-gray-50"
           >
             <td class="px-4 py-3 text-sm text-gray-700 text-center">
+              <button
+                class="px-3 py-1 text-sm text-gray-600 bg-transparent border-0 underline hover:bg-gray-500 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
+                @click="checkHouseInfo(ad.houseId)"
+              >
               {{ ad.houseTitle }}
+              </button>
             </td>
             <td class="px-4 py-3 text-sm text-center text-gray-700">
               {{ ad.paidDate }}
@@ -246,13 +265,26 @@ const checkAd = async (adId) => {
           </tr>
           <tr v-if="processedAds.length === 0">
             <td colspan="6" class="px-4 py-3 text-center text-gray-500">
-              目前沒有商品
+              目前沒有申請VIP服務
             </td>
           </tr>
         </tbody>
       </table>
     </div>
   </div>
+
+    <!-- 房屋資訊彈窗 -->
+    <Dialog
+    v-model:visible="showHouseView"
+    :modal="true"
+    :dismissableMask="true"
+    header="查看房屋資訊"
+    class="dialog-theme"
+  >
+    <div class="dialog-container">
+      <HouseView :houseId="selectedHouseId" @close="showHouseView = false" />
+    </div>
+  </Dialog>
 </template>
 
 <style scoped>

@@ -6,7 +6,7 @@
   
   onMounted(() => {
     setTimeout(() => {
-      router.push("/orders");
+      router.push("/member-center/my-orders");
     }, 3000);
   });
   </script>

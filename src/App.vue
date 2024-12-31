@@ -97,7 +97,7 @@ const addMarker = (locations,status) => {
 
 .app-header {
   width: 100%;
-  height: 15vh;
+  height: 20vh;
   border-bottom: 1px solid lightgray;
   display: flex;
   justify-content: space-between;
@@ -105,7 +105,7 @@ const addMarker = (locations,status) => {
 
 .app-main {
   width: 100%;
-  height: 85vh;
+  height: 80vh;
   /* flex: 1; */
   /* 填滿剩餘空間 */
   /* display: flex;
@@ -114,7 +114,7 @@ const addMarker = (locations,status) => {
 
 .chat-button {
   position: fixed;
-  bottom: 20px;
+  bottom: 90px;
   right: 20px;
   width: 50px;
   height: 50px;
@@ -130,7 +130,19 @@ const addMarker = (locations,status) => {
   z-index: 9999;
 }
 
+
 .chat-button:hover {
   background-color: #0056b3;
+}
+
+.chat-popup {
+  position: fixed;
+  bottom: 140px; /* 根據需要設置，這樣讓它與按鈕有相同的間距 */
+  right: 20px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  z-index: 10000; /* 確保 ChatPopup 顯示在按鈕之上 */
 }
 </style>

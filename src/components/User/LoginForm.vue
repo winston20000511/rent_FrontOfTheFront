@@ -1,6 +1,6 @@
 <template>
   <div class="login-container">
-    <h2>登入</h2>
+    <h2 class="register-title">登入</h2>
     <form @submit.prevent="handleLogin">
       <div class="mb-3">
         <label for="loginEmail" class="form-label">電子信箱</label>
@@ -27,15 +27,15 @@
       <p v-if="errorMessage" class="error text-danger">{{ errorMessage }}</p>
       <button type="submit" class="btn btn-primary w-100">登入</button>
       <!-- Google 登入按鈕 -->
-    <div class="google-login-btn-container">
-      <button
-        type="button"
-        class="btn btn-dark w-100 mt-3"
-        @click="googleLogin"
-      >
-        使用 Google 帳號登入
-      </button>
-    </div>
+      <div class="google-login-btn-container">
+        <button
+          type="button"
+          class="btn btn-dark w-100 mt-3"
+          @click="googleLogin"
+        >
+          使用 Google 帳號登入
+        </button>
+      </div>
       
       <!-- 忘記密碼按鈕 -->
       <button
@@ -53,10 +53,10 @@
 </template>
 
 <script>
-// 引入自訂的 Axios API 模組
-import api from "../../api/api"; // Authorization 自動添加的功能見 api.js
+import api from "../../api/api"; // 引入自訂的 Axios API 模組
 import ForgotPassword from "../../components/User/ForgotPassword.vue"; // 引入 ForgotPassword 組件
 import { useAuthStore } from "@/stores/auth"; // 引入 Pinia 的 authStore
+import { useCart } from "@/stores/cartStore";
 
 export default {
   components: {
@@ -87,6 +87,10 @@ export default {
         // 後端回傳 JWT token
         const token = response.data.token;
 
+        // 更新 pinia store 中的 token
+        const cartStore = useCart();
+        cartStore.updateToken(token);
+
         // 儲存 token 到 localStorage
         localStorage.setItem("jwt", token);
 
@@ -94,9 +98,12 @@ export default {
         const authStore = useAuthStore();
         authStore.isLoggedIn = true;
 
-        // 登入成功提示並跳轉至會員中心
+        // 登入成功提示並跳轉回首頁
         alert("登入成功！");
-        this.$router.push("/member-Center");
+        this.$router.push("/");
+
+        // 在登入成功後觸發 'login-success' 事件
+        this.$emit('login-success');
       } catch (error) {
         // 錯誤處理
         this.errorMessage =
@@ -110,7 +117,7 @@ export default {
         if (!window.grecaptcha) {
           reject(new Error("reCAPTCHA 尚未載入，請稍後再試"));
           return;
-        };
+        }
         
         window.grecaptcha
           .execute(import.meta.env.VITE_RECAPTCHA_SITE_KEY, { action: "login" })
@@ -136,11 +143,24 @@ export default {
     script.defer = true;
     document.head.appendChild(script);
   },
+  // mounted() {
+  //   // 初始化 Google 登入
+  //   window.gapi.load("auth2", () => {
+  //     window.gapi.auth2.init({
+  //       client_id: "YOUR_GOOGLE_CLIENT_ID", // 替換為你的 Google Client ID
+  //     });
+  //   });
+  // },
 };
 
 </script>
 
 <style scoped>
+.register-title {
+  font-size: 3rem; /* 設定字體大小為3rem，約等於斗大的字 */
+  font-weight: bold; /* 使字體加粗 */
+  margin-bottom: 20px; /* 設定底部邊距 */
+}
 .login-container {
   max-width: 400px;
   margin: 50px auto;

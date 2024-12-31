@@ -51,9 +51,10 @@ onMounted(async () => {
   cartStore.initializeCart();
   await getAdtypeAndId();
   isLoading.value = false;
+  cartStore.loadCart();
 });
 
-const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // 篩選條件變更
 const changeFilter = (filterName, filterValue) => {
@@ -67,7 +68,7 @@ const changeFilter = (filterName, filterValue) => {
 
 // 篩選廣告
 const filterAds = async () => {
-  console.log("篩選條件: ", filters);
+  // console.log("篩選條件: ", filters);
 
   isLoading.value = true;
   try {
@@ -81,9 +82,9 @@ const filterAds = async () => {
       body: JSON.stringify(filters),
     });
     const data = await response.json();
-    console.log("篩選廣告結果: ", data);
-    const { content, totalPages: total } = data;
+    // console.log("篩選廣告結果: ", data);
 
+    const { content, totalPages: total } = data;
     ads.value = content;
     totalPages.value = total;
 
@@ -99,17 +100,19 @@ const filterAds = async () => {
       currentPage.value = 1;
     }
 
-    // 等待 Vue 更新 DOM
-    // await nextTick();
     await delay(200);
-    
-    console.log("Updated ads:", ads.value);
   } catch (error) {
     console.error("發送請求時發生錯誤: ", error);
   } finally {
     isLoading.value = false;
   }
 };
+
+async function searchByTitle() {
+  filters.value.page = 1;
+  currentPage.value = 1;
+  await filterAds();
+}
 
 // 換頁
 const onPageNumberChange = async (page) => {
@@ -130,7 +133,6 @@ const closeAdDetail = () => {
   showOverlay.value = false;
   showAdDetail.value = false;
   detail.value = {};
-  console.log("close ad detail showAdDeatil.value: ", showAdDetail.value);
 };
 
 // 顯示無廣告的物件
@@ -159,8 +161,6 @@ const getAdtypeAndId = async () => {
   });
   const data = await response.json();
 
-  console.log("adtypes ", data);
-
   adtypes.value = data;
 };
 
@@ -178,10 +178,8 @@ const filterNoAdHouses = async () => {
     });
     const data = await response.json();
 
-    console.log(data.content);
-
     noAdHouses.value = data.content;
-    console.log("no ad houses: ", noAdHouses.value);
+    // console.log("no ad houses: ", noAdHouses.value);
   } catch (error) {
     console.error("請求錯誤: ", error);
   }
@@ -200,7 +198,6 @@ const toggleCart = () => {
 
 // 刪除廣告結果處理
 const handleDeleteAdResult = (result) => {
-  console.log("delete result: ", result);
   messageTitle.value = result.messageTitle;
   messageContent.value = result.message;
   showMessage.value = true;
@@ -216,7 +213,6 @@ const closeMessage = () => {
 };
 
 const closeOnOverlayClick = () => {
-  console.log("close on overlay click: ", showAdDetail.value);
   showMessage.value = false;
   showCart.value = false;
   showAdDetail.value = false;
@@ -263,7 +259,7 @@ watch(
 
   <div class="flex flex-wrap items-center space-x-6 mt-4 mb-6 px-6">
     <div class="flex items-center space-x-6 flex-grow">
-      <AdUserInputFilter v-model="filters.housetitle" />
+      <AdUserInputFilter v-model="filters.housetitle" @search="searchByTitle" />
     </div>
 
     <div class="flex items-center justify-end w-full sm:w-auto">

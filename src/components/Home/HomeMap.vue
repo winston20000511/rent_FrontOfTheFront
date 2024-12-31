@@ -91,99 +91,88 @@ onMounted(() => {
     mapMarkers.value.forEach((marker) => marker.map = null);
     mapMarkers.value = [];
 
+    renderMarkerInBatches(list,map)
     
-    list.forEach((marker) => {
-
-      const dateSpec = '1999-01-01T00:00:00';
-      const sourceDate = new Date(marker.paidDate);
-      const targetDate = new Date(dateSpec);
-
-      const buttonElement = document.createElement("button");
-
-      if (sourceDate > targetDate) {
-        buttonElement.className ="btn-info"
-        ibtns.value.push(buttonElement);
-      } else {
-        buttonElement.className="btn-purple"
-        pbtns.value.push(buttonElement);
-      }
-      buttonElement.innerHTML=`${(Number(marker.price)/1000).toFixed(1)}K`
-      buttonElement.style.pointerEvents = "auto";
-
-      var latlng = new google.maps.LatLng(marker.lat, marker.lng);
-      var mapMark = new google.maps.marker.AdvancedMarkerElement({
-        position: latlng,
-        map: map.value,
-        title: marker.street,
-        content: buttonElement,
-      });
-
+    // list.forEach((marker) => {
       
+      // const dateSpec = '1999-01-01T00:00:00';
+      // const sourceDate = new Date(marker.paidDate);
+      // const targetDate = new Date(dateSpec);
+
+      // const buttonElement = document.createElement("button");
+
+      // if (sourceDate > targetDate) {
+      //   buttonElement.className ="btn-info"
+      //   ibtns.value.push(buttonElement);
+      // } else {
+      //   buttonElement.className="btn-purple"
+      //   pbtns.value.push(buttonElement);
+      // }
+      // buttonElement.innerHTML=`${(Number(marker.price)/1000).toFixed(1)}K`
+      // buttonElement.style.pointerEvents = "auto";
+
+      // var latlng = new google.maps.LatLng(marker.lat, marker.lng);
+      // var mapMark = new google.maps.marker.AdvancedMarkerElement({
+      //   position: latlng,
+      //   map: map.value,
+      //   title: marker.street,
+      //   content: buttonElement,
+      // });
+
+      // const contentContainer = document.createElement('div');
+      // contentContainer.classList.add('card','custom-shadow','card-shadow');
+      // contentContainer.style.width='36em'
       
-      const contentContainer = document.createElement('div');
-      contentContainer.classList.add('card','custom-shadow','card-shadow');
-      contentContainer.style.width='36em'
-      
-      contentContainer.addEventListener('click',()=>{
-        openHouseView(Number(marker.houseid))
-      })
+      // contentContainer.addEventListener('click',()=>{
+      //   openHouseView(Number(marker.houseid))
+      // })
 
-      // 使用 Vue 渲染 InfoWindowContent 組件
-      const app = createApp(HousePhotos, {
-        houseId: marker.houseid,
-      });
-      app.mount(contentContainer);
+      // // 使用 Vue 渲染 InfoWindowContent 組件
+      // const app = createApp(HousePhotos, {
+      //   houseId: marker.houseid,
+      // });
+      // app.mount(contentContainer);
 
-      // 創建 InfoWindow 並嵌入渲染的 Vue 組件
-      const infoWindow = new google.maps.InfoWindow({
-        content: contentContainer,
-      });
-
-      const paragraph1 = document.createElement('p');
-      paragraph1.textContent = `NT$ ${marker.price}`;
-      paragraph1.style.fontSize='24px'
-      paragraph1.style.fontWeight='bold'
-      paragraph1.style.margin = '10px 0 0 20px'
-      contentContainer.appendChild(paragraph1);
-
-      const paragraph2 = document.createElement('p');
-      paragraph2.textContent = marker.address;
-      paragraph2.style.fontSize='18px'
-      paragraph2.style.margin = '10px 0 10px 20px'
-      contentContainer.appendChild(paragraph2);
-
-      //<img src="${data.image}" alt="房屋圖片" style="max-width: 200px; margin-bottom: 10px;">
+      // // 創建 InfoWindow 並嵌入渲染的 Vue 組件
       // const infoWindow = new google.maps.InfoWindow({
-      //     content: `
-      //       <div style="text-align: center;">
-              
-      //         <p>${marker.houseTitle}</p>
-      //       </div>
-      //     `,
+      //   content: contentContainer,
+      // });
+
+      // const paragraph1 = document.createElement('p');
+      // paragraph1.textContent = `NT$ ${marker.price}`;
+      // paragraph1.style.fontSize='24px'
+      // paragraph1.style.fontWeight='bold'
+      // paragraph1.style.margin = '10px 0 0 20px'
+      // contentContainer.appendChild(paragraph1);
+
+      // const paragraph2 = document.createElement('p');
+      // paragraph2.textContent = marker.address;
+      // paragraph2.style.fontSize='18px'
+      // paragraph2.style.margin = '10px 0 10px 20px'
+      // contentContainer.appendChild(paragraph2);
+
+      //   // 點擊標記顯示資訊窗口
+      //   mapMark.addListener('click', () => {
+      //     if (activeInfoWindow) {
+      //       activeInfoWindow.close(); // 關閉當前開啟的 InfoWindow
+      //       }
+      //       infoWindow.open(map.value, mapMark);
+      //       activeInfoWindow = infoWindow; // 記錄新打開的 InfoWindow
+      //       // store.updateSeleted(marker);
+      //       clearAllButtons(buttonElement)
+      //       // activeBtn.value = buttonElement
+      //       buttonElement.className ="btn-red"
+      //   });
+        
+      //   map.value.addListener('click', () => {
+      //     if (activeInfoWindow) {
+      //       activeInfoWindow.close();
+      //       activeInfoWindow = null; // 清除記錄
+      //     }
       //   });
 
-        // 點擊標記顯示資訊窗口
-        mapMark.addListener('click', () => {
-          if (activeInfoWindow) {
-            activeInfoWindow.close(); // 關閉當前開啟的 InfoWindow
-            }
-            infoWindow.open(map.value, mapMark);
-            activeInfoWindow = infoWindow; // 記錄新打開的 InfoWindow
-            // store.updateSeleted(marker);
-            clearAllButtons(buttonElement)
-            // activeBtn.value = buttonElement
-            buttonElement.className ="btn-red"
-        });
-        
-        map.value.addListener('click', () => {
-          if (activeInfoWindow) {
-            activeInfoWindow.close();
-            activeInfoWindow = null; // 清除記錄
-          }
-        });
-
-      mapMarkers.value.push(mapMark);
-    });
+    //   mapMarkers.value.push(mapMark);
+    // });
 
     // const buttonOrigin = document.createElement("button");
     // buttonOrigin.className="btn-yellow"
@@ -218,6 +207,103 @@ onMounted(() => {
   }
 
   // =========================================繪圖功能=================================================================
+  //分批渲染for delay
+  function renderMarkerInBatches(list,map){
+    const batchSize=20;
+    let index = 0;
+
+    function processBatch(){
+      const batch = list.slice(index, index+batchSize);
+
+
+      batch.forEach((marker)=>{
+
+      const dateSpec = '1999-01-01T00:00:00';
+      const sourceDate = new Date(marker.paidDate);
+      const targetDate = new Date(dateSpec);
+
+      const buttonElement = document.createElement("button");
+      if (sourceDate > targetDate) {
+        buttonElement.className ="btn-info"
+        ibtns.value.push(buttonElement);
+      } else {
+        buttonElement.className="btn-purple"
+        pbtns.value.push(buttonElement);
+      }
+      buttonElement.innerHTML=`${(Number(marker.price)/1000).toFixed(1)}K`
+      buttonElement.style.pointerEvents = "auto";
+
+      var latlng = new google.maps.LatLng(marker.lat, marker.lng);
+      var mapMark = new google.maps.marker.AdvancedMarkerElement({
+        position: latlng,
+        map: map.value,
+        title: marker.street,
+        content: buttonElement,
+      });
+
+      const contentContainer = document.createElement('div');
+      contentContainer.classList.add('card','custom-shadow','card-shadow');
+      contentContainer.style.width='36em'
+      
+      contentContainer.addEventListener('click',()=>{
+        openHouseView(Number(marker.houseid))
+      })
+
+      // 使用 Vue 渲染 InfoWindowContent 組件
+      const app = createApp(HousePhotos, {
+        houseId: marker.houseid,
+      });
+      app.mount(contentContainer);
+
+      // 創建 InfoWindow 並嵌入渲染的 Vue 組件
+      const infoWindow = new google.maps.InfoWindow({
+        content: contentContainer,
+      });
+
+      const paragraph1 = document.createElement('p');
+      paragraph1.textContent = `NT$ ${marker.price}`;
+      paragraph1.style.fontSize='24px'
+      paragraph1.style.fontWeight='bold'
+      paragraph1.style.margin = '10px 0 0 20px'
+      contentContainer.appendChild(paragraph1);
+
+      const paragraph2 = document.createElement('p');
+      paragraph2.textContent = marker.address;
+      paragraph2.style.fontSize='18px'
+      paragraph2.style.margin = '10px 0 10px 20px'
+      contentContainer.appendChild(paragraph2);
+
+      // 點擊標記顯示資訊窗口 
+      mapMark.addListener('click', () => {
+        if (activeInfoWindow) {
+          activeInfoWindow.close(); // 關閉當前開啟的 InfoWindow
+          }
+          infoWindow.open(map.value, mapMark);
+          activeInfoWindow = infoWindow; // 記錄新打開的 InfoWindow
+          // store.updateSeleted(marker);
+          clearAllButtons(buttonElement)
+          // activeBtn.value = buttonElement
+          buttonElement.className ="btn-red"
+      });
+        
+      map.value.addListener('click', () => {
+        if (activeInfoWindow) {
+          activeInfoWindow.close();
+          activeInfoWindow = null; // 清除記錄
+        }
+      });
+
+      mapMarkers.value.push(mapMark);
+    })
+    index += batchSize;
+    if (index < list.length){
+      setTimeout(processBatch, 100);
+    }
+  }
+  processBatch();
+}
+
+
   // 開始繪圖
   function startDrawing(event) {
     isDrawing = true;
@@ -295,6 +381,7 @@ onMounted(() => {
     } else {
       // 關閉繪圖模式
       canvasElement.style.pointerEvents = 'none';
+      clearPoint();
       map.value.setOptions({
         draggable: true,
         gestureHandling: 'auto',

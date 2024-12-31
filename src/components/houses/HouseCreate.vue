@@ -1,110 +1,304 @@
 <template>
   <div class="container mt-5">
     <h2 class="text-center section-title">新增房屋</h2>
-    <hr>
+    <hr />
     <form @submit.prevent="submitForm">
-      <div class="form-group" :class="{'is-invalid': errors.title}"> 
-        <label for="title">標題</label> 
-        <input type="text" id="title" class="form-control" v-model="form.title" @input="validateTitle" required />
-        <div v-if="errors.title" class="invalid-feedback">標題不可包含特殊字元！</div>
+      <div class="form-group" :class="{ 'has-error': errors.title }">
+        <label for="title">標題</label>
+        <input
+          type="text"
+          id="title"
+          class="form-control"
+          v-model="form.title"
+          @input="validateTitle"
+          required
+          placeholder="不允許輸入特殊字元"
+        />
+        <div v-if="errors.title" class="error-message">
+          {{ errorMessages.title }}
+        </div>
       </div>
       <div class="form-row">
-        <div class="form-group col-md-6" :class="{'is-invalid': errors.price}"> 
-          <label for="price">價格</label> 
-          <input type="number" id="price" class="form-control" v-model.number="form.price" required min="0" />
+        <div class="form-group col-md-6" :class="{ 'has-error': errors.price }">
+          <label for="price">價格</label>
+          <input
+            type="number"
+            id="price"
+            class="form-control"
+            v-model.number="form.price"
+            required
+            min="0"
+          />
+          <div v-if="errors.price" class="error-message">
+            {{ errorMessages.price }}
+          </div>
         </div>
-        <div class="form-group col-md-6" :class="{'is-invalid': errors.size}"> 
-          <label for="size">坪數</label> 
-          <input type="number" id="size" class="form-control" v-model.number="form.size" required min="1" />
+        <div class="form-group col-md-6" :class="{ 'has-error': errors.size }">
+          <label for="size">坪數</label>
+          <input
+            type="number"
+            id="size"
+            class="form-control"
+            v-model.number="form.size"
+            required
+            min="1"
+          />
+          <div v-if="errors.size" class="error-message">
+            {{ errorMessages.size }}
+          </div>
         </div>
       </div>
-      <div class="form-group"> 
-        <label for="address">詳細地址</label> 
-        <input type="text" id="address" class="form-control" v-model="form.address" required /> 
+      <div class="form-group">
+        <label for="address">詳細地址</label>
+        <input
+          type="text"
+          id="address"
+          class="form-control"
+          v-model="form.address"
+          required
+        />
       </div>
+
       <div class="form-row">
-        <div class="form-group col-md-3" :class="{'is-invalid': errors.room}"> 
-          <label for="room">房間數</label> 
-          <input type="number" id="room" class="form-control" v-model.number="form.room" required min="0" max="255" @input="validateNumber('room')" />
-          <div v-if="errors.room" class="invalid-feedback">請輸入 0 到 255 之間的數字！</div>
+        <div class="form-group col-md-3" :class="{ 'has-error': errors.room }">
+          <label for="room">房間數</label>
+          <input
+            type="number"
+            id="room"
+            class="form-control"
+            v-model.number="form.room"
+            required
+            min="0"
+            max="255"
+            @input="validateNumber('room')"
+          />
+          <div v-if="errors.room" class="error-message">
+            {{ errorMessages.room }}
+          </div>
         </div>
-        <div class="form-group col-md-3" :class="{'is-invalid': errors.bathroom}"> 
-          <label for="bathroom">浴廁數量</label> 
-          <input type="number" id="bathroom" class="form-control" v-model.number="form.bathroom" required min="0" max="255" @input="validateNumber('bathroom')" />
-          <div v-if="errors.bathroom" class="invalid-feedback">請輸入 0 到 255 之間的數字！</div>
+
+        <div
+          class="form-group col-md-3"
+          :class="{ 'has-error': errors.bathroom }"
+        >
+          <label for="bathroom">浴廁數量</label>
+          <input
+            type="number"
+            id="bathroom"
+            class="form-control"
+            v-model.number="form.bathroom"
+            required
+            min="0"
+            max="255"
+            @input="validateNumber('bathroom')"
+          />
+          <div v-if="errors.bathroom" class="error-message">
+            {{ errorMessages.bathroom }}
+          </div>
         </div>
-        <div class="form-group col-md-3" :class="{'is-invalid': errors.livingroom}"> 
-          <label for="livingroom">客廳數量</label> 
-          <input type="number" id="livingroom" class="form-control" v-model.number="form.livingroom" required min="0" max="255" @input="validateNumber('livingroom')" />
-          <div v-if="errors.livingroom" class="invalid-feedback">請輸入 0 到 255 之間的數字！</div>
+
+        <div
+          class="form-group col-md-3"
+          :class="{ 'has-error': errors.livingroom }"
+        >
+          <label for="livingroom">客廳數量</label>
+          <input
+            type="number"
+            id="livingroom"
+            class="form-control"
+            v-model.number="form.livingroom"
+            required
+            min="0"
+            max="255"
+            @input="validateNumber('livingroom')"
+          />
+          <div v-if="errors.livingroom" class="error-message">
+            {{ errorMessages.livingroom }}
+          </div>
         </div>
-        <div class="form-group col-md-3" :class="{'is-invalid': errors.floor}"> 
-          <label for="floor">樓層</label> 
-          <input type="number" id="floor" class="form-control" v-model.number="form.floor" required min="-3" max="255" @input="validateNumber('floor')" />
-          <div v-if="errors.floor" class="invalid-feedback">請輸入 -3 到 255 之間的數字！</div>
+
+        <div class="form-group col-md-3" :class="{ 'has-error': errors.floor }">
+          <label for="floor">樓層</label>
+          <input
+            type="number"
+            id="floor"
+            class="form-control"
+            v-model.number="form.floor"
+            required
+            min="-3"
+            max="255"
+            @input="validateNumber('floor')"
+          />
+          <div v-if="errors.floor" class="error-message">
+            {{ errorMessages.floor }}
+          </div>
         </div>
       </div>
-      <div class="form-group"> <label for="houseType">房屋類型</label> <select id="houseType" class="form-control"
-          v-model="form.houseType" required>
+      <div class="form-group">
+        <label for="houseType">房屋類型</label>
+        <select
+          id="houseType"
+          class="form-control"
+          v-model="form.houseType"
+          required
+        >
           <option value="雅房">雅房</option>
           <option value="分租套房">分租套房</option>
           <option value="獨立套房">獨立套房</option>
           <option value="透天">透天</option>
           <option value="公寓">公寓</option>
           <option value="別墅">別墅</option>
-        </select> </div>
-      <div class="form-group"> <label> <input type="checkbox" v-model="form.atticAddition" /> 是否為頂樓加蓋 </label> </div>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>
+          <input type="checkbox" v-model="form.atticAddition" /> 是否為頂樓加蓋
+        </label>
+      </div>
       <!-- 提供家具與服務 -->
       <hr />
       <h3 class="section-title">提供家具與服務</h3>
       <div class="furniture-services">
         <label class="icon-label">
-          <input type="checkbox" v-model.lazy.number="furnitureServices.washingMachine" />
-          <img src="../../assets/icon/house-on/washingMachine.ico" alt="洗衣機" class="icon-image" /> 洗衣機
+          <input
+            type="checkbox"
+            v-model.lazy.number="furnitureServices.washingMachine"
+          />
+          <img
+            src="../../assets/icon/house-on/washingMachine.ico"
+            alt="洗衣機"
+            class="icon-image"
+          />
+          洗衣機
         </label>
         <label class="icon-label">
-          <input type="checkbox" v-model.lazy.number="furnitureServices.airConditioner" />
-          <img src="../../assets/icon/house-on/airConditioner.ico" alt="空調" class="icon-image" /> 空調
+          <input
+            type="checkbox"
+            v-model.lazy.number="furnitureServices.airConditioner"
+          />
+          <img
+            src="../../assets/icon/house-on/airConditioner.ico"
+            alt="空調"
+            class="icon-image"
+          />
+          空調
         </label>
         <label class="icon-label">
-          <input type="checkbox" v-model.lazy.number="furnitureServices.network" />
-          <img src="../../assets/icon/house-on/network.ico" alt="網路" class="icon-image" /> 網路
+          <input
+            type="checkbox"
+            v-model.lazy.number="furnitureServices.network"
+          />
+          <img
+            src="../../assets/icon/house-on/network.ico"
+            alt="網路"
+            class="icon-image"
+          />
+          網路
         </label>
         <label class="icon-label">
-          <input type="checkbox" v-model.lazy.number="furnitureServices.bedstead" />
-          <img src="../../assets/icon/house-on/Bedsteck.ico" alt="床架" class="icon-image" /> 床架
+          <input
+            type="checkbox"
+            v-model.lazy.number="furnitureServices.bedstead"
+          />
+          <img
+            src="../../assets/icon/house-on/Bedsteck.ico"
+            alt="床架"
+            class="icon-image"
+          />
+          床架
         </label>
         <label class="icon-label">
-          <input type="checkbox" v-model.lazy.number="furnitureServices.mattress" />
-          <img src="../../assets/icon/house-on/mattress.ico" alt="床墊" class="icon-image" /> 床墊
+          <input
+            type="checkbox"
+            v-model.lazy.number="furnitureServices.mattress"
+          />
+          <img
+            src="../../assets/icon/house-on/mattress.ico"
+            alt="床墊"
+            class="icon-image"
+          />
+          床墊
         </label>
         <label class="icon-label">
-          <input type="checkbox" v-model.lazy.number="furnitureServices.refrigerator" />
-          <img src="../../assets/icon/house-on/refrigerator.ico" alt="冰箱" class="icon-image" /> 冰箱
+          <input
+            type="checkbox"
+            v-model.lazy.number="furnitureServices.refrigerator"
+          />
+          <img
+            src="../../assets/icon/house-on/refrigerator.ico"
+            alt="冰箱"
+            class="icon-image"
+          />
+          冰箱
         </label>
         <label class="icon-label">
-          <input type="checkbox" v-model.lazy.number="furnitureServices.ewaterHeater" />
-          <img src="../../assets/icon/house-on/ewaterHeater.ico" alt="電熱水器" class="icon-image" /> 電熱水器
+          <input
+            type="checkbox"
+            v-model.lazy.number="furnitureServices.ewaterHeater"
+          />
+          <img
+            src="../../assets/icon/house-on/ewaterHeater.ico"
+            alt="電熱水器"
+            class="icon-image"
+          />
+          電熱水器
         </label>
         <label class="icon-label">
-          <input type="checkbox" v-model.lazy.number="furnitureServices.gwaterHeater" />
-          <img src="../../assets/icon/house-on/gas.ico" alt="瓦斯熱水器" class="icon-image" /> 瓦斯熱水器
+          <input
+            type="checkbox"
+            v-model.lazy.number="furnitureServices.gwaterHeater"
+          />
+          <img
+            src="../../assets/icon/house-on/gas.ico"
+            alt="瓦斯熱水器"
+            class="icon-image"
+          />
+          瓦斯熱水器
         </label>
         <label class="icon-label">
-          <input type="checkbox" v-model.lazy.number="furnitureServices.television" />
-          <img src="../../assets/icon/house-on/TV.ico" alt="電視" class="icon-image" /> 電視
+          <input
+            type="checkbox"
+            v-model.lazy.number="furnitureServices.television"
+          />
+          <img
+            src="../../assets/icon/house-on/TV.ico"
+            alt="電視"
+            class="icon-image"
+          />
+          電視
         </label>
         <label class="icon-label">
-          <input type="checkbox" v-model.lazy.number="furnitureServices.channel4" />
-          <img src="../../assets/icon/house-on/channel4.ico" alt="第四台" class="icon-image" /> 第四台
+          <input
+            type="checkbox"
+            v-model.lazy.number="furnitureServices.channel4"
+          />
+          <img
+            src="../../assets/icon/house-on/channel4.ico"
+            alt="第四台"
+            class="icon-image"
+          />
+          第四台
         </label>
         <label class="icon-label">
           <input type="checkbox" v-model.lazy.number="furnitureServices.sofa" />
-          <img src="../../assets/icon/house-on/sofa.ico" alt="沙發" class="icon-image" /> 沙發
+          <img
+            src="../../assets/icon/house-on/sofa.ico"
+            alt="沙發"
+            class="icon-image"
+          />
+          沙發
         </label>
         <label class="icon-label">
-          <input type="checkbox" v-model.lazy.number="furnitureServices.tables" />
-          <img src="../../assets/icon/house-on/desk.ico" alt="桌椅" class="icon-image" /> 桌椅
+          <input
+            type="checkbox"
+            v-model.lazy.number="furnitureServices.tables"
+          />
+          <img
+            src="../../assets/icon/house-on/desk.ico"
+            alt="桌椅"
+            class="icon-image"
+          />
+          桌椅
         </label>
       </div>
 
@@ -114,54 +308,137 @@
       <div class="house-restrictions">
         <label class="icon-label">
           <input type="checkbox" v-model.lazy.number="houseRestrictions.pet" />
-          <img src="../../assets/icon/house-on/PET.ico" alt="允許養寵物" class="icon-image" /> 允許養寵物
+          <img
+            src="../../assets/icon/house-on/PET.ico"
+            alt="允許養寵物"
+            class="icon-image"
+          />
+          允許養寵物
         </label>
         <label class="icon-label">
-          <input type="checkbox" v-model.lazy.number="houseRestrictions.parkingSpace" />
-          <img src="../../assets/icon/house-on/Parking.ico" alt="提供停車位" class="icon-image" /> 提供停車位
+          <input
+            type="checkbox"
+            v-model.lazy.number="houseRestrictions.parkingSpace"
+          />
+          <img
+            src="../../assets/icon/house-on/Parking.ico"
+            alt="提供停車位"
+            class="icon-image"
+          />
+          提供停車位
         </label>
         <label class="icon-label">
-          <input type="checkbox" v-model.lazy.number="houseRestrictions.elevator" />
-          <img src="../../assets/icon/house-on/elevator.ico" alt="有電梯" class="icon-image" /> 有電梯
+          <input
+            type="checkbox"
+            v-model.lazy.number="houseRestrictions.elevator"
+          />
+          <img
+            src="../../assets/icon/house-on/elevator.ico"
+            alt="有電梯"
+            class="icon-image"
+          />
+          有電梯
         </label>
         <label class="icon-label">
-          <input type="checkbox" v-model.lazy.number="houseRestrictions.balcony" />
-          <img src="../../assets/icon/house-on/balcony.ico" alt="有陽台" class="icon-image" /> 有陽台
+          <input
+            type="checkbox"
+            v-model.lazy.number="houseRestrictions.balcony"
+          />
+          <img
+            src="../../assets/icon/house-on/balcony.ico"
+            alt="有陽台"
+            class="icon-image"
+          />
+          有陽台
         </label>
         <label class="icon-label">
-          <input type="checkbox" v-model.lazy.number="houseRestrictions.shortTerm" />
-          <img src="../../assets/icon/house-on/shortTerm.ico" alt="允許短期租賃" class="icon-image" /> 允許短期租賃
+          <input
+            type="checkbox"
+            v-model.lazy.number="houseRestrictions.shortTerm"
+          />
+          <img
+            src="../../assets/icon/house-on/shortTerm.ico"
+            alt="允許短期租賃"
+            class="icon-image"
+          />
+          允許短期租賃
         </label>
         <label class="icon-label">
-          <input type="checkbox" v-model.lazy.number="houseRestrictions.cooking" />
-          <img src="../../assets/icon/house-on/cooking.ico" alt="允許烹飪" class="icon-image" /> 允許烹飪
+          <input
+            type="checkbox"
+            v-model.lazy.number="houseRestrictions.cooking"
+          />
+          <img
+            src="../../assets/icon/house-on/cooking.ico"
+            alt="允許烹飪"
+            class="icon-image"
+          />
+          允許烹飪
         </label>
         <label class="icon-label">
-          <input type="checkbox" v-model.lazy.number="houseRestrictions.waterDispenser" />
-          <img src="../../assets/icon/house-on/waterDispenser.ico" alt="提供飲水機" class="icon-image" /> 提供飲水機
+          <input
+            type="checkbox"
+            v-model.lazy.number="houseRestrictions.waterDispenser"
+          />
+          <img
+            src="../../assets/icon/house-on/waterDispenser.ico"
+            alt="提供飲水機"
+            class="icon-image"
+          />
+          提供飲水機
         </label>
         <label class="icon-label">
           <input type="checkbox" v-model.lazy.number="houseRestrictions.fee" />
-          <img src="../../assets/icon/house-on/FEE.ico" alt="管理費" class="icon-image" /> 管理費
+          <img
+            src="../../assets/icon/house-on/FEE.ico"
+            alt="管理費"
+            class="icon-image"
+          />
+          管理費
         </label>
         <label class="icon-label">
-          <input type="checkbox" v-model.lazy.number="houseRestrictions.genderRestrictions" />
-          <img src="../../assets/icon/house-on/gender.ico" alt="性別限制" class="icon-image" /> 性別限制
+          <input
+            type="checkbox"
+            v-model.lazy.number="houseRestrictions.genderRestrictions"
+          />
+          <img
+            src="../../assets/icon/house-on/gender.ico"
+            alt="性別限制"
+            class="icon-image"
+          />
+          性別限制
         </label>
       </div>
 
       <!-- 性別選項 -->
       <div v-if="houseRestrictions.genderRestrictions">
         <label>
-          <input type="radio" name="genderOption" value="1" v-model="genderOption" />
-          <img src="../../assets/icon/house-on/male.ico" alt="male" class="icon-image" />
+          <input
+            type="radio"
+            name="genderOption"
+            value="1"
+            v-model="genderOption"
+          />
+          <img
+            src="../../assets/icon/house-on/male.ico"
+            alt="male"
+            class="icon-image"
+          />
         </label>
         <label>
-          <input type="radio" name="genderOption" value="2" v-model="genderOption" />
-          <img src="../../assets/icon/house-on/female.ico" alt="female" class="icon-image" />
+          <input
+            type="radio"
+            name="genderOption"
+            value="2"
+            v-model="genderOption"
+          />
+          <img
+            src="../../assets/icon/house-on/female.ico"
+            alt="female"
+            class="icon-image"
+          />
         </label>
       </div>
-
 
       <!-- 設定預約時段 -->
       <hr />
@@ -172,19 +449,35 @@
       <hr />
       <h3 class="section-title">簡介</h3>
       <div class="form-group">
-        <textarea class="form-control" id="description" v-model="form.description"></textarea>
+        <textarea
+          class="form-control"
+          id="description"
+          v-model="form.description"
+        ></textarea>
       </div>
 
       <!-- 上傳圖片 -->
       <hr />
       <label for="fileInput">上傳圖片</label>
-      <input type="file" id="fileInput" multiple @change="handleFileUpload" accept="image/*" />
+      <input
+        type="file"
+        id="fileInput"
+        multiple
+        @change="handleFileUpload"
+        accept="image/*"
+      />
 
       <!-- 圖片預覽 -->
       <div class="image-preview">
-        <div v-for="(image, index) in images" :key="index" class="image-container">
+        <div
+          v-for="(image, index) in images"
+          :key="index"
+          class="image-container"
+        >
           <img :src="image.imageUrl" alt="Preview" class="image-thumbnail" />
-          <button @click="removeImage(index)" class="remove-btn">刪除</button>
+          <button @click="removeImage(index)" class="remove-btn">
+            <img src="../../assets/delete-24.png" class="btm" alt="刪除" />
+          </button>
         </div>
       </div>
 
@@ -195,31 +488,47 @@
 </template>
 
 <script>
-import { ref, reactive } from 'vue';
-import BookingSlotSetting from '../Booking/BookingSlotSetting.vue';
-
+import { ref, reactive } from "vue";
+import BookingSlotSetting from "../Booking/BookingSlotSetting.vue";
 
 export default {
   emits: ["close"],
   components: {
-    BookingSlotSetting
+    BookingSlotSetting,
   },
   setup() {
     const form = reactive({
-      title: '',
+      title: "",
       price: null,
       size: null,
-      address: '',
+      address: "",
       room: null,
       bathroom: null,
       livingroom: null,
       kitchen: null,
       floor: null,
-      description: '',
-      houseType: '',
-      atticAddition: false
+      description: "",
+      houseType: "",
+      atticAddition: false,
     });
-
+    const errors = reactive({
+      title: false,
+      price: false,
+      size: false,
+      room: false,
+      bathroom: false,
+      livingroom: false,
+      floor: false,
+    });
+    const errorMessages = reactive({
+      title: "",
+      price: "",
+      size: "",
+      room: "",
+      bathroom: "",
+      livingroom: "",
+      floor: "",
+    });
     const furnitureServices = reactive({
       washingMachine: false,
       airConditioner: false,
@@ -252,10 +561,33 @@ export default {
     };
     const validateNumber = (field) => {
       const value = form[field];
-      if (field === 'floor') {
-        errors[field] = value < -3 || value > 255;
+      if (field === "price" && (value < 0 || value === null)) {
+        errors.price = true;
+        errorMessages.price = "價格必須大於等於 0！";
+      } else if (field === "size" && (value < 1 || value === null)) {
+        errors.size = true;
+        errorMessages.size = "坪數必須大於等於 1！";
+      } else if (
+        (field === "room" || field === "bathroom" || field === "livingroom") &&
+        (value < 0 || value > 255 || value === null)
+      ) {
+        errors[field] = true;
+        errorMessages[field] = `${
+          field === "room"
+            ? "房間數"
+            : field === "bathroom"
+            ? "浴廁數量"
+            : "客廳數量"
+        }必須介於 0 到 255！`;
+      } else if (
+        field === "floor" &&
+        (value < -3 || value > 255 || value === null)
+      ) {
+        errors.floor = true;
+        errorMessages.floor = "樓層必須介於 -3 到 255！";
       } else {
-        errors[field] = value < 0 || value > 255;
+        errors[field] = false;
+        errorMessages[field] = "";
       }
     };
     const genderOption = ref(null);
@@ -265,11 +597,11 @@ export default {
     const handleFileUpload = (event) => {
       const files = Array.from(event.target.files);
       files.forEach((file) => {
-        if (file && file.type.startsWith('image/')) {
+        if (file && file.type.startsWith("image/")) {
           const imageUrl = URL.createObjectURL(file);
           images.value.push({ file, imageUrl });
         } else {
-          alert('只能上傳圖片檔案！');
+          alert("只能上傳圖片檔案！");
         }
       });
     };
@@ -282,74 +614,103 @@ export default {
       const formData = new FormData();
 
       // Basic house details
-      formData.append('title', form.title || '');
-      formData.append('price', form.price || '0');
-      formData.append('size', form.size || '0');
-      formData.append('address', form.address || ''); // 確認這裡的鍵名和模板一致
-      formData.append('room', form.room || '0');
-      formData.append('bathroom', form.bathroom || '0');
-      formData.append('livingroom', form.livingroom || '0');
-      formData.append('kitchen', form.kitchen || '0');
-      formData.append('floor', form.floor || '0');
-      formData.append('description', form.description || '');
-      formData.append('houseType', form.houseType || '');
-      formData.append('atticAddition', form.atticAddition ? '1' : '0');
+      formData.append("title", form.title || "");
+      formData.append("price", form.price || "0");
+      formData.append("size", form.size || "0");
+      formData.append("address", form.address || ""); // 確認這裡的鍵名和模板一致
+      formData.append("room", form.room || "0");
+      formData.append("bathroom", form.bathroom || "0");
+      formData.append("livingroom", form.livingroom || "0");
+      formData.append("kitchen", form.kitchen || "0");
+      formData.append("floor", form.floor || "0");
+      formData.append("description", form.description || "");
+      formData.append("houseType", form.houseType || "");
+      formData.append("atticAddition", form.atticAddition ? "1" : "0");
       // Furniture Services (BOOLEAN to BYTE: true = 1, false = 0)
-      formData.append('washingMachine', furnitureServices.washingMachine ? '1' : '0');
-      formData.append('airConditioner', furnitureServices.airConditioner ? '1' : '0');
-      formData.append('network', furnitureServices.network ? '1' : '0');
-      formData.append('bedstead', furnitureServices.bedstead ? '1' : '0');
-      formData.append('mattress', furnitureServices.mattress ? '1' : '0');
-      formData.append('refrigerator', furnitureServices.refrigerator ? '1' : '0');
-      formData.append('ewaterHeater', furnitureServices.ewaterHeater ? '1' : '0');
-      formData.append('gwaterHeater', furnitureServices.gwaterHeater ? '1' : '0');
-      formData.append('television', furnitureServices.television ? '1' : '0');
-      formData.append('channel4', furnitureServices.channel4 ? '1' : '0');
-      formData.append('sofa', furnitureServices.sofa ? '1' : '0');
-      formData.append('tables', furnitureServices.tables ? '1' : '0');
+      formData.append(
+        "washingMachine",
+        furnitureServices.washingMachine ? "1" : "0"
+      );
+      formData.append(
+        "airConditioner",
+        furnitureServices.airConditioner ? "1" : "0"
+      );
+      formData.append("network", furnitureServices.network ? "1" : "0");
+      formData.append("bedstead", furnitureServices.bedstead ? "1" : "0");
+      formData.append("mattress", furnitureServices.mattress ? "1" : "0");
+      formData.append(
+        "refrigerator",
+        furnitureServices.refrigerator ? "1" : "0"
+      );
+      formData.append(
+        "ewaterHeater",
+        furnitureServices.ewaterHeater ? "1" : "0"
+      );
+      formData.append(
+        "gwaterHeater",
+        furnitureServices.gwaterHeater ? "1" : "0"
+      );
+      formData.append("television", furnitureServices.television ? "1" : "0");
+      formData.append("channel4", furnitureServices.channel4 ? "1" : "0");
+      formData.append("sofa", furnitureServices.sofa ? "1" : "0");
+      formData.append("tables", furnitureServices.tables ? "1" : "0");
 
       // House Restrictions (BOOLEAN to BYTE: true = 1, false = 0)
-      formData.append('pet', houseRestrictions.pet ? '1' : '0');
-      formData.append('parkingSpace', houseRestrictions.parkingSpace ? '1' : '0');
-      formData.append('elevator', houseRestrictions.elevator ? '1' : '0');
-      formData.append('balcony', houseRestrictions.balcony ? '1' : '0');
-      formData.append('shortTerm', houseRestrictions.shortTerm ? '1' : '0');
-      formData.append('cooking', houseRestrictions.cooking ? '1' : '0');
-      formData.append('waterDispenser', houseRestrictions.waterDispenser ? '1' : '0');
-      formData.append('managementFee', houseRestrictions.fee ? '1' : '0');
+      formData.append("pet", houseRestrictions.pet ? "1" : "0");
+      formData.append(
+        "parkingSpace",
+        houseRestrictions.parkingSpace ? "1" : "0"
+      );
+      formData.append("elevator", houseRestrictions.elevator ? "1" : "0");
+      formData.append("balcony", houseRestrictions.balcony ? "1" : "0");
+      formData.append("shortTerm", houseRestrictions.shortTerm ? "1" : "0");
+      formData.append("cooking", houseRestrictions.cooking ? "1" : "0");
+      formData.append(
+        "waterDispenser",
+        houseRestrictions.waterDispenser ? "1" : "0"
+      );
+      formData.append("managementFee", houseRestrictions.fee ? "1" : "0");
 
       // Booking Setting
-      formData.append('fromDate', bookingForm.value.fromDate);
-      formData.append('toDate', bookingForm.value.toDate);
-      formData.append('fromTime', bookingForm.value.fromTime);
-      formData.append('toTime', bookingForm.value.toTime);
-      formData.append('duration', bookingForm.value.duration);
-      formData.append('weekDay', bookingForm.value.weekDay);
+      formData.append("fromDate", bookingForm.value.fromDate);
+      formData.append("toDate", bookingForm.value.toDate);
+      formData.append("fromTime", bookingForm.value.fromTime);
+      formData.append("toTime", bookingForm.value.toTime);
+      formData.append("duration", bookingForm.value.duration);
+      formData.append("weekDay", bookingForm.value.weekDay);
       // Object.keys(bookingForm.value).forEach((key) => {
       //   formData.append(key, bookingForm.value[key]);
       // });
 
       // Gender Restrictions (Specific BYTE values)
       const genderRestrictionsByte = houseRestrictions.genderRestrictions
-        ? (genderOption.value === '1' ? '1' : '2')
-        : '0';
-      formData.append('genderRestrictions', genderRestrictionsByte);
+        ? genderOption.value === "1"
+          ? "1"
+          : "2"
+        : "0";
+      formData.append("genderRestrictions", genderRestrictionsByte);
 
       // Image Handling
       images.value.forEach((image, index) => {
-        formData.append('images', image.file);
+        formData.append("images", image.file);
       });
 
       // Debug: Log FormData contents
       for (let [key, value] of formData.entries()) {
         console.log(key, value);
       }
-      const token = localStorage.getItem('jwt');
-      fetch(import.meta.env.VITE_APIURL + '/houses/add', {
-        method: 'POST',
+      validateTitle();
+      validateNumber("price");
+      validateNumber("size");
+      if (Object.values(errors).some((value) => value)) {
+        alert("請修正表單中的錯誤！");
+        return;
+      }
+      const token = localStorage.getItem("jwt");
+      fetch(import.meta.env.VITE_APIURL + "/houses/add", {
+        method: "POST",
         headers: {
           Authorization: token,
-
         },
         body: formData,
       })
@@ -362,19 +723,19 @@ export default {
           return response.json();
         })
         .then((data) => {
-          alert('房屋新增成功！');
+          alert("房屋新增成功！");
           resetForm();
-          emit('close'); 
+          emits("close");
         })
         .catch((error) => {
-          console.error('提交失敗:', error);
-          alert('提交失敗：' + error.message);
+          console.error("提交失敗:", error);
+          alert("提交失敗：" + error.message);
         });
     };
 
     const resetForm = () => {
       Object.keys(form).forEach((key) => {
-        form[key] = '';
+        form[key] = "";
       });
       Object.keys(furnitureServices).forEach((key) => {
         furnitureServices[key] = false;
@@ -398,6 +759,7 @@ export default {
       validateTitle,
       validateNumber,
       errors,
+      errorMessages,
     };
   },
 };
@@ -422,14 +784,6 @@ body {
   /* 加大字體 */
   margin-bottom: 10px;
   text-align: center;
-}
-.is-invalid {
-  border-color: red;
-}
-.invalid-feedback {
-  color: red;
-  font-size: 0.9em;
-  margin-top: 5px;
 }
 hr {
   margin: 20px 0;
@@ -489,7 +843,7 @@ hr {
   object-fit: contain;
 }
 
-.icon-label input[type='checkbox'] {
+.icon-label input[type="checkbox"] {
   margin-right: 10px;
 }
 
@@ -503,5 +857,24 @@ hr {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+}
+
+.has-error .form-control {
+  border-color: red;
+}
+
+.error-message {
+  color: red;
+  font-size: 0.9em;
+  margin-top: 5px;
+}
+
+.remove-btn {
+  font-size: 0.8rem;
+  padding: 4px 8px;
+  margin-top: 3px;
+}
+.btm {
+  transform: scale(0.3);
 }
 </style>

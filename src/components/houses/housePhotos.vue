@@ -1,6 +1,8 @@
 <template>
   <div>
-    <div v-if="loading" class="loading">加載中...</div>
+    <div v-if="loading" class="loading">
+      <div class="spinner"></div>
+    </div>
     <div v-else-if="error" class="error">
       {{ error.message }}
       <button @click="fetchHousePhotos" class="retry-button">重試</button>
@@ -11,13 +13,11 @@
         <Splide :options="splideOptions" class="splide-container">
           <template #arrows>
             <button class="splide__arrow splide__arrow--prev">
-
               <svg viewBox="0 0 24 24">
                 <path d="M15 18l-6-6 6-6" />
               </svg>
             </button>
             <button class="splide__arrow splide__arrow--next">
-
               <svg viewBox="0 0 24 24">
                 <path d="M9 6l6 6-6 6" />
               </svg>
@@ -130,16 +130,38 @@ export default {
 </script>
 
 <style scoped>
+/* Loading Spinner */
+.spinner {
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-top: 4px solid #007bff; /* 藍色 Spinner */
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 20px auto;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 .loading {
   text-align: center;
   font-size: 1.2rem;
   color: #555;
 }
+
 .error {
   text-align: center;
   color: red;
   font-size: 1.2rem;
 }
+
 .retry-button {
   background-color: #007bff;
   color: white;
@@ -149,31 +171,35 @@ export default {
   border-radius: 4px;
   margin-top: 10px;
 }
+
 .retry-button:hover {
   background-color: #0056b3;
 }
+
 .no-photos {
   text-align: center;
   color: #777;
   font-size: 1.2rem;
 }
+
 .main-photo {
   display: block;
   margin: 0 auto;
-  max-width: 100%; /* 調整為 100% 以適應容器 */
-  max-height: 500px;
+  max-width: 100%;
+  max-height: 300px;
   object-fit: contain;
   border: 1px solid #ddd;
   border-radius: 8px;
   transition: transform 0.3s ease;
   cursor: pointer;
 }
+
 .main-photo:hover {
   transform: scale(1.05);
 }
 
 .splide-container {
-  width: 100%; /* 確保容器佔滿父元素的寬度 */
+  width: 100%;
   padding: 1rem;
 }
 
@@ -190,7 +216,7 @@ export default {
 }
 
 .splide__arrow svg {
-  fill: #ff9800; /* 箭頭颜色 */
+  fill: #ff9800;
   width: 100%;
   height: 100%;
 }
@@ -210,24 +236,28 @@ export default {
 .splide__pagination {
   bottom: -1.5rem;
 }
-
-.splide__pagination__page {
-  background-color: gray;
-  width: 12px;
-  height: 12px;
+::v-deep(.splide__pagination__page) {
+  background-color: lightgray !important;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
+  margin: 0 5px;
 }
 
-.splide__pagination__page.is-active {
-  background-color: red;
+::v-deep(.splide__pagination__page.is-active) {
+  background-color: #4feac0 !important;
+  transform: scale(1.2);
 }
 
-/* 响应式样式 */
+::v-deep(.splide__pagination__page:hover) {
+  background-color: #4fe4ea !important;
+}
 @media (max-width: 1200px) {
   .main-photo {
     max-width: 80%;
   }
 }
+
 @media (max-width: 768px) {
   .main-photo {
     max-width: 70%;

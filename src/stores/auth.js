@@ -10,7 +10,7 @@ export const useAuthStore = defineStore('auth', {
   }),
   actions: {
     checkLoginStatus() {
-      const token = localStorage.getItem('jwt_token');
+      const token = localStorage.getItem('jwt');
       if (token) {
         this.isLoggedIn = true;
         this.fetchUserProfile();

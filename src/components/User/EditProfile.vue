@@ -12,10 +12,10 @@
                 <div class="mb-3">
                   <label for="user_id" class="form-label">使用者ID</label>
                   <input
-                    type="text"
+                    type="text" 
                     class="form-control"
                     id="user_id"
-                    v-model="user.user_id"
+                    v-model="user.userId"
                     disabled
                   />
                 </div>
@@ -42,7 +42,8 @@
                 </div>
 
                 <div class="mb-3">
-                  <label for="password" class="form-label">密碼</label>
+                  <label for="password" class="form-label">密碼</label><div></div>
+                  <small class="form-text">密碼需至少8個字母，並包含英數字</small>
                   <input
                     type="password"
                     class="form-control"
@@ -52,7 +53,8 @@
                 </div>
 
                 <div class="mb-3">
-                  <label for="phone" class="form-label">手機</label>
+                  <label for="phone" class="form-label">手機</label><div></div>
+                  <small class="form-text">手機格式須為0912345678</small>
                   <input
                     type="text"
                     class="form-control"
@@ -62,7 +64,7 @@
                 </div>
 
                 <div class="mb-3">
-                  <label for="picture" class="form-label">大頭貼</label>
+                  <!-- <label for="picture" class="form-label">大頭貼</label>
                   <input
                     type="file"
                     class="form-control"
@@ -71,11 +73,17 @@
                   />
                   <img
                     v-if="previewImage"
-                    :src="previewImage"
+                    :src="`data:image/jpeg;base64,${previewImage}`"
                     alt="Profile Picture"
                     class="img-thumbnail mt-3"
                     width="100"
-                  />
+                  /> -->
+                  <label for="profileImage">頭像圖片:</label>
+                  <input type="file" id="profileImage" @change="handleImageUpload" accept="image/*" />
+                  <div v-if="previewImage">
+                    <p>預覽圖片:</p>
+                    <img :src="previewImage" alt="Profile Preview" style="max-width: 200px;" />
+                  </div>
                 </div>
 
                 <div class="mb-3">
@@ -84,7 +92,7 @@
                     type="text"
                     class="form-control"
                     id="createtime"
-                    v-model="user.createtime"
+                    v-model="user.createTime"
                     disabled
                   />
                 </div>
@@ -172,63 +180,102 @@
 
 <script>
 import api from "../../api/api"; // 確保路徑正確
-
 export default {
   name: "EditProfile",
   data() {
     return {
       user: {
-        user_id: 1,
-        name: "John Doe",
-        email: "john@example.com",
+        userId: "", 
+        name: "",
+        email: "",
         password: "",
-        phone: "0912345678",
-        picture: "",
-        createtime: "2024-01-01",
-        gender: 0,
+        phone: "",
+        imageBase64: "",
+        createTime: "",
+        gender: null,
         coupon: 3,
-        status: 1,
+        status: null,
       },
-      previewImage: null,
+      previewImage : null,
     };
   },
+  created() {
+    // 1. 使用 post 請求載入目前登入會員資料
+    api
+      .post("http://localhost:8080/api/user/userCenter") // 獲取會員資料的 API
+      .then((response) => {
+        this.user = {
+          ...response.data,
+          password: "", // 預防直接顯示密碼，保留為空
+        };
+        // this.user.userId = response.data.userId
+        console.log(response.data)
+        console.log(JSON.stringify(this.user))
+      })
+      .catch((error) => {
+        console.error("載入會員資料失敗", error);
+        alert("無法載入會員資料，請稍後再試！");
+      });
+  },
   methods: {
-    handleFileUpload(event) {
-      const file = event.target.files[0];
-      if (file) {
-        this.previewImage = URL.createObjectURL(file);
-        this.user.picture = file;
+    // 2. 使用 PUT 請求更新會員資料
+    async submitForm() {
+      try {
+        const response = await api.put("http://localhost:8080/api/user/update", this.user);
+        if (!response || response.status !== 200) {
+          throw new Error("資料更新失敗");
+        }
+        alert("資料已成功更新！");
+        console.log(response.data);
+      } catch (error) {
+        console.error("資料更新錯誤", error);
+        alert("發生錯誤，請稍後再試！");
       }
     },
-    submitForm() {
-      api
-        .put("http://localhost:8080/api/user/update", this.user)
-        .then((response) => {
-          console.log("資料已儲存", response);
-          this.showModal("資料已儲存！");
-        })
-        .catch((error) => {
-          console.error("儲存資料錯誤", error);
-          this.showModal("儲存資料時發生錯誤！");
-        });
-    },
-    confirmDeactivate() {
-      console.log("帳號已停用");
-      this.$router.push({ name: "DeactivateAccount" });
-    },
-    showModal(message) {
-      this.modalMessage = message;
-      const modal = new bootstrap.Modal(
-        document.getElementById("alertModal"),
-        {}
-      );
-      modal.show();
+    // updateUser() {
+    //   api
+    //     .put("http://localhost:8080/api/user/update", this.user) // 更新會員資料的 API
+    //     .then(() => {
+    //     console.log(this.user) 
+    //       alert("會員資料更新成功！");
+    //     })
+    //     .catch((error) => {
+    //       console.error("更新會員資料失敗", error);
+    //       alert("更新失敗，請檢查輸入內容！");
+    //     });
+    // },
+   // 3. 提交表單
+  //  submitForm() {
+  //     this.updateUser();
+  //   },
+    handleImageUpload(event) {
+      const file = event.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          this.user.imageBase64 = e.target.result; // 將圖片 Base64 賦值到 user
+          this.previewImage = e.target.result; // 更新圖片預覽
+        };
+        reader.readAsDataURL(file); // 將文件讀取為 Base64
+      }
     },
   },
 };
 </script>
 
 <style scoped>
+.form-text {
+  color: red;          /* 設定文字顏色為紅色 */
+}
+
+.form-label {
+  margin-bottom: 2px; /* 減少標籤和下一行之間的間距 */
+}
+
+.form-text {
+  margin-top: 2px; /* 減少提示文字和標籤之間的間距 */
+
+}
 .edit-profile {
   font-family: 'Arial', sans-serif;
 }

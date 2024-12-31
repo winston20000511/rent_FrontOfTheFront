@@ -18,7 +18,7 @@ let token = localStorage.getItem("jwt");
 
 onMounted(async () => {
   // 載入時取得購物車內容
-  console.log("order confirm view cartId: ", cartId);
+  // console.log("order confirm view cartId: ", cartId);
 
   try {
     const url = "http://localhost:8080/api/orders/content/confirmation";
@@ -31,8 +31,6 @@ onMounted(async () => {
       body: cartId,
     });
     const data = await response.json();
-
-    console.log("order confirm page: ", data);
 
     cartItems.value = data;
     isLoading.value = false;
@@ -58,10 +56,10 @@ onMounted(async () => {
 async function processOrderCreation(){
 
   const result = await createOrder();
-  console.log("processOrderCreation result: ", result);
 
   if(result){
     handlePayment(result.merchantTradNo);
+    cartStore.clearCart();
   }else{
     console.error("付款失敗");
   };
@@ -69,7 +67,7 @@ async function processOrderCreation(){
 };
 
 async function createOrder(){
-  console.log("cartStore 資料: ", cartStore);
+  // console.log("cartStore 資料: ", cartStore);
   const result = await cartStore.createOrder();
   return result;
 };
@@ -89,44 +87,35 @@ async function handlePayment(merchantTradNo){
   const body = merchantTradNo;
 
   if (cartStore.thirdParty === "linepay") {
-    console.log("呼叫LINEPAY");
 
     const linepayResponse = await processPayment(
-      "LINEPAY",
+      "linepay",
       "http://localhost:8080/api/linepay/request",
       body,
       headers
     );
 
-    const responseJson = await linepayResponse.json();
-
-    if (responseJson && responseJson.paymentUrl) {
+    if (linepayResponse && linepayResponse.paymentUrl) {
       cartStore.clearCart();
-      window.location.href = responseJson.paymentUrl;
-    };
+      window.location.href = linepayResponse.paymentUrl;
+    }
   };
 
   if (cartStore.thirdParty === "ecpay") {
-    console.log("呼叫ECpay");
 
     const formHTMLResponse = await processPayment(
-      "綠界支付",
+      "ecpay",
       "http://localhost:8080/api/ecpay/ecpayCheckout",
       body,
       headers
     );
 
-    const formHTML = await formHTMLResponse.text();
 
-    console.log("綠界回傳: ", formHTML)
-
-    if (formHTML) {
-      console.log("有得到綠界html");
+    if (formHTMLResponse) {
       cartStore.clearCart();
       const tempDiv = document.createElement("div");
-      tempDiv.innerHTML = formHTML.trim();
+      tempDiv.innerHTML = formHTMLResponse.trim();
       const formElement = tempDiv.firstChild;
-      console.log("formElement", formElement);
       formContainer.value.appendChild(formElement);
       formElement.submit();
     };
@@ -144,25 +133,27 @@ async function processPayment(paymentType, url, body, headers) {
 
     if (!response.ok) throw new Error("支付請求失敗");
 
-    // return await response.json(); // 或根據需要處理返回格式
-    return response;
+    if (paymentType === "linepay") {
+      const data = await response.json();
+      return data;
+    } else if (paymentType === "ecpay") {
+      const formHTML = await response.text();
+      return formHTML;
+    }
+    
   } catch (error) {
     console.error(`${paymentType} 付款失敗: `, error);
     this.$router.push({ name: "ads" });
     return null;
   }
 }
+
 </script>
 
 <template>
   <div class="text-xl mb-3 text-center border-b border-black py-2">
     訂單確認
   </div>
-
-  <div>檢驗付款方式{{ cartStore.thirdParty }}</div>
-  <div>檢驗付款方式{{ cartStore.choosePayment }}</div>
-  <div>使用優惠券{{ cartStore.couponUsage }}</div>
-  <div>使用優惠券{{ cartStore.totalAmount }}</div>
 
   <div v-if="isLoading" class="text-center mt-10">
     <p>資料加載中...</p>
@@ -245,7 +236,7 @@ async function processPayment(paymentType, url, body, headers) {
           </td>
         </tr>
         <tr>
-          <td colspan="8" class="text-right">
+          <td colspan="7" class="text-right">
             <button
               @click="processOrderCreation"
               type="button"

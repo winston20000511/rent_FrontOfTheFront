@@ -6,6 +6,7 @@ export const useOption = defineStore('option', {
     actions: {
       updateData(userOption) {
         this.shareOptions = userOption; // 更新狀態
+
       },
       initializeData() {
         this.shareOptions = {
