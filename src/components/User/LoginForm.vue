@@ -112,7 +112,16 @@ export default {
         console.error("登入錯誤詳情：", error.response || error);
       }
     },
-    executeRecaptcha() {
+    async googleLogin(){
+      const response = await fetch("http://localhost:8080/api/user/google/login",{method: 'get'})
+      if (!response.ok) {
+        throw new Error('Network response was not ok')
+      }
+      const data = await response.json();
+      window.location.href= data.authUrl;
+
+    },
+    executeRecaptcha() {;
       return new Promise((resolve, reject) => {
         if (!window.grecaptcha) {
           reject(new Error("reCAPTCHA 尚未載入，請稍後再試"));
