@@ -1,8 +1,8 @@
 <script setup>
-import { computed } from "vue";
+import { computed,ref } from "vue";
 import { useCart } from "@/stores/cartStore";
-import HouseView from "@/View/HouseView.vue";
 import Dialog from "primevue/dialog";
+import HouseView from "@/View/HouseView.vue";
 
 let token = localStorage.getItem("jwt");
 

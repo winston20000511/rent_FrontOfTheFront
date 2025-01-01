@@ -69,7 +69,7 @@
                       :class="{ active: activeTab === 'ads' }"
                       role="tab"
                     >
-                      我的VIP物件清單
+                      我的廣告
                     </router-link>
                   </li>
 
@@ -81,7 +81,7 @@
                       :class="{ active: activeTab === 'orders' }"
                       role="tab"
                     >
-                      VIP物件訂單
+                      我的訂單
                     </router-link>
                   </li>
 
@@ -131,12 +131,8 @@ export default {
         this.activeTab = "collections";
       } else if (to.path === "/member-center/my-booking") {
         this.activeTab = "booking";
-      } else if (to.path === "/member-center/ads") {
-        this.activeTab = "ads";
       } else if (to.path === "/member-center/homeowner") {
         this.activeTab = "homeowner";
-      } else if (to.path === "/member-center/reservation") {
-        this.activeTab = "reservation";
       } else if (to.path === "/member-center/my-advertisements") {
         this.activeTab = "ads";
       } else if (to.path === "/member-center/my-orders") {
@@ -154,12 +150,8 @@ export default {
       this.activeTab = "collections";
     } else if (this.$route.path === "/member-center/my-booking") {
       this.activeTab = "booking";
-    } else if (this.$route.path === "/member-center/ads") {
-      this.activeTab = "ads";
     } else if (this.$route.path === "/member-center/homeowner") {
       this.activeTab = "homeowner";
-    } else if (this.$route.path === "/member-center/reservation") {
-      this.activeTab = "reservation";
     } else if (this.$route.path === "/member-center/my-advertisements") {
       this.activeTab = "ads";
     } else if (this.$route.path === "/member-center/my-orders") {
