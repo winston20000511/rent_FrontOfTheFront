@@ -725,7 +725,7 @@ export default {
         .then((data) => {
           alert("房屋新增成功！");
           resetForm();
-          emits("close");
+
         })
         .catch((error) => {
           console.error("提交失敗:", error);
