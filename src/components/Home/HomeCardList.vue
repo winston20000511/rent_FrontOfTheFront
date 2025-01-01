@@ -176,7 +176,7 @@ function getShowGood(item) {
 }
 
 .card {
-  max-width: 400px; 
+  max-width: 800px; 
   max-height: 500px; 
   overflow: hidden; 
 }

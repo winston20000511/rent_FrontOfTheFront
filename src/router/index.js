@@ -18,6 +18,7 @@ import MyAdvertisements from "@/components/Ads/MyAdvertisements.vue";
 import ResetPassword from "@/components/User/ResetPassword.vue"; // 新增 ResetPassword 匯入
 
 import DeactivateAccount from "@/components/User/DeactivateAccount.vue";
+import GoogleCallBack from "@/components/User/GoogleCallBack.vue";
 
 const routes = [
   {
@@ -25,6 +26,10 @@ const routes = [
     name: "home",
     component: HomeView,
     props: (route) => ({ markers: route.params.markers || {} }),
+  },
+  {
+    path: "/callback",
+    component: GoogleCallBack,
   },
   {
     path: "/forgot-password", // 忘記密碼頁面
