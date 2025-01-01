@@ -107,7 +107,7 @@ const handleLoginSuccess = () => {
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 999;
+  z-index: 1300;
   overflow: auto; /* 避免內容溢出時遮蓋 */
 }
 

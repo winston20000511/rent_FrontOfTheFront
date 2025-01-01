@@ -47,6 +47,7 @@ import Avatar from "primevue/avatar";
 import BookingView from "@/View/BookingView.vue";
 import axios from "axios";
 import Dialog from 'primevue/dialog';
+import { useAuthStore } from "@/stores/auth";
 
 export default {
   components: {
@@ -127,7 +128,13 @@ export default {
 },
 
     openBookingView() {
-      this.showBookingView = true;
+      const authStore = useAuthStore();
+
+      if (!authStore.isLoggedIn) {
+        authStore.showLogin();
+      } else {
+        this.showBookingView = true;
+      }
     },
 
     closeBookingView() {

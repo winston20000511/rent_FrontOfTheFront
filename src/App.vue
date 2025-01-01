@@ -13,6 +13,7 @@ import CollectHouseList from './components/houses/CollectHouseList.vue';
 import HouseCreate from './components/houses/HouseCreate.vue';
 import HouseUpdate from './components/houses/HouseUpdate.vue';
 import { useHouseCard } from './stores/CardHouseStore';
+import { useAuthStore } from './stores/auth';
 
 const router = useRouter();
 const showChatPopup = ref(false);
@@ -20,6 +21,7 @@ const showChatApp = ref(true);
 const route = useRoute();
 const store = useHouseCard();
 const markers = ref({});
+const authStore = useAuthStore();
 
 const toggleChatPopup = () => {
   showChatPopup.value = !showChatPopup.value;
@@ -84,7 +86,7 @@ const addMarker = (locations,status) => {
     </div>
 
     <!-- 登錄頁面 -->
-    <LoginPage v-if="showLoginPage" @closeLoginPage="toggleLoginPage" />
+    <LoginPage v-if="authStore.showLoginPage" @closeLoginPage="authStore.hideLogin" />
   </div>
 </template>
 

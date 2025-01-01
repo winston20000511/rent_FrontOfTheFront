@@ -7,6 +7,7 @@ export const useAuthStore = defineStore('auth', {
     isLoggedIn: false, // 是否登入
     userProfile: null, // 用戶資料，存儲所有的用戶資料
     profilePicture: null, // 會員頭像 URL
+    showLoginPage: false, // 控制是否顯示登入頁面
   }),
   actions: {
     checkLoginStatus() {
@@ -32,6 +33,12 @@ export const useAuthStore = defineStore('auth', {
       this.isLoggedIn = false; // 更新狀態為未登入
       this.userProfile = null; // 清空用戶資料
       this.profilePicture = null; // 清空頭像 URL
-    }
+    },
+    showLogin() {
+      this.showLoginPage = true; //顯示登入頁面
+    },
+    hideLogin() {
+      this.showLoginPage = false; //關閉登入頁面
+    },
   },
 });

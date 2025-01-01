@@ -174,7 +174,7 @@ const router = useRouter();
 
 const handleSignInClick = () => {
   if (!authStore.isLoggedIn) {
-    emits('signInClicked');
+    authStore.showLogin();
   } else {
     authStore.logout();
     router.push('/');
