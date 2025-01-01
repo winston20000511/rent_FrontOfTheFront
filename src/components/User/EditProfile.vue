@@ -42,18 +42,7 @@
                 </div>
 
                 <div class="mb-3">
-                  <label for="password" class="form-label">密碼</label><div></div>
-                  <small class="form-text">密碼需至少8個字母，並包含英數字</small>
-                  <input
-                    type="password"
-                    class="form-control"
-                    id="password"
-                    v-model="user.password"
-                  />
-                </div>
-
-                <div class="mb-3">
-                  <label for="phone" class="form-label">手機</label><div></div>
+                  <label for="phone" class="form-label">手機</label>
                   <small class="form-text">手機格式須為0912345678</small>
                   <input
                     type="text"
@@ -64,25 +53,15 @@
                 </div>
 
                 <div class="mb-3">
-                  <!-- <label for="picture" class="form-label">大頭貼</label>
-                  <input
-                    type="file"
-                    class="form-control"
-                    id="picture"
-                    @change="handleFileUpload"
-                  />
-                  <img
-                    v-if="previewImage"
-                    :src="`data:image/jpeg;base64,${previewImage}`"
-                    alt="Profile Picture"
-                    class="img-thumbnail mt-3"
-                    width="100"
-                  /> -->
                   <label for="profileImage">頭像圖片:</label>
                   <input type="file" id="profileImage" @change="handleImageUpload" accept="image/*" />
                   <div v-if="previewImage">
                     <p>預覽圖片:</p>
                     <img :src="previewImage" alt="Profile Preview" style="max-width: 200px;" />
+                  </div>
+                  <div v-else-if="user.pictureBase64">
+                    <p>當前頭像:</p>
+                    <img :src="`data:image/jpeg;base64,${user.pictureBase64}`" alt="Current Profile Image" style="max-width: 200px;" />
                   </div>
                 </div>
 
@@ -117,7 +96,13 @@
                 </div>
 
                 <button type="submit" class="btn btn-primary">儲存修改</button>
-                <!-- 新增刪除帳號按鈕 -->
+                <button
+                  type="button"
+                  class="btn btn-secondary ms-2"
+                  @click="showPasswordModal = true"
+                >
+                  修改密碼
+                </button>
                 <button
                   type="button"
                   class="btn btn-danger ms-2"
@@ -133,7 +118,7 @@
       </div>
     </div>
 
-    <!-- Bootstrap Modal -->
+    <!-- 確認刪除帳號彈窗 -->
     <div
       class="modal fade"
       id="confirmModal"
@@ -175,42 +160,46 @@
         </div>
       </div>
     </div>
+
+    <!-- 密碼修改彈窗組件 -->
+    <PasswordModal v-if="showPasswordModal" @close="showPasswordModal = false" />
   </div>
 </template>
 
 <script>
-import api from "../../api/api"; // 確保路徑正確
+import api from "../../api/api";
+import PasswordModal from "./PasswordModal.vue";
+
 export default {
   name: "EditProfile",
+  components: {
+    PasswordModal,
+  },
   data() {
     return {
       user: {
-        userId: "", 
+        userId: "",
         name: "",
         email: "",
-        password: "",
         phone: "",
-        imageBase64: "",
+        pictureBase64: "",
+        imageBytes: [], // 改為 BYTE[]
         createTime: "",
         gender: null,
         coupon: 3,
-        status: null,
       },
-      previewImage : null,
+      previewImage: null,
+      showPasswordModal: false,
     };
   },
   created() {
-    // 1. 使用 post 請求載入目前登入會員資料
     api
-      .post("http://localhost:8080/api/user/userCenter") // 獲取會員資料的 API
+      .post("http://localhost:8080/api/user/userCenter")
       .then((response) => {
-        this.user = {
-          ...response.data,
-          password: "", // 預防直接顯示密碼，保留為空
-        };
-        // this.user.userId = response.data.userId
-        console.log(response.data)
-        console.log(JSON.stringify(this.user))
+        this.user = { ...response.data };
+        if (this.user.pictureBase64) {
+          this.previewImage = `data:image/jpeg;base64,${this.user.pictureBase64}`;
+        }
       })
       .catch((error) => {
         console.error("載入會員資料失敗", error);
@@ -218,90 +207,49 @@ export default {
       });
   },
   methods: {
-    // 2. 使用 PUT 請求更新會員資料
     async submitForm() {
       try {
+        console.log(this.user.imageBytes); // 確認圖片數據是否存在
         const response = await api.put("http://localhost:8080/api/user/update", this.user);
-        if (!response || response.status !== 200) {
-          throw new Error("資料更新失敗");
-        }
+        console.log("資料更新成功，圖片更新成功：" + (this.user.imageBytes.length > 0));
         alert("資料已成功更新！");
-        console.log(response.data);
       } catch (error) {
         console.error("資料更新錯誤", error);
         alert("發生錯誤，請稍後再試！");
       }
     },
-    // updateUser() {
-    //   api
-    //     .put("http://localhost:8080/api/user/update", this.user) // 更新會員資料的 API
-    //     .then(() => {
-    //     console.log(this.user) 
-    //       alert("會員資料更新成功！");
-    //     })
-    //     .catch((error) => {
-    //       console.error("更新會員資料失敗", error);
-    //       alert("更新失敗，請檢查輸入內容！");
-    //     });
-    // },
-   // 3. 提交表單
-  //  submitForm() {
-  //     this.updateUser();
-  //   },
     handleImageUpload(event) {
       const file = event.target.files[0];
       if (file) {
         const reader = new FileReader();
         reader.onload = (e) => {
-          this.user.imageBase64 = e.target.result; // 將圖片 Base64 賦值到 user
-          this.previewImage = e.target.result; // 更新圖片預覽
+          this.user.imageBytes = Array.from(new Uint8Array(e.target.result)); // 將圖片轉換為 BYTE[]
+          console.log("接收到圖片，大小：" + this.user.imageBytes.length + " bytes");
+          this.previewImage = URL.createObjectURL(file); // 預覽圖片
         };
-        reader.readAsDataURL(file); // 將文件讀取為 Base64
+        reader.readAsArrayBuffer(file); // 讀取為 ArrayBuffer
       }
+    },
+    confirmDeactivate() {
+      alert("帳號已停用！");
     },
   },
 };
+
+
 </script>
+
 
 <style scoped>
 .form-text {
-  color: red;          /* 設定文字顏色為紅色 */
+  color: red;
 }
-
-.form-label {
-  margin-bottom: 2px; /* 減少標籤和下一行之間的間距 */
-}
-
-.form-text {
-  margin-top: 2px; /* 減少提示文字和標籤之間的間距 */
-
-}
-.edit-profile {
-  font-family: 'Arial', sans-serif;
-}
-
 .card {
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
-
 .card-header {
   background-color: #007bff;
   color: white;
-  font-size: 1.25rem;
-  border-radius: 10px 10px 0 0;
-}
-
-.card-body {
-  padding: 2rem;
-}
-
-.form-label {
-  font-weight: bold;
-}
-
-.img-thumbnail {
-  max-width: 100%;
-  border-radius: 5px;
 }
 </style>
