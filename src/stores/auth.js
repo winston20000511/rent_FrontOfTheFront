@@ -10,7 +10,7 @@ export const useAuthStore = defineStore('auth', {
   }),
   actions: {
     checkLoginStatus() {
-      const token = localStorage.getItem('jwt_token');
+      const token = localStorage.getItem('token');
       if (token) {
         this.isLoggedIn = true;
         this.fetchUserProfile();
@@ -28,7 +28,7 @@ export const useAuthStore = defineStore('auth', {
       }
     },
     logout() {
-      localStorage.removeItem('jwt_token'); // 移除 token
+      localStorage.removeItem('jwt'); // 移除 jwt
       this.isLoggedIn = false; // 更新狀態為未登入
       this.userProfile = null; // 清空用戶資料
       this.profilePicture = null; // 清空頭像 URL

@@ -23,6 +23,7 @@ const emits = defineEmits(['add-marker', 'signInClicked']);
 onMounted(() => {
   document.addEventListener('click', handleClickOutside);
   optionStore.initializeData();
+  authStore.checkLoginStatus();
 });
 
 onUnmounted(() => {

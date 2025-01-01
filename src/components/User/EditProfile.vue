@@ -1,3 +1,4 @@
+```javascript
 <template>
   <div class="edit-profile">
     <div class="container">
@@ -8,14 +9,14 @@
               <h4>修改會員資料</h4>
             </div>
             <div class="card-body">
-              <form @submit.prevent="submitForm">
+              <form @submit.prevent="handleSubmit">
                 <div class="mb-3">
                   <label for="user_id" class="form-label">使用者ID</label>
                   <input
                     type="text" 
                     class="form-control"
                     id="user_id"
-                    v-model="user.userId"
+                    v-model="formData.userId"
                     disabled
                   />
                 </div>
@@ -26,7 +27,7 @@
                     type="text"
                     class="form-control"
                     id="name"
-                    v-model="user.name"
+                    v-model="formData.name"
                   />
                 </div>
 
@@ -36,54 +37,50 @@
                     type="email"
                     class="form-control"
                     id="email"
-                    v-model="user.email"
+                    v-model="formData.email"
                     disabled
                   />
                 </div>
 
                 <div class="mb-3">
-                  <label for="password" class="form-label">密碼</label><div></div>
+                  <label for="password" class="form-label">密碼</label>
                   <small class="form-text">密碼需至少8個字母，並包含英數字</small>
                   <input
                     type="password"
                     class="form-control"
                     id="password"
-                    v-model="user.password"
+                    v-model="formData.password"
                   />
+                  <span v-if="errors.password" class="error">{{ errors.password }}</span>
                 </div>
 
                 <div class="mb-3">
-                  <label for="phone" class="form-label">手機</label><div></div>
+                  <label for="phone" class="form-label">手機</label>
                   <small class="form-text">手機格式須為0912345678</small>
                   <input
                     type="text"
                     class="form-control"
                     id="phone"
-                    v-model="user.phone"
+                    v-model="formData.phone"
                   />
+                  <span v-if="errors.phone" class="error">{{ errors.phone }}</span>
                 </div>
 
                 <div class="mb-3">
-                  <!-- <label for="picture" class="form-label">大頭貼</label>
-                  <input
-                    type="file"
+                  <label for="picture" class="form-label">大頭貼</label>
+                  <input 
+                    type="file" 
                     class="form-control"
                     id="picture"
-                    @change="handleFileUpload"
+                    @change="handleFileChange"
                   />
-                  <img
-                    v-if="previewImage"
-                    :src="`data:image/jpeg;base64,${previewImage}`"
-                    alt="Profile Picture"
-                    class="img-thumbnail mt-3"
-                    width="100"
-                  /> -->
-                  <label for="profileImage">頭像圖片:</label>
-                  <input type="file" id="profileImage" @change="handleImageUpload" accept="image/*" />
-                  <div v-if="previewImage">
-                    <p>預覽圖片:</p>
-                    <img :src="previewImage" alt="Profile Preview" style="max-width: 200px;" />
-                  </div>
+                  <img 
+                    v-if="formData.picturePreview" 
+                    :src="formData.picturePreview" 
+                    alt="圖片預覽"
+                    class="mt-2 img-thumbnail"
+                  />
+                  <span v-if="errors.picture" class="error">{{ errors.picture }}</span>
                 </div>
 
                 <div class="mb-3">
@@ -92,14 +89,14 @@
                     type="text"
                     class="form-control"
                     id="createtime"
-                    v-model="user.createTime"
+                    v-model="formData.createTime"
                     disabled
                   />
                 </div>
 
                 <div class="mb-3">
                   <label for="gender" class="form-label">性別</label>
-                  <select class="form-select" id="gender" v-model="user.gender">
+                  <select class="form-select" id="gender" v-model="formData.gender">
                     <option value="0">男</option>
                     <option value="1">女</option>
                   </select>
@@ -111,13 +108,19 @@
                     type="number"
                     class="form-control"
                     id="coupon"
-                    v-model="user.coupon"
+                    v-model="formData.coupon"
                     disabled
                   />
                 </div>
 
-                <button type="submit" class="btn btn-primary">儲存修改</button>
-                <!-- 新增刪除帳號按鈕 -->
+                <button 
+                  type="submit" 
+                  class="btn btn-primary"
+                  :disabled="loading"
+                >
+                  {{ loading ? '提交中...' : '儲存修改' }}
+                </button>
+                
                 <button
                   type="button"
                   class="btn btn-danger ms-2"
@@ -133,7 +136,7 @@
       </div>
     </div>
 
-    <!-- Bootstrap Modal -->
+    <!-- Modal -->
     <div
       class="modal fade"
       id="confirmModal"
@@ -179,103 +182,151 @@
 </template>
 
 <script>
-import api from "../../api/api"; // 確保路徑正確
+import api from "../../api/api";
+
 export default {
-  name: "EditProfile",
   data() {
     return {
-      user: {
-        userId: "", 
-        name: "",
-        email: "",
-        password: "",
-        phone: "",
-        imageBase64: "",
-        createTime: "",
-        gender: null,
-        coupon: 3,
-        status: null,
+      formData: {
+        userId: '',
+        name: '',
+        email: '',
+        phone: '',
+        password: '',
+        picture: null,
+        picturePreview: null,
+        createTime: '',
+        gender: '0',
+        coupon: 0
       },
-      previewImage : null,
+      errors: {
+        phone: '',
+        password: '',
+        picture: ''
+      },
+      loading: false
     };
   },
+  
   created() {
-    // 1. 使用 post 請求載入目前登入會員資料
-    api
-      .post("http://localhost:8080/api/user/userCenter") // 獲取會員資料的 API
-      .then((response) => {
-        this.user = {
-          ...response.data,
-          password: "", // 預防直接顯示密碼，保留為空
+    this.loadUserData();
+  },
+
+  methods: {
+    async loadUserData() {
+      try {
+        const response = await api.post("http://localhost:8080/api/user/userCenter");
+        const userData = response.data;
+        this.formData = {
+          ...userData,
+          password: '',
+          picture: null,
+          picturePreview: null
         };
-        // this.user.userId = response.data.userId
-        console.log(response.data)
-        console.log(JSON.stringify(this.user))
-      })
-      .catch((error) => {
+      } catch (error) {
         console.error("載入會員資料失敗", error);
         alert("無法載入會員資料，請稍後再試！");
-      });
-  },
-  methods: {
-    // 2. 使用 PUT 請求更新會員資料
-    async submitForm() {
-      try {
-        const response = await api.put("http://localhost:8080/api/user/update", this.user);
-        if (!response || response.status !== 200) {
-          throw new Error("資料更新失敗");
-        }
-        alert("資料已成功更新！");
-        console.log(response.data);
-      } catch (error) {
-        console.error("資料更新錯誤", error);
-        alert("發生錯誤，請稍後再試！");
       }
     },
-    // updateUser() {
-    //   api
-    //     .put("http://localhost:8080/api/user/update", this.user) // 更新會員資料的 API
-    //     .then(() => {
-    //     console.log(this.user) 
-    //       alert("會員資料更新成功！");
-    //     })
-    //     .catch((error) => {
-    //       console.error("更新會員資料失敗", error);
-    //       alert("更新失敗，請檢查輸入內容！");
-    //     });
-    // },
-   // 3. 提交表單
-  //  submitForm() {
-  //     this.updateUser();
-  //   },
-    handleImageUpload(event) {
+
+    handleFileChange(event) {
       const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          this.user.imageBase64 = e.target.result; // 將圖片 Base64 賦值到 user
-          this.previewImage = e.target.result; // 更新圖片預覽
-        };
-        reader.readAsDataURL(file); // 將文件讀取為 Base64
+      if (!file) return;
+
+      if (!['image/jpeg', 'image/png'].includes(file.type)) {
+        this.errors.picture = '僅支援 JPEG 或 PNG 格式的圖片';
+        return;
+      }
+
+      if (file.size > 1024 * 1024) {
+        this.errors.picture = '圖片大小不可超過 1MB';
+        return;
+      }
+
+      this.errors.picture = '';
+      this.formData.picture = file;
+
+      const reader = new FileReader();
+      reader.onload = e => this.formData.picturePreview = e.target.result;
+      reader.readAsDataURL(file);
+    },
+
+    validateForm() {
+      let isValid = true;
+      this.errors = { phone: '', password: '', picture: '' };
+
+      const phoneRegex = /^09\d{8}$/;
+      if (!phoneRegex.test(this.formData.phone)) {
+        this.errors.phone = '電話格式錯誤，應為 0912345678';
+        isValid = false;
+      }
+
+      if (this.formData.password) {
+        const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+        if (!passwordRegex.test(this.formData.password)) {
+          this.errors.password = '密碼需至少 8 位且包含英文字母與數字';
+          isValid = false;
+        }
+      }
+
+      return isValid;
+    },
+
+    async handleSubmit() {
+      if (!this.validateForm()) return;
+
+      this.loading = true;
+      const formData = new FormData();
+      
+      Object.keys(this.formData).forEach(key => {
+        if (key !== 'picturePreview' && this.formData[key] !== null) {
+          formData.append(key, this.formData[key]);
+        }
+      });
+
+      try {
+        await api.put("http://localhost:8080/api/user/update", formData);
+        alert("會員資料更新成功！");
+      } catch (error) {
+        console.error("更新會員資料失敗", error);
+        alert("更新失敗，請檢查輸入內容！");
+      } finally {
+        this.loading = false;
       }
     },
-  },
+
+    async confirmDeactivate() {
+      try {
+        await api.post("http://localhost:8080/api/user/deactivate");
+        alert("帳號已停用");
+        this.$router.push('/login');
+      } catch (error) {
+        console.error("停用帳號失敗", error);
+        alert("停用帳號失敗，請稍後再試！");
+      }
+    }
+  }
 };
 </script>
 
 <style scoped>
 .form-text {
-  color: red;          /* 設定文字顏色為紅色 */
+  color: red;
+  margin-top: 2px;
 }
 
 .form-label {
-  margin-bottom: 2px; /* 減少標籤和下一行之間的間距 */
+  margin-bottom: 2px;
+  font-weight: bold;
 }
 
-.form-text {
-  margin-top: 2px; /* 減少提示文字和標籤之間的間距 */
-
+.error {
+  color: red;
+  font-size: 0.875rem;
+  display: block;
+  margin-top: 0.25rem;
 }
+
 .edit-profile {
   font-family: 'Arial', sans-serif;
 }
@@ -296,12 +347,8 @@ export default {
   padding: 2rem;
 }
 
-.form-label {
-  font-weight: bold;
-}
-
 .img-thumbnail {
-  max-width: 100%;
+  max-width: 200px;
   border-radius: 5px;
 }
 </style>

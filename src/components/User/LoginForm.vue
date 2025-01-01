@@ -56,6 +56,7 @@
 import api from "../../api/api"; // 引入自訂的 Axios API 模組
 import ForgotPassword from "../../components/User/ForgotPassword.vue"; // 引入 ForgotPassword 組件
 import { useAuthStore } from "@/stores/auth"; // 引入 Pinia 的 authStore
+import { useCart } from "@/stores/cartStore";
 
 export default {
   components: {
@@ -86,6 +87,10 @@ export default {
         // 後端回傳 JWT token
         const token = response.data.token;
 
+        // 更新 pinia store 中的 token
+        const cartStore = useCart();
+        cartStore.updateToken(token);
+
         // 儲存 token 到 localStorage
         localStorage.setItem("jwt", token);
 
@@ -107,6 +112,51 @@ export default {
         console.error("登入錯誤詳情：", error.response || error);
       }
     },
+    async googleLogin(){
+      const response = await fetch("http://localhost:8080/api/user/google/login",{method: 'get'})
+      if (!response.ok) {
+        throw new Error('Network response was not ok')
+      }
+      const data = await response.json();
+      window.location.href= data.authUrl;
+
+    },
+    async handleGoogleCallback() {
+      try {
+          // 第二次請求：從後端獲取用戶信息
+          const response = await fetch("http://localhost:8080/api/user/google/callback", {method: 'get'});
+
+          if (!response.ok) {
+              throw new Error('Network response was not ok');
+          }
+
+          // 從後端獲取用戶信息
+          const data = await response.json();
+
+          const jwt = data.token; // JWT token
+          const redirectUrl = data.redirectUrl; // 跳轉地址
+          console.log("JWT Token:", jwt);
+
+          // 存儲 JWT
+          // 更新 pinia store 中的 token
+          const cartStore = useCart();
+          cartStore.updateToken(token);
+
+          // 儲存 token 到 localStorage
+          localStorage.setItem("jwt", token);
+
+          // 更新 authStore 的登入狀態
+          const authStore = useAuthStore();
+          authStore.isLoggedIn = true;
+
+          // 登入成功提示並跳轉回首頁
+          alert("登入成功！");
+          this.$router.push("/");
+
+      } catch (error) {
+          console.error("Failed to handle Google callback:", error.message);
+      }
+    },
     executeRecaptcha() {
       return new Promise((resolve, reject) => {
         if (!window.grecaptcha) {
@@ -122,7 +172,6 @@ export default {
           });
       });
     },
-
     closeForgotPassword() {
       // 關閉 ForgotPassword 組件
       this.showForgotPassword = false;
@@ -138,7 +187,16 @@ export default {
     script.defer = true;
     document.head.appendChild(script);
   },
+  // mounted() {
+  //   // 初始化 Google 登入
+  //   window.gapi.load("auth2", () => {
+  //     window.gapi.auth2.init({
+  //       client_id: "YOUR_GOOGLE_CLIENT_ID", // 替換為你的 Google Client ID
+  //     });
+  //   });
+  // },
 };
+
 </script>
 
 <style scoped>

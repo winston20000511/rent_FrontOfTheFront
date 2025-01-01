@@ -6,7 +6,7 @@ import ForgotPassword from "@/components/User/ForgotPassword.vue";
 import LoginForm from "@/components/User/LoginForm.vue";
 import MyOrders from "@/components/Orders/MyOrders.vue";
 import OrderConfirmView from "@/View/OrderConfirmView.vue";
-import AdtypeView from "@/View/AdtypeView.vue";
+
 import OrderCompleteView from "@/View/OrderCompleteView.vue";
 import EditProfile from "@/components/User/EditProfile.vue";
 import Houselist from "@/components/houses/houselist.vue";
@@ -18,6 +18,7 @@ import MyAdvertisements from "@/components/Ads/MyAdvertisements.vue";
 import ResetPassword from "@/components/User/ResetPassword.vue"; // 新增 ResetPassword 匯入
 
 import DeactivateAccount from "@/components/User/DeactivateAccount.vue";
+import GoogleCallBack from "@/components/User/GoogleCallBack.vue";
 
 const routes = [
   {
@@ -25,6 +26,10 @@ const routes = [
     name: "home",
     component: HomeView,
     props: (route) => ({ markers: route.params.markers || {} }),
+  },
+  {
+    path:"/callback",
+    component: GoogleCallBack,
   },
   {
     path: "/forgot-password", // 忘記密碼頁面
@@ -98,11 +103,6 @@ const routes = [
     path: "/login", // 登入頁面
     name: "LoginForm",
     component: LoginForm,
-  },
-  {
-    path: '/adtype',
-    name: 'AdTypes',
-    component: AdtypeView,
   },
   {
     path: "/order-confirm",
