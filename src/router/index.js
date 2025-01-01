@@ -28,7 +28,7 @@ const routes = [
     props: (route) => ({ markers: route.params.markers || {} }),
   },
   {
-    path:"/callback",
+    path: "/callback",
     component: GoogleCallBack,
   },
   {

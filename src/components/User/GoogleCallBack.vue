@@ -15,7 +15,6 @@ import { onMounted } from 'vue';
         // 更新 pinia store 中的 token
             const cartStore = useCart();
             cartStore.updateToken(token);
-            
 
             // 儲存 token 到 localStorage
             localStorage.setItem("jwt", token);

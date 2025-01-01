@@ -28,7 +28,7 @@ export const useAuthStore = defineStore('auth', {
       }
     },
     logout() {
-      localStorage.removeItem('jwt'); // 移除 jwt
+      localStorage.removeItem('jwt'); // 移除 token
       this.isLoggedIn = false; // 更新狀態為未登入
       this.userProfile = null; // 清空用戶資料
       this.profilePicture = null; // 清空頭像 URL
