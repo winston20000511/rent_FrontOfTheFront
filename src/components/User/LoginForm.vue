@@ -135,7 +135,7 @@ export default {
 
           const jwt = data.token; // JWT token
           const redirectUrl = data.redirectUrl; // 跳轉地址
-          console.log("JWT Token:", jwt);
+          // console.log("JWT Token:", jwt);
 
           // 存儲 JWT
           // 更新 pinia store 中的 token

@@ -176,9 +176,9 @@ export default {
           const response = await api.post(
             "http://localhost:8080/api/user/userSimpleInfo"
           );
-          console.log(response.data);
+          // console.log(response.data);
           const { name, picture } = response.data;
-          console.log(picture);
+          // console.log(picture);
           this.memberPicture=`data:image/jpeg;base64,${picture}`;
           //this.memberPicture = atob(picture);
           

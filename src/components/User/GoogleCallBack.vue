@@ -10,7 +10,7 @@ import { onMounted } from 'vue';
         const token = urlParams.get('token');
 
         if (token) {
-            console.log("JWT Token received:", token);
+            // console.log("JWT Token received:", token);
 
         // 更新 pinia store 中的 token
             const cartStore = useCart();

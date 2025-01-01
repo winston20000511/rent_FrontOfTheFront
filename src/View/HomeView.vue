@@ -53,7 +53,7 @@ const showAdsMarker = async () => {
   }
 
   const data = await response.json();
-  console.log(data);
+  // console.log(data);
   updateMarker(data,0);
 
 }

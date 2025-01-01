@@ -172,7 +172,7 @@ export const useCart = defineStore("cart", {
           console.error("無法從購物車移除商品: ", error);
         }
       } else {
-        console.log("商品不在購物車中");
+        // console.log("商品不在購物車中");
       }
     },
 
@@ -237,10 +237,10 @@ export const useCart = defineStore("cart", {
         const dataResponse = await response.json();
 
         if (response.ok) {
-          console.log("訂單提交成功");
+          // console.log("訂單提交成功");
           return dataResponse;
         } else {
-          console.log("訂單提交失敗");
+          // console.log("訂單提交失敗");
         }
       } catch (error) {
         console.error("提交訂單時發生錯誤: ", error);

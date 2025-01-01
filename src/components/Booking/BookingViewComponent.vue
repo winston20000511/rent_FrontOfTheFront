@@ -2,7 +2,8 @@
 import { ref, onMounted, computed, nextTick } from 'vue';
 import Datepicker from '@vuepic/vue-datepicker';
 import '@vuepic/vue-datepicker/dist/main.css'
-import BookingAgreement from './BookingAgreement.vue';
+import BookingAgreement from './bookingAgreement.vue';
+
 
 
 const BASE_URL = import.meta.env.VITE_APIURL
@@ -42,7 +43,7 @@ const load = async () => {
         },
     });
     const data = await response.json();
-    console.log(data);
+    // console.log(data);
 
     const currentDate = new Date();
     const fromDate = new Date(data.fromDate + 'T00:00:00');
@@ -147,7 +148,7 @@ const disabledWeekDays = computed(() => {
         }
     }
 
-    console.log("Disabled days:", disabledDays);
+    // console.log("Disabled days:", disabledDays);
     return disabledDays;
 });
 

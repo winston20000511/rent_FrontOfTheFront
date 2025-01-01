@@ -114,7 +114,7 @@ const showKeyWordFetch = async () => {
   }
 
   const data = await response.json();
-  console.log('Data received:', data);
+  // console.log('Data received:', data);
   if (data.length == 1){
     searchInputRef.value.value = data[0].address
   }

@@ -167,7 +167,7 @@ const checkAd = async (adId) => {
       body: adId,
     });
     const data = await response.json();
-    console.log("廣告詳細: ", data);
+    // console.log("廣告詳細: ", data);
     emit("detail", data);
   } catch (error) {
     console.error("系統錯誤: ", error);

@@ -40,7 +40,7 @@ onMounted(async () => {
       map: map,
     });
 
-    console.log("Google Maps API 返回數據:", mapData.value);
+    // console.log("Google Maps API 返回數據:", mapData.value);
   } catch (error) {
     console.error("初始化地圖失敗:", error);
   }

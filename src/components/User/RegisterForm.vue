@@ -165,7 +165,7 @@ export default {
           email: this.email,
         });
 
-        console.log("驗證信已發送至您的電子信箱！");
+        // console.log("驗證信已發送至您的電子信箱！");
       } catch (error) {
   console.error("完整的錯誤對象：", error);
   if (error.response) {

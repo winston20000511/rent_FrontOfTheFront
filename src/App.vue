@@ -43,7 +43,7 @@ const toggleLoginPage = () => {
 };
 
 const addMarker = (locations,status) => {
-  console.log(status)
+  // console.log(status)
   if (status == 1){
     markers.value = locations;
     store.updateData(markers.value.searchList);

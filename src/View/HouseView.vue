@@ -64,7 +64,7 @@ async function addFavorite() {
         },
       }
     );
-    console.log("已加入收藏");
+    // console.log("已加入收藏");
   } catch (error) {
     console.error("加入收藏失敗:", error);
   }
@@ -83,7 +83,7 @@ async function removeFavorite() {
         },
       }
     );
-    console.log("已移除收藏");
+    // console.log("已移除收藏");
   } catch (error) {
     console.error("移除收藏失敗:", error);
   }

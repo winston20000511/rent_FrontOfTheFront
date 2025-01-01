@@ -89,7 +89,7 @@
         }
 
         const data = await response.json();
-        console.log('Data received:' , data);
+        // console.log('Data received:' , data);
         showLKeyWrodList(data);
     }
 

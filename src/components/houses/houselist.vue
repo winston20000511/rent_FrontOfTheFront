@@ -96,7 +96,7 @@
             @click="
               showHouseView = true;
               selectedHouseId = slotProps.data.houseId;
-              console.log('Selected House ID:', selectedHouseId);
+              
             "
           />
           <Button
@@ -123,7 +123,7 @@
       :dismissableMask="false"
       header="編輯房屋資訊"
       class="dialog-theme"
-      style="width: 80vw;"
+      style="width: 80vw"
     >
       <div class="dialog-container">
         <HouseUpdate :houseId="selectedHouseId" @close="showEditForm = false" />
@@ -137,7 +137,7 @@
       :dismissableMask="true"
       header="查看房屋資訊"
       class="dialog-theme"
-      style="width: 80vw;"
+      style="width: 80vw"
     >
       <div class="dialog-container">
         <HouseView :houseId="selectedHouseId" @close="showHouseView = false" />
@@ -151,7 +151,7 @@
       :dismissableMask="false"
       header="新增房屋"
       class="dialog-theme"
-      style="width: 80vw;"
+      style="width: 80vw"
     >
       <div class="dialog-container">
         <HouseCreate @close="showCreateForm = false" />
@@ -225,7 +225,7 @@ export default {
       }
     },
     async loadHouses() {
-      this.isLoading = true; 
+      this.isLoading = true;
       try {
         const response = await fetch(`${this.baseUrl}/houses`, {
           headers: this.getAuthHeaders(),

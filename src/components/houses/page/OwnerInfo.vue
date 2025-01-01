@@ -118,7 +118,7 @@ export default {
   try {
     const payloadBase64 = token.split(".")[1]; // 提取 payload 部分
     const decodedPayload = JSON.parse(atob(payloadBase64)); // Base64 解碼
-    console.log("JWT 解碼後的 payload:", decodedPayload);
+    // console.log("JWT 解碼後的 payload:", decodedPayload);
     return decodedPayload.userId || ""; // 提取 USERID，如果沒有則返回空字串
   } catch (e) {
     console.error("JWT 解碼失敗:", e);
@@ -151,10 +151,10 @@ export default {
   }
 },
     async sendMessage() {
-  console.log("[ownerInfo]arrival send function");
+  // console.log("[ownerInfo]arrival send function");
 
   const token = localStorage.getItem("jwt");
-  console.log(localStorage.getItem("jwt"));
+  // console.log(localStorage.getItem("jwt"));
 
   if (!token) {
     return alert("未登入");
@@ -164,8 +164,8 @@ export default {
     return alert("JWT 解析錯誤，請重新登入");
   }
 
-  console.log("current login userId:", decodedToken.userId);
-  console.log("owner userId:", this.ownerInfo.userId);
+  // console.log("current login userId:", decodedToken.userId);
+  // console.log("owner userId:", this.ownerInfo.userId);
 
   const messagePayload = {
     senderId: decodedToken.userId,

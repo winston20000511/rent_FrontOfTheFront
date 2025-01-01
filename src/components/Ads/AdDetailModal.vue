@@ -150,7 +150,7 @@ async function saveAdPlan(){
     const updatedAd = await response.json();
 
     if(response.ok){
-      console.log("有收到通知");
+      // console.log("有收到通知");
       props.detail.adName = updatedAd.adName;
       props.detail.adPrice = updatedAd.adPrice;
 

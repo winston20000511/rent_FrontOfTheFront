@@ -28,7 +28,7 @@
             },
 
             onInputEnterClick(){
-                console.log("輸入的值: ", this.userInput);
+                // console.log("輸入的值: ", this.userInput);
                 this.$emit("input-update", this.userInput);
             }
         },

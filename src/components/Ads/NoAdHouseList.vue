@@ -33,12 +33,12 @@ const showHouseModal = ref(false);
 // 初始化資料
 function initializeData() {
   if (props.noAdHouses.length > 0 && props.adtypes.length > 0) {
-    console.log("初始化載入");
+    // console.log("初始化載入");
     selectedAdtypes.value = props.noAdHouses.map(
       () => props.adtypes[0] || null
     );
   } else {
-    console.log("沒有符合資料");
+    // console.log("沒有符合資料");
   }
 
   isDataLoaded.value = true;

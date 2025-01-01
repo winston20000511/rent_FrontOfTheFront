@@ -209,9 +209,9 @@ export default {
   methods: {
     async submitForm() {
       try {
-        console.log(this.user.imageBytes); // 確認圖片數據是否存在
+        // console.log(this.user.imageBytes); // 確認圖片數據是否存在
         const response = await api.put("http://localhost:8080/api/user/update", this.user);
-        console.log("資料更新成功，圖片更新成功：" + (this.user.imageBytes.length > 0));
+        // console.log("資料更新成功，圖片更新成功：" + (this.user.imageBytes.length > 0));
         alert("資料已成功更新！");
       } catch (error) {
         console.error("資料更新錯誤", error);
@@ -224,7 +224,7 @@ export default {
         const reader = new FileReader();
         reader.onload = (e) => {
           this.user.imageBytes = Array.from(new Uint8Array(e.target.result)); // 將圖片轉換為 BYTE[]
-          console.log("接收到圖片，大小：" + this.user.imageBytes.length + " bytes");
+          // console.log("接收到圖片，大小：" + this.user.imageBytes.length + " bytes");
           this.previewImage = URL.createObjectURL(file); // 預覽圖片
         };
         reader.readAsArrayBuffer(file); // 讀取為 ArrayBuffer

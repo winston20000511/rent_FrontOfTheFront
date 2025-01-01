@@ -156,7 +156,7 @@ const loadChatUsers = async () => {
           throw new Error(`HTTP error! status: ${userResponse.status}`);
         }
         const userDetails = await userResponse.json();
-        console.log('User details received:', userDetails);
+        // console.log('User details received:', userDetails);
         return {
           userId,
           name: userName,
