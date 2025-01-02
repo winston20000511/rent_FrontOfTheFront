@@ -50,6 +50,5 @@ onMounted(async () => {
 <template>
   <div>
     <div ref="mapRef" style="width: 100%; height: 400px;"></div>
-    <p v-if="mapData">地圖數據已加載成功</p>
   </div>
 </template>

@@ -531,111 +531,112 @@ export default {
 
     // 提交更新 (含文字、布林、新圖片、刪除列表)
     async submitForm() {
-      try {
-        // 表單驗證
-        this.validateTitle();
-        ['room', 'bathroom', 'livingroom', 'floor'].forEach(field => this.validateNumber(field));
-        if (Object.values(this.errors).some(value => value)) {
-          alert("請修正表單中的錯誤！");
-          return;
-        }
+  try {
+    // 表單驗證
+    this.validateTitle();
+    ['room', 'bathroom', 'livingroom', 'floor'].forEach(field => this.validateNumber(field));
+    if (Object.values(this.errors).some(value => value)) {
+      alert("請修正表單中的錯誤！");
+      return;
+    }
 
-        // 房屋基本資料（文字欄位）
-        const houseData = {
-          title: this.form.title,
-          price: String(this.form.price), // 字串化，確保後端能正確接收
-          size: String(this.form.size),
-          address: this.form.address,
-          room: String(this.form.room),
-          bathroom: String(this.form.bathroom),
-          livingroom: String(this.form.livingroom),
-          floor: String(this.form.floor),
-          houseType: this.form.houseType || "",
-          atticAddition: this.form.atticAddition ? "1" : "0",
-          description: this.form.description || "",
-          genderRestrictions: String(this.form.genderRestrictions), // 性別限制 (0=不限, 1=只租男, 2=只租女)
-        };
+    // 房屋基本資料（文字欄位）
+    const houseData = {
+      title: this.form.title,
+      price: String(this.form.price), // 字串化，確保後端能正確接收
+      size: String(this.form.size),
+      address: this.form.address,
+      room: String(this.form.room),
+      bathroom: String(this.form.bathroom),
+      livingroom: String(this.form.livingroom),
+      floor: String(this.form.floor),
+      houseType: this.form.houseType || "",
+      atticAddition: this.form.atticAddition,
+      description: this.form.description || "",
+      genderRestrictions: String(this.form.genderRestrictions), // 性別限制 (0=不限, 1=只租男, 2=只租女)
+    };
 
-        // 家具服務（布林欄位）
-        const furnitureServices = {
-          washingMachine: this.form.washingMachine ? "1" : "0",
-          airConditioner: this.form.airConditioner ? "1" : "0",
-          network: this.form.network ? "1" : "0",
-          bedstead: this.form.bedstead ? "1" : "0",
-          mattress: this.form.mattress ? "1" : "0",
-          refrigerator: this.form.refrigerator ? "1" : "0",
-          ewaterHeater: this.form.ewaterHeater ? "1" : "0",
-          gwaterHeater: this.form.gwaterHeater ? "1" : "0",
-          television: this.form.television ? "1" : "0",
-          channel4: this.form.channel4 ? "1" : "0",
-          sofa: this.form.sofa ? "1" : "0",
-          tables: this.form.tables ? "1" : "0",
-        };
+    // 家具服務（布林欄位）
+    const furnitureServices = {
+      washingMachine: this.form.washingMachine,
+      airConditioner: this.form.airConditioner,
+      network: this.form.network,
+      bedstead: this.form.bedstead,
+      mattress: this.form.mattress,
+      refrigerator: this.form.refrigerator,
+      ewaterHeater: this.form.ewaterHeater,
+      gwaterHeater: this.form.gwaterHeater,
+      television: this.form.television,
+      channel4: this.form.channel4,
+      sofa: this.form.sofa,
+      tables: this.form.tables,
+    };
 
-        // 房屋限制（布林欄位）
-        const houseRestrictions = {
-          pet: this.form.pet ? "1" : "0",
-          parkingSpace: this.form.parkingSpace ? "1" : "0",
-          elevator: this.form.elevator ? "1" : "0",
-          balcony: this.form.balcony ? "1" : "0",
-          shortTerm: this.form.shortTerm ? "1" : "0",
-          cooking: this.form.cooking ? "1" : "0",
-          waterDispenser: this.form.waterDispenser ? "1" : "0",
-          managementFee: this.form.managementFee ? "1" : "0",
-        };
+    // 房屋限制（布林欄位）
+    const houseRestrictions = {
+      pet: this.form.pet,
+      parkingSpace: this.form.parkingSpace,
+      elevator: this.form.elevator,
+      balcony: this.form.balcony,
+      shortTerm: this.form.shortTerm,
+      cooking: this.form.cooking,
+      waterDispenser: this.form.waterDispenser,
+      managementFee: this.form.managementFee,
+    };
 
-        // 舊圖片 ID（保留清單）
-        const existingImageIds = this.existingImages.map(img => img.id);
+    // 舊圖片 ID（保留清單）
+    const existingImageIds = this.existingImages.map(img => img.id);
 
-        // 組裝 FormData
-        const formData = new FormData();
+    // 組裝 FormData
+    const formData = new FormData();
 
-        // 添加房屋基本資料
-        formData.append('houseData', JSON.stringify(houseData));
+    // 添加房屋基本資料
+    formData.append('houseData', JSON.stringify(houseData));
 
-        // 添加家具布林
-        formData.append('furnitureServices', JSON.stringify(furnitureServices));
+    // 添加家具布林
+    formData.append('furnitureServices', JSON.stringify(furnitureServices));
 
-        // 添加房屋限制布林
-        formData.append('houseRestrictions', JSON.stringify(houseRestrictions));
+    // 添加房屋限制布林
+    formData.append('houseRestrictions', JSON.stringify(houseRestrictions));
 
-        // 添加保留的舊圖片 ID
-        existingImageIds.forEach((id) => {
-          formData.append('existingImageIds', id);
-        });
+    // 添加保留的舊圖片 ID
+    existingImageIds.forEach((id) => {
+      formData.append('existingImageIds', id);
+    });
 
-        // 添加新圖片（若有）
-        this.files.forEach((file) => {
-          formData.append('newImages', file);
-        });
+    // 添加新圖片（若有）
+    this.files.forEach((file) => {
+      formData.append('newImages', file);
+    });
 
-        // 發送請求到後端
-        const response = await fetch(
-          `http://localhost:8080/api/houses/update/${this.houseId}`,
-          {
-            method: 'POST',
-            headers: {
-              Authorization: localStorage.getItem('jwt'), // Token 驗證
-              // Content-Type 不要手動設定，瀏覽器會自動處理
-            },
-            body: formData,
-          }
-        );
-
-        // 處理回應
-        if (!response.ok) {
-          const errorText = await response.text();
-          throw new Error(`更新失敗，狀態碼: ${response.status} - ${errorText}`);
-        }
-
-        // 更新成功提示
-        alert('房屋更新成功！');
-        this.$emit('close'); // 關閉編輯視窗
-      } catch (error) {
-        console.error('房屋更新失敗:', error);
-        alert('房屋更新失敗，請稍後再試！');
+    // 發送請求到後端
+    const response = await fetch(
+      `http://localhost:8080/api/houses/update/${this.houseId}`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization: localStorage.getItem('jwt'), // Token 驗證
+          // Content-Type 不要手動設定，瀏覽器會自動處理
+        },
+        body: formData,
       }
-    },
+    );
+
+    // 處理回應
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`更新失敗，狀態碼: ${response.status} - ${errorText}`);
+    }
+
+    // 更新成功提示
+    alert('房屋更新成功！');
+    this.$emit('close'); // 關閉編輯視窗
+  } catch (error) {
+    console.error('房屋更新失敗:', error);
+    alert('房屋更新失敗，請稍後再試！');
+  }
+}
+
   },
 };
 </script>

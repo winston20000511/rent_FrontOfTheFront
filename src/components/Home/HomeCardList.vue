@@ -29,7 +29,7 @@
         </div>
 
         <!-- 每次渲染时更新点击数 -->
-        <div v-if="scheduleClickCountUpdate(list.houseid)" style="display: none;"></div>
+        <!-- <div v-if="scheduleClickCountUpdate(list.houseid)" style="display: none;"></div> -->
       </div>
     </div>
   </div>
@@ -49,7 +49,7 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, toRef, watch } from "vue";
 import Dialog from "primevue/dialog";
 import HouseView from "@/View/HouseView.vue";
 import HousePhotos from "../houses/housePhotos.vue";
@@ -71,6 +71,15 @@ const showView = ref(false);
 const selectedHouseId = ref(null);
 const clickCounts = ref({});
 const hotMark = ref('');
+const markers = toRef(props, 'markers');
+
+watch(markers,(newMarkers)=>{
+  
+  newMarkers.searchList.forEach(e => {
+    scheduleClickCountUpdate(e.houseid)
+  });
+  
+},{ deep: true })
 
 async function fetchClickCount(houseId) {
   try {

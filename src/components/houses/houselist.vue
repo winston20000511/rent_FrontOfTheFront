@@ -96,7 +96,6 @@
             @click="
               showHouseView = true;
               selectedHouseId = slotProps.data.houseId;
-              
             "
           />
           <Button
@@ -152,9 +151,10 @@
       header="新增房屋"
       class="dialog-theme"
       style="width: 80vw"
+      @close="handleCloseCreateForm"
     >
       <div class="dialog-container">
-        <HouseCreate @close="showCreateForm = false" />
+        <HouseCreate @close="handleCloseCreateForm" />
       </div>
     </Dialog>
   </div>
@@ -268,6 +268,11 @@ export default {
         console.error("加載房屋列表失敗:", error);
       }
       this.isLoading = false;
+    },
+
+    handleCloseCreateForm() {
+      this.showCreateForm = false;
+      this.loadHouses(); // 重新加載房屋數據
     },
 
     getAuthHeaders() {
@@ -437,36 +442,6 @@ export default {
 
 .p-button-info:hover {
   background-color: #3b82f6;
-}
-
-/* 響應式設計 */
-@media (max-width: 768px) {
-  .dialog-theme {
-    width: 95vw;
-    max-width: 600px;
-  }
-
-  .custom-table ::v-deep(.p-datatable-thead > tr > th) {
-    font-size: 0.9em;
-  }
-
-  .custom-table ::v-deep(.p-datatable-tbody > tr > td) {
-    font-size: 0.9em;
-  }
-
-  .action-button {
-    font-size: 1rem;
-    padding: 10px 15px;
-  }
-
-  .large-button {
-    font-size: 1.2rem;
-    padding: 12px 20px;
-  }
-
-  .search-input {
-    width: 200px;
-  }
 }
 
 @media (max-width: 480px) {

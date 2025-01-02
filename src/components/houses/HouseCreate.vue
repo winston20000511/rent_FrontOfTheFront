@@ -496,7 +496,7 @@ export default {
   components: {
     BookingSlotSetting,
   },
-  setup() {
+  setup(_, { emit })  {
     const form = reactive({
       title: "",
       price: null,
@@ -725,7 +725,7 @@ export default {
         .then((data) => {
           alert("房屋新增成功！");
           resetForm();
-
+          emit('close');
         })
         .catch((error) => {
           console.error("提交失敗:", error);
