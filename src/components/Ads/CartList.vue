@@ -156,7 +156,7 @@ const discountAmount = computed(() => {
             class="mt-2 bg-gray-50 p-3 border-t text-sm text-gray-600"
           >
             <p>房屋標題：{{ cartItem.houseTitle }}</p>
-            <p>推播時長：{{ cartItem.adName }}</p>
+            <p>時長：{{ cartItem.adName }}天</p>
           </div>
         </div>
       </div>

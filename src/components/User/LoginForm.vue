@@ -113,50 +113,21 @@ export default {
       }
     },
     async googleLogin(){
+
+      console.log("進到google login function");
+
       const response = await fetch("http://localhost:8080/api/user/google/login",{method: 'get'})
       if (!response.ok) {
         throw new Error('Network response was not ok')
       }
       const data = await response.json();
+
+      console.log("執行完google login後回傳的方法");
+
       window.location.href= data.authUrl;
 
     },
-    async handleGoogleCallback() {
-      try {
-          // 第二次請求：從後端獲取用戶信息
-          const response = await fetch("http://localhost:8080/api/user/google/callback", {method: 'get'});
-
-          if (!response.ok) {
-              throw new Error('Network response was not ok');
-          }
-
-          // 從後端獲取用戶信息
-          const data = await response.json();
-
-          const jwt = data.token; // JWT token
-          const redirectUrl = data.redirectUrl; // 跳轉地址
-          // console.log("JWT Token:", jwt);
-
-          // 存儲 JWT
-          // 更新 pinia store 中的 token
-          const cartStore = useCart();
-          cartStore.updateToken(token);
-
-          // 儲存 token 到 localStorage
-          localStorage.setItem("jwt", token);
-
-          // 更新 authStore 的登入狀態
-          const authStore = useAuthStore();
-          authStore.isLoggedIn = true;
-
-          // 登入成功提示並跳轉回首頁
-          alert("登入成功！");
-          this.$router.push("/");
-
-      } catch (error) {
-          console.error("Failed to handle Google callback:", error.message);
-      }
-    },
+    
     executeRecaptcha() {
       return new Promise((resolve, reject) => {
         if (!window.grecaptcha) {

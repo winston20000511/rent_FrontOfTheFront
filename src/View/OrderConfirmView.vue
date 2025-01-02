@@ -200,8 +200,8 @@ async function processPayment(paymentType, url, body, headers) {
         <tr class="text-center text-sm font-medium text-gray-700">
           <th class="px-4 py-2">服務編號</th>
           <th class="px-4 py-2">物件內容</th>
-          <th class="px-4 py-2">VIP方案</th>
-          <th class="px-4 py-2" colspan="2">VIP服務時間</th>
+          <th class="px-4 py-2">廣告方案</th>
+          <th class="px-4 py-2" colspan="2">廣告期限</th>
           <th class="px-4 py-2 text-right">金額</th>
           <th class="px-4 py-2 text-right">折扣</th>
           <th class="px-4 py-2 text-right">最終金額</th>

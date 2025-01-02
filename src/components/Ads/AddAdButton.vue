@@ -10,7 +10,7 @@
 
     const emit = defineEmits(["toggle-no-ad-houses"]);
 
-    const buttonText = ref("為物件新增VIP服務+");
+    const buttonText = ref("為物件新增廣告+");
     const buttonClass = computed(() => {
     return buttonText.value === "結束新增服務"
         ? "bg-gray-500 hover:bg-gray-400 focus:ring-gray-300"
@@ -24,7 +24,7 @@
     // watch(source, callback, options?)
     watch(
       () => props.showAdList,
-      (newValue) => {buttonText.value = newValue ? "為物件新增VIP服務+" : "結束新增服務";},
+      (newValue) => {buttonText.value = newValue ? "為物件新增廣告+" : "結束新增";},
       { immediate: true }
     ); 
 

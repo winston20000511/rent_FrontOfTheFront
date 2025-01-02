@@ -120,7 +120,7 @@ const deleteAd = async (adId) => {
         emit("ad-delete-result", {
           success: true,
           adId,
-          messageTitle: "已刪除VIP推播申請",
+          messageTitle: "已刪除廣告申請",
           message: "",
         });
 
@@ -148,7 +148,7 @@ const deleteAd = async (adId) => {
     emit("ad-delete-result", {
       success: false,
       adId,
-      messageTitle: "尚未刪除VIP推播申請",
+      messageTitle: "尚未刪除廣告推播申請",
       message: "",
     });
   }
@@ -180,10 +180,19 @@ const checkAd = async (adId) => {
     <div
       class="px-4 py-2 text-sm font-bold text-yellow-600 bg-yellow-100 rounded m-3"
     >
-      <div>．加入選購清單後，可前往查看並進行付費。</div>
       <div>
         ．選購清單之內容，於加入第一筆項目起算，保留三天。如逾期未結帳，將自動清除所有紀錄。
       </div>
+    </div>
+
+    <div
+      class="px-4 py-2 text-sm font-bold text-yellow-600 bg-yellow-100 rounded m-3"
+    >
+      <div>．使用流程說明：</div>
+      <div>　1. 點選「為物件新增廣告」，可找到尚無廣告的物件</div>
+      <div>　2. 點選新增，可謂物件申請廣告</div>
+      <div>　3. 點選結束新增，回到一覽表，再點選 <i class="fa-solid fa-cart-plus"></i>，可新增至申請清單</div>
+      <div>　4. 點選查看申請清單，可確認申購內容，並前往結帳</div>
     </div>
 
     <!-- 資料表格 -->
@@ -200,7 +209,7 @@ const checkAd = async (adId) => {
               發布時間
             </th>
             <th class="px-4 py-2 text-center text-sm font-medium text-gray-600">
-              VIP服務狀態
+              廣告狀態
             </th>
             <th class="px-4 py-2 text-center text-sm font-medium text-gray-600">
               付款狀態
@@ -266,7 +275,7 @@ const checkAd = async (adId) => {
           </tr>
           <tr v-if="processedAds.length === 0">
             <td colspan="6" class="px-4 py-3 text-center text-gray-500">
-              目前沒有申請VIP服務
+              目前沒有申請廣告
             </td>
           </tr>
         </tbody>

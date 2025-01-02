@@ -39,11 +39,11 @@ watch(
 
 // 計算廣告資料，會根據是否處於編輯狀態來決定是否可編輯
 const adDetails = computed(() => [
-  { label: "VIP服務編號", value: props.detail.adId, editable: false },
+  { label: "廣告編號", value: props.detail.adId, editable: false },
   { label: "房屋標題", value: props.detail.houseTitle, editable: false },
   {
     label: "服務方案",
-    value: `${props.detail.adName}`,
+    value: `${props.detail.adName}天`,
     editable: editableDetails.isEditing,
   },
   {
@@ -229,7 +229,7 @@ function closeDetail(){
                         :key="adtype.adtypeId"
                         :value="adtype.adName"
                       >
-                        {{ adtype.adName }}
+                        {{ adtype.adName }}天
                       </option>
                     </select>
                     <p

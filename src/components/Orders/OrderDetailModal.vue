@@ -80,7 +80,7 @@ function calculateDiscountedPrice(ad, price){
             <tbody>
               <tr>
                 <th class="bg-gray-200 text-center">廣告編號</th>
-                <th class="bg-gray-200 text-center">VIP方案</th>
+                <th class="bg-gray-200 text-center">廣告方案</th>
                 <th class="bg-gray-200 text-center">方案金額</th>
                 <th class="bg-gray-200 text-center">房屋標題</th>
                 <th class="bg-gray-200 text-center">折扣</th>

@@ -105,7 +105,7 @@ async function addAd(houseId, adtypeId) {
       <div
         class="px-4 py-2 text-sm font-bold text-yellow-600 bg-yellow-100 rounded m-3"
       >
-        請選擇想要升級為VIP的物件
+        請選擇想要申請廣告的物件
       </div>
 
       <table
@@ -115,7 +115,7 @@ async function addAd(houseId, adtypeId) {
           <tr class="bg-green-400 text-white text-center">
             <th class="px-4 py-3 font-semibold">房屋標題</th>
             <th class="px-4 py-3 font-semibold">查看房屋</th>
-            <th class="px-4 py-3 font-semibold">VIP方案</th>
+            <th class="px-4 py-3 font-semibold">廣告方案</th>
             <th class="px-4 py-3 font-semibold">方案價格</th>
             <th class="px-4 py-3 font-semibold">申請新增服務</th>
           </tr>
@@ -152,7 +152,7 @@ async function addAd(houseId, adtypeId) {
                   :key="adIndex"
                   :value="adtype"
                 >
-                  {{ adtype.adName }}
+                  {{ adtype.adName }}天
                 </option>
               </select>
             </td>
